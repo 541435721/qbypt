@@ -1,0 +1,97 @@
+<script src="../static/js/jquery.js"></script>
+{% extends 'administrator_side.html' %}
+{% block title %}项目管理{% endblock %}
+{% block content %}
+    <script>
+function chooseParts(parts) {
+    document.getElementById('id_part_' + String(parseInt(parts) - 1)).checked = true
+    document.getElementById('id_part_' + String(parseInt(parts) - 1)).disabled = 'disabled'
+}
+function displayParts() {
+    var id = document.getElementsByName('part');
+    for (var i = 0; i < id.length; i++) {
+        if (id[i].checked == false) {
+            id[i].parentNode.parentNode.style.display = "none";
+        }
+    }
+}
+function disable()
+        {
+            var d = document.getElementById("myfield");
+            for(var i=0;i<d.childNodes.length;i++)
+            {
+                if(d.childNodes[i].disabled!=null)
+                {
+
+                    d.childNodes[i].disabled = "disabled";
+                }
+            }
+        }
+
+    </script>
+    <section id="content">
+        <section class="vbox">
+            <section class="scrollable padder">
+                <ul class="breadcrumb no-border no-radius b-b b-light pull-in">
+                    <li><a href="/"><i class="fa fa-home"></i> 主页</a></li>
+                    <li class="active">查看项目</li>
+                </ul>
+                <div class="col-sm-3 pull-left">
+                </div>
+                <div class="col-sm-5">
+                    <form data-validate="parsley" class="ProjectFrom" action="/administrator_project_list/" method="post"
+                          role="form">
+                        {% csrf_token %}
+                        <fieldset>
+                        <label>
+                            项目编号：
+                        </label>
+                        {{ project.project }}
+                            <div id="myfield" class="form-group{% if field.errors %} has-error{% endif %}">
+                            {% for field in form.visible_fields %}
+
+                                    <label for="{{ field.label }}">{{ field.label }}</label>
+                                    {{ field}}
+                                    {% if field.help_text %}
+                                        <span class="help-block">{{ field.help_text|safe }}</span>
+                                    {% endif %}
+                                    {% for error in field.errors %}
+                                        <label class="control-label">{{ error }}</label>
+                                    {% endfor %}
+
+                            {% endfor %}
+                            </div>
+                            {% for field in form.visible_fields %}
+                                {% for error in field.errors %}
+                                    <script>
+                                        $("#id_dir").val("");
+                                        //这里的for循环就需要很注意，form表单展示出来的时候就是for循环，所以在for循环没循环到指定位置的时候，
+                                        //对这个指定位置所做的操作是无效的，比如这里，想要触发清空dir字段的操作，必须要在上面的for循环结束之后
+                                        //再做，因为就算是在for循环里dir字段之前的字段发生错误触发这个清空操作，dir字段的id是找不到的，因为它还没有
+                                        //被展示在网页里，所以只有在所有的filed展示出来，即以代码的形式通过for循环展示到网页中之后，定位dir字段id的
+                                        //的操作才会绝对有效
+                                    </script>
+                                {% endfor %}
+                            {% endfor %}
+                            {% for everypart in parts %}
+                                <script>chooseParts({{ everypart.part_id }})</script>
+                            {% endfor %}
+                        <script>displayParts()</script>
+
+                        <script>disable()</script>
+
+                            <label>所需费用为：</label>
+                            <span id="price">0</span>
+                            <label>元</label>
+                            <div class="form-group-left">
+                                <button type="submit" class="btn btn-large btn-primary">确定</button>
+
+                            </div>
+                        </fieldset>
+                    </form>
+                </div>
+            </section>
+        </section>
+    </section>
+
+{% endblock %}
