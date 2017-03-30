@@ -1,0 +1,105 @@
+{% extends 'administrator_side.html' %}
+{% block title %}个人中心{% endblock %}
+{% block content %}
+    {% if method == '1' %}
+        <script>
+            parent.location.reload();
+            var index = parent.layer.getFrameIndex(window.name); //先得到当前iframe层的索引
+            parent.layer.close(index);
+        </script>
+    {% endif %}
+
+    <section id="content">
+        <section class="vbox">
+            <section class="scrollable padder">
+                <ul class="breadcrumb no-border no-radius b-b b-light pull-in">
+                    <li><a href="/"><i class="fa fa-home"></i> 主页</a></li>
+                    <li class="active">个人中心</li>
+                </ul>
+                <div class="m-b-md">
+                    {#                            <h3 class="m-b-none">个人中心</h3>#}
+                    <small></small>
+                </div>
+                <section class="panel panel-default">
+                    <div class="row m-l-none m-r-none bg-light lter">
+                        <header class="panel-heading font-bold">账号信息</header>
+                        <div class="col-sm-5 col-md-2 padder-v b-light">
+                                    <span
+                                            class="thumb-lg avatar pull-left "> <img
+                                            src="../static/images/avatar.jpg"> </span>
+
+                        </div>
+                        <div class="col-sm-8 col-md-4 padder-v b-light">
+                            <span class="pull-left"
+                                  style="font-size: medium">用户ID:&nbsp&nbsp{{ user_info.user.id }}</span>
+                            <br> </br>
+                            <span class="pull-left" style="font-size: medium">用户名:&nbsp&nbsp{{ user_info.user.username }}</span>
+                            <br> </br>
+                                    <span class="pull-left"
+                                          style="font-size: medium">注册时间:&nbsp&nbsp{{ user_info.user.date_joined|date:"Y-m-d H:i:s" }}</span>
+                            <br> </br>
+                                    <span class="pull-left"
+                                          style="font-size: medium">最近登陆:&nbsp&nbsp{{ user_info.user.last_login|date:"Y-m-d H:i:s" }}</span>
+                        </div>
+
+                    </div>
+                </section>
+                <div class="row">
+                    <div class="col-md-12">
+                        <section class="panel panel-default">
+                            <header class="panel-heading font-bold">安全设置</header>
+                            <div class="col-sm-10 col-md-10 padder-v b-light">
+
+                                <label class="pull-left" style="font-size: medium">登陆密码</label>
+
+                                <span class="" style="font-size: small ">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;安全性高的密码可以使帐号更安全。设置一个包含字母，符号或数字中至少两项且长度超过6位的密码。</span>
+                                <a class="pull-right" onclick="javascript:Change_password({{ user_info.user.id }})" style="color: #00a6ce">修改</a>
+{#                                <a class="pull-right" href="/customer_password_change/" style="color: #00a6ce">修改</a>#}
+                            </div>
+                        </section>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-12">
+
+                        <div class="col-sm-10 col-md-10 padder-v">
+                            <label class="pull-left" style="font-size: medium">手机号码</label>
+                            <span class="" style="font-size: small ">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;您已绑定了手机180****8541。[您的手机号可以直接用于登录、找回密码等]</span>
+                            <a class="pull-right" href="/change_passwords/" style="color: #00a6ce">修改</a>
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-12">
+
+                        <div class="col-sm-10 col-md-10 padder-v">
+                            <label class="pull-left" style="font-size: medium">绑定邮箱</label>
+                            <span class="" style="font-size: small ">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;您已绑定了邮箱289643938@qq.com。[您的邮箱可以直接用于登录、找回密码等]</span>
+                            <a class="pull-right" href="/change_passwords/" style="color: #00a6ce">修改</a>
+                        </div>
+                    </div>
+                </div>
+
+
+                </div>
+            </section>
+        </section>
+        <a href="#" class="hide nav-off-screen-block" data-toggle="class:nav-off-screen" data-target="#nav"></a>
+    </section>
+    <script>
+        function Change_password(user_id) {
+            var index = layer.open({
+                type: 2,
+                area: ['700px', '530px'],
+                fix: false, //不固定
+                maxmin: true,
+                content: '/administrator_password_change/?user_id=' + user_id
+            });
+        }
+    </script>
+{% endblock %}
+<link rel="stylesheet" href="../../../static/css/app.v2.css" type="text/css"/>
+
+<link href="http://libs.baidu.com/bootstrap/3.0.3/css/bootstrap.min.css" rel="stylesheet">
+<script src="http://libs.baidu.com/jquery/2.0.0/jquery.min.js"></script>
+<script src="http://libs.baidu.com/bootstrap/3.0.3/js/bootstrap.min.js"></script>

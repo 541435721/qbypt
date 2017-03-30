@@ -1,0 +1,84 @@
+{% extends 'administrator_side.html' %}
+{% block title %}项目管理{% endblock %}
+{% block content %}
+    <section id="content">
+        <section class="vbox">
+    <section class="scrollable padder">
+    <ul class="breadcrumb no-border no-radius b-b b-light pull-in">
+                            <li><a href="/"><i class="fa fa-home"></i> 主页</a></li>
+                            <li class="active">项目清单</li>
+                        </ul>
+        <section class="panel panel-default">
+            <div style="border:0px solid; width:auto; height: auto; overflow:auto;">
+                <table data-toggle="table"
+               data-url="/gh/get/response.json/wenzhixin/bootstrap-table/tree/master/docs/data/data1/"
+               data-search="true"
+               data-sort-name="stargazers_count"
+               data-sort-order="desc"
+               data-show-refresh="true"
+               data-show-toggle="true"
+               data-show-columns="true">
+            <thead>
+            <tr>
+                <th data-field="userID" data-sortable="true">
+                    <div style="font-weight: 900;font-size: medium">用户ID</div>
+                </th>
+                <th data-field="username" data-sortable="true">
+                    <div style="font-weight: 900;font-size: medium">用户名</div>
+                </th>
+                <th data-field="name" data-sortable="true">
+                    <div style="font-weight: 900;font-size: medium">姓名</div>
+                </th>
+                <th data-field="tel" data-sortable="true">
+                    <div style="font-weight: 900;font-size: medium">手机号码</div>
+                </th>
+                <th data-field="status" data-sortable="true">
+                    <div style="font-weight: 900;font-size: medium">身份</div>
+                </th>
+                <th data-field="handle">
+                    <div style="font-weight: 900;font-size: medium">操作</div>
+                </th>
+            </tr>
+            </thead>
+                    {% for people in Users %}
+                        <tr>
+                        <td>{{ people.user }}</td>
+                        <td>{{ people.user.username }}</td>
+                         <td>{{ people.user_name }}</td>
+                        <td>{{ people.user_telephone }}</td>
+                        <td>{{ people.user_identify }}</td>
+                        <td>
+{#                            <a href="javascript:deleteUser({{ people.user_id }})">删除</a>/#}
+                            <a href="javascript:user_info_change({{ people.user_id }})">修改资料</a>
+                        </td>
+                    </tr>
+                    {% endfor %}
+
+     </table>
+            </div>
+
+            <footer class="panel-footer">
+                <div class="row">
+                    <div class="col-sm-4 hidden-xs">
+
+                    </div>
+                    <div class="col-sm-4 text-center">
+                    </div>
+                    <div class="col-sm-4 text-right text-center-xs">
+
+                    </div>
+                </div>
+            </footer>
+        </section>
+    </section>
+                </section>
+    </section>
+    <a href="#" class="hide nav-off-screen-block" data-toggle="class:nav-off-screen" data-target="#nav"></a>
+
+    <script>
+        function user_info_change(user_id) {
+            location.href = "/administrator_user_info_alter/?user_id=" + user_id;
+        }
+
+    </script>
+{% endblock %}

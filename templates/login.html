@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+{% load static %}
+<html lang="en" class="bg-dark">
+<head>
+    <meta charset="utf-8"/>
+    <title>Notebook | Web Application</title>
+    <meta name="description"
+          content="app, web app, responsive, admin dashboard, admin, flat, flat ui, ui kit, off screen nav"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+    <link rel="stylesheet" href="{% static 'css/app.v2.css' %}" type="text/css"/>
+    <link rel="stylesheet" href="{% static 'css/font.css' %}" type="text/css" cache="false"/>
+    <script src="http://libs.baidu.com/jquery/2.0.0/jquery.min.js"></script>
+    <script src="http://libs.baidu.com/bootstrap/3.0.3/js/bootstrap.min.js"></script>
+    <!--[if lt IE 9]> <script src="../../../static/js/ie/html5shiv.js" cache="false"></script> <script src="../../../static/js/ie/respond.min.js" cache="false"></script> <script src="../../../static/js/ie/excanvas.js" cache="false"></script>
+    <![endif]-->
+</head>
+<body style="font-family: 微软雅黑">
+
+{% if method == '2' %}
+    <script>
+        alert("密码修改成功,请重新登录");
+        parent.location.reload();
+        var index = parent.layer.getFrameIndex(window.name); //先得到当前iframe层的索引
+        parent.layer.close(index);
+    </script>
+{% endif %}
+
+
+<section id="content" class="m-t-lg wrapper-md animated fadeInUp">
+    <div class="container aside-xxl"><a class="navbar-brand block" href="/person/"></a>
+        <section class="panel panel-default bg-white m-t-lg">
+            <header class="panel-heading text-center"><strong>登录</strong></header>
+            <form action="{% url 'login' %}" method="post" class="panel-body wrapper-lg">
+                {% csrf_token %}
+
+                {% for field in form.visible_fields %}  <!--对于每一个field-->
+                    <div class="form-group{% if field.errors %} has-error{% endif %}">
+                        <!--对表单进行排版-->
+                        <label for="id_username">{{ field.label }}</label>
+                        {{ field }} <!--显示输入框 -->
+                        {% if field.help_text %}
+                            <span class="help-block">{{ field.help_text|safe }}</span> <!--如果有帮助提示，则显示-->
+                        {% endif %}
+                        {% for error in field.errors %}
+                            <label class="control-label">{{ error }}</label> <!--显示每个错误提示-->
+                        {% endfor %}
+                    </div>
+                {% endfor %}
+                <div class="checkbox">
+                    <label>
+                        <input type="checkbox">
+                        记住登录状态 </label>
+                </div>
+                <a onclick="javascript:Change_password()" class="pull-right m-t-xs">
+                    <small>忘记密码?</small>
+                </a>
+                <button type="submit" class="btn btn-primary">登录</button>
+                <div class="line line-dashed"></div>
+                {#        <a href="#" class="btn btn-facebook btn-block m-b-sm"><i class="fa fa-facebook pull-left"></i>Sign in with Facebook</a> <a href="#" class="btn btn-twitter btn-block"><i class="fa fa-twitter pull-left"></i>Sign in with Twitter</a>#}
+                <div class="line line-dashed"></div>
+                <p class="text-muted text-center">
+                    <small>没有账号?</small>
+                </p>
+                <a href="/register/" class="btn btn-default btn-block">注册</a>
+            </form>
+        </section>
+    </div>
+</section>
+<!-- footer -->
+<footer id="footer">
+    {#  <div class="text-center padder">#}
+    {#    <p> <small>Web app framework base on Bootstrap<br>#}
+    {#      &copy; 2013</small> </p>#}
+    {#  </div>#}
+</footer>
+<!-- / footer -->
+
+<script>
+    function Change_password() {
+        var index = layer.open({
+            type: 2,
+            area: ['700px', '530px'],
+            fix: false, //不固定
+            maxmin: true,
+            content: '/customer_password_change/'
+        });
+    }
+</script>
+</body>
+</html>

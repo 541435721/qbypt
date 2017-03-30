@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+{% load static %}
+<html lang="en" class="bg-dark">
+<head>
+    <meta charset="utf-8"/>
+    <title>Notebook | Web Application</title>
+    <meta name="description"
+          content="app, web app, responsive, admin dashboard, admin, flat, flat ui, ui kit, off screen nav"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+    <link rel="stylesheet" href="{% static  'css/app.v2.css' %}" type="text/css"/>
+    <link rel="stylesheet" href="{% static 'css/font.css' %}" type="text/css" cache="false"/>
+    <!--[if lt IE 9]>
+    <script src="{% static 'js/ie/html5shiv.js'%}" cache="false"></script>
+    <script src="{% static 'js/ie/respond.min.js'%}" cache="false"></script>
+    <script src="{% static 'js/ie/excanvas.js'%}" cache="false"></script>
+    <![endif]-->
+</head>
+<body style="font-family: 微软雅黑">
+<section id="content" class="m-t-lg wrapper-md animated fadeInDown">
+    <div class="container aside-xxl"><a class="navbar-brand block" href="index.html"></a>
+        <section class="panel panel-default m-t-lg bg-white">
+            <header class="panel-heading text-center"><strong>注册</strong></header>
+            <form action="{% url 'register' %}" method="post" class="panel-body wrapper-lg">
+                {#        <div class="form-group">#}
+                {#          <label class="control-label">Name</label>#}
+                {#          <input type="text" placeholder="eg. Your name or company" class="form-control input-lg">#}
+                {#        </div>#}
+                {#        <div class="form-group">#}
+                {#          <label class="control-label">Email</label>#}
+                {#          <input type="email" placeholder="test@example.com" class="form-control input-lg">#}
+                {#        </div>#}
+                {#        <div class="form-group">#}
+                {#          <label class="control-label">Password</label>#}
+                {#          <input type="password" id="inputPassword" placeholder="Type a password" class="form-control input-lg">#}
+                {#        </div>#}
+                {% csrf_token %}
+                <fieldset>
+                    {% for field in form.visible_fields %}  <!--对于每一个field-->
+                        <div class="form-group{% if field.errors %} has-error{% endif %}"> <!--对表单进行排版-->
+                            <label>{{ field.label }}</label>
+                            {{ field }} <!--显示输入框 -->
+                            {% if field.help_text %}
+                                <span class="help-block">{{ field.help_text|safe }}</span> <!--如果有帮助提示，则显示-->
+                            {% endif %}
+                            {% for error in field.errors %}
+                                <label class="control-label">{{ error }}</label> <!--显示每个错误提示-->
+                            {% endfor %}
+                        </div>
+                    {% endfor %}
+
+                </fieldset>
+                <div class="checkbox">
+                    <label>
+                        <input type="checkbox">
+                        同意 <a href="#">用户注册协议</a> </label>
+                </div>
+                <button type="submit" class="btn btn-primary">注册</button>
+                <div class="line line-dashed"></div>
+                <p class="text-muted text-center">
+                    <small>已经有账号?</small>
+                </p>
+                <a href="/login/" class="btn btn-default btn-block">登录</a>
+            </form>
+        </section>
+    </div>
+</section>
+<!-- footer -->
+<footer id="footer">
+    <div class="text-center padder clearfix">
+        {#    <p> <small>Web app framework base on Bootstrap<br>#}
+        {#      &copy; 2013</small> </p>#}
+    </div>
+</footer>
+<!-- / footer -->
+</body>
+</html>

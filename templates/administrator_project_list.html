@@ -1,0 +1,119 @@
+{% extends 'administrator_side.html' %}
+{% block title %}项目管理{% endblock %}
+{% block content %}
+    <section id="content">
+        <section class="vbox">
+    <section class="scrollable padder">
+    <ul class="breadcrumb no-border no-radius b-b b-light pull-in">
+                            <li><a href="/"><i class="fa fa-home"></i> 主页</a></li>
+                            <li class="active">项目清单</li>
+                        </ul>
+        <section class="panel panel-default">
+            <div style="border:0px solid; width:auto; height: auto; overflow:auto;">
+                <table data-toggle="table"
+                        {#               data-url="/gh/get/response.json/wenzhixin/bootstrap-table/tree/master/docs/data/data1/"#}
+                       data-search="true"
+                       data-sort-name="stargazers_count"
+                       data-sort-order="desc"
+                       data-show-refresh="true"
+                       data-show-toggle="true"
+                       data-show-columns="true">
+                    <thead>
+                    <tr>
+                        <th data-field="username" data-sortable="true">
+                            <div style="font-weight: 900;font-size: medium">账号</div>
+                        </th>
+                        <th data-field="ID" data-sortable="true">
+                            <div style="font-weight: 900;font-size: medium">项目编号</div>
+                        </th>
+                        <th data-field="name" data-sortable="true">
+                            <div style="font-weight: 900;font-size: medium">项目名</div>
+                        </th>
+                        <th data-field="class" data-sortable="true">
+                            <div style="font-weight: 900;font-size: medium">项目类别</div>
+                        </th>
+                        <th data-field="create_time" data-sortable="true">
+                            <div style="font-weight: 900;font-size: medium">创建时间</div>
+                        </th>
+                        <th data-field="status" data-sortable="true">
+                            <div style="font-weight: 900;font-size: medium">完成状态</div>
+                        </th>
+                        <th data-field="handle">
+                            <div style="font-weight: 900;font-size: medium">操作</div>
+                        </th>
+                    </tr>
+                    </thead>
+                    {% for foo in project %}
+                        <tr>
+                            <td>{{ foo.user.username }}</td>
+                            <td>{{ foo.project }}</td>
+                            <td>{{ foo.project_name }}</td>
+                            <td>{{ foo.classify }}</td>
+                            <td>{{ foo.create_time|date:"Y-m-d H:i:s" }}</td>
+
+
+                            <td>{% if foo.status == '3' %}
+                                已完成
+                            {% elif foo.status == '0' %}
+                                未上传
+                            {% elif foo.status == '1' %}
+                                未支付
+                             {% elif foo.status == '2' %}
+                                处理中
+                            {% endif %}</td>
+
+                            <td>
+                                <a href="javascript:administrator_project_delete({{ foo.project }})">删除</a>
+                                {% if foo.status %}
+                                    <a href="javascript:administrator_project_info({{ foo.project }})">查看</a>
+                                {% else %}
+                                    查看
+                                {% endif %}
+                                <a href="javascript:administrator_project_alter({{ foo.project }})">修改</a>
+                            </td>
+                        </tr>
+                    {% endfor %}
+
+                </table>
+            </div>
+
+            <footer class="panel-footer">
+                <div class="row">
+                    <div class="col-sm-4 hidden-xs">
+
+                    </div>
+                    <div class="col-sm-4 text-center">
+                        <button type="submit" class="btn btn-large btn-primary"
+                                onclick="javascript:createProject()">
+                            <font color="#00008b" size="3"><B>新建项目</B></font>
+                        </button>
+                    </div>
+                    <div class="col-sm-4 text-right text-center-xs">
+
+                    </div>
+                </div>
+            </footer>
+        </section>
+    </section>
+                </section>
+    </section>
+    <a href="#" class="hide nav-off-screen-block" data-toggle="class:nav-off-screen" data-target="#nav"></a>
+
+    <script>
+        function administrator_project_alter(project_id) {
+            location.href = "/administrator_project_alter/?project_id=" + project_id;
+        }
+
+        function administrator_project_delete(project_id) {
+            if (confirm("您确定要删除么，记录删除后将无法找回")) {
+                location.href = "/administrator_project_delete/?project_id=" + project_id ;
+            }
+        }
+        function administrator_project_info(project_id) {
+            location.href = "/administrator_project_info/?project_id=" + project_id;
+        }
+        function createProject() {
+            location.href = "/display_project/?order_id=" + orderId +"";
+        }
+    </script>
+{% endblock %}
