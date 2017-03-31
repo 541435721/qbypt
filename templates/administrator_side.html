@@ -8,8 +8,8 @@
           content="app, web app, responsive, admin dashboard, admin, flat, flat ui, ui kit, off screen nav"/>
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
     <link rel="stylesheet" href="{% static 'css/app.v2.css' %}" type="text/css"/>
-    <link rel="stylesheet" href="../static/css/combo.select.css" type="text/css"/>
-    <link rel="stylesheet" href="../static/js/calendar/bootstrap_calendar.css" type="text/css" cache="false"/>
+    <link rel="stylesheet" href="{% static 'css/combo.select.css'%}" type="text/css"/>
+    <link rel="stylesheet" href="{% static 'js/calendar/bootstrap_calendar.css'%}" type="text/css" cache="false"/>
     <!--[if lt IE 9]> <script src="js/ie/html5shiv.js" cache="false"></script> <script src="js/ie/respond.min.js" cache="false"></script> <script src="js/ie/excanvas.js" cache="false"></script>
     <![endif]-->
 </head>
@@ -214,32 +214,10 @@
         </section>
     </section>
 </section>
-<script src="../../../static/js/app.v2.js"></script> <!-- Bootstrap --> <!-- App -->
-<script src="../../../static/js/charts/easypiechart/jquery.easy-pie-chart.js" cache="false"></script>
-<script src="../../../static/js/charts/sparkline/jquery.sparkline.min.js" cache="false"></script>
-<script src="../../../static/js/charts/flot/jquery.flot.min.js" cache="false"></script>
-<script src="../../../static/js/charts/flot/jquery.flot.tooltip.min.js" cache="false"></script>
-<script src="../../../static/js/layer.js"></script>
-<script src="../../../static/js/charts/flot/jquery.flot.resize.js" cache="false"></script>
-<script src="../../../static/js/charts/flot/jquery.flot.grow.js" cache="false"></script>
-<script src="../../../static/js/charts/flot/demo.js" cache="false"></script>
-<script src="../../../static/js/calendar/bootstrap_calendar.js" cache="false"></script>
-<script src="../../../static/js/calendar/demo.js" cache="false"></script>
-<script src="../../../static/js/sortable/jquery.sortable.js" cache="false"></script>
-<script src="../../../static/js/jquery.combo.select.js"></script>
-
-<!-- Uploadify Core JavaScript -->
-<link href="../../../static/css/uploadify.css" type="text/css" rel="stylesheet">
-<script src="../../../static/js/jquery.uploadify.min.js"></script>
-<script src="../../../static/js/swfobject.js"></script>
-<script src="../../../static/js/upload_deal.js"></script>
-<script src="../../../static/js/layer.js"></script>
-<script src="../../../static/js/jquery.combo.select.js"></script>
-
 {# 可用于表格排序筛选的样式 #}
-
-<link href="../../../static/css/bootstrap-table.css" rel="stylesheet">
-<script src="../../../static/js/bootstrap-table.js"></script>
+<script src="{% static 'js/layer.js' %}"></script>
+<link href="{% static 'css/bootstrap-table.css' %}" rel="stylesheet">
+<script src="{% static 'js/bootstrap-table.js' %}"></script>
 
 </body>
 </html>
