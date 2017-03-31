@@ -719,9 +719,13 @@ def alipy_notify(request):
         if request.GET['is_success'] == 'T' and request.GET['trade_status'] == 'TRADE_SUCCESS':
             thisorder = xmqb_model.Order.objects.get(order=request.GET['out_trade_no'])
             thisorder.is_pay = True  # 将当前已支付的订单设置为已支付
-            thisorder.save()
             thisproject = thisorder.project  # 将当前订单对应的项目设置为已支付状态
             thisproject.status = '2'
+            # 支付完成生成工单,默认1号为审核员
+            worker=xmqb_model.WorkOrder.objects.get(worker=1)
+        
+            workorder=xmqb_model.WorkOrder.objects.create(project=thisproject,order=thisorder,assessor=worker,processor=1,status=0)
+            thisorder.save()
             thisproject.save()
             projects = xmqb_model.Project.objects.filter(user=request.user)
             pays = []
