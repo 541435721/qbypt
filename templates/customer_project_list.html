@@ -1,14 +1,8 @@
 {% extends 'customer_side.html' %}
-<<<<<<< HEAD
-{% block title %}查看项目{% endblock %}
-{% block content %}
-
-=======
 {% load static %}
 {% block title %}查看项目{% endblock %}
 {% block content %}
     <script src="{% static 'js/jquery.js' %}"></script>
->>>>>>> b8341942a5f91101acbde9500fa81042e0dde439
     {% if method == '1' %}
         <script>
             alert("文件上传成功");
@@ -84,7 +78,6 @@
                                     {% if foo.status == '0' %}
                                         <a href="javascript:upload_file({{ foo.project }})">上传文件</a>
                                     {% endif %}
-                                    {% if foo.status == '0' %}
                                 </td>
                             </tr>
                         {% endfor %}

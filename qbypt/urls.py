@@ -17,6 +17,8 @@ Including another URLconf
 from django.conf.urls import url
 from django.contrib.auth.views import logout
 import xmqb.views as views
+from django.views.static import serve
+import settings
 
 
 urlpatterns = [
@@ -69,6 +71,8 @@ urlpatterns = [
     url(r'^uploadify_script/$', views.uploadify_script, name='uploadify_script'),
 
     url(r'^profile_upload/$', views.profile_upload, name='profile_upload'),
+
+    url(r'^download/(?P<path>.*)$', serve, {'document_root': settings.DOWNLOAD_DIR, 'show_indexes': False}),
 
     url(r'^administrator_user_info_list/$', views.administrator_user_info_list, name='administrator_user_info_list'),
 
