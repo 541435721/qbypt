@@ -11,6 +11,7 @@ import uuid
 import os, random
 import forms as xmqb_form
 import models as xmqb_model
+from django.db.models import Q
 import time
 # 图片验证码引用包
 import StringIO
@@ -616,7 +617,7 @@ def administrator_work_order_distribute(request):  # 管理工单分配
     if not request.user.is_superuser == 1:
         return redirect('/login')
     if request.method == 'GET':
-        workOrders = xmqb_model.WorkOrder.objects.filter(status=0 or 1)
+        workOrders = xmqb_model.WorkOrder.objects.all()
         processors = xmqb_model.Worker.objects.filter(worker_position='处理员')
         assessors = xmqb_model.Worker.objects.filter(worker_position='审核员')
         return render(request, 'administrator_work_order_distribute.html',
@@ -633,7 +634,7 @@ def administrator_work_order_distribute(request):  # 管理工单分配
             workOrder.processor = processor
             workOrder.status = 1
             workOrder.save()
-        workOrders = xmqb_model.WorkOrder.objects.filter(status=0 or 1)
+        workOrders = xmqb_model.WorkOrder.objects.all()
         processors = xmqb_model.Worker.objects.filter(worker_position='处理员')
         assessors = xmqb_model.Worker.objects.filter(worker_position='审核员')
         return render(request, 'administrator_work_order_distribute.html',
