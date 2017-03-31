@@ -18,7 +18,6 @@ from django.conf.urls import url
 from django.contrib.auth.views import logout
 import xmqb.views as views
 
-
 urlpatterns = [
     url(r'^$', views.index, name='index'),
 
@@ -28,7 +27,7 @@ urlpatterns = [
 
     url(r'^register/$', views.register, name='register'),
 
-    url(r'^checkcode/$', views.CheckCode , name='CheckCode'),  # 图片验证码生成方法
+    url(r'^checkcode/$', views.CheckCode, name='CheckCode'),  # 图片验证码生成方法
 
     url(r'^customer_user_info/$', views.customer_user_info, name='customer_user_info'),
 
@@ -84,19 +83,22 @@ urlpatterns = [
 
     url(r'^administrator_project_alter/$', views.administrator_project_alter, name='administrator_project_alter'),
 
-
     url(r'^administrator_project_delete/$', views.administrator_project_delete, name='administrator_project_delete'),
 
-    url(r'^administrator_work_order_distribute/$', views.administrator_work_order_distribute, name='administrator_work_order_distribute'),
+    url(r'^administrator_work_order_distribute/$', views.administrator_work_order_distribute,
+        name='administrator_work_order_distribute'),
 
-    url(r'^administrator_work_order_handle_list/$', views.administrator_work_order_handle_list, name='administrator_work_order_handle_list'),
+    url(r'^administrator_work_order_handle_list/$', views.administrator_work_order_handle_list,
+        name='administrator_work_order_handle_list'),
 
+    url(r'^administrator_work_order_handle/$', views.administrator_work_order_handle,
+        name='administrator_work_order_handle'),
 
-    url(r'^administrator_work_order_handle/$', views.administrator_work_order_handle, name='administrator_work_order_handle'),
+    url(r'^administrator_work_order_assess_list/$', views.administrator_work_order_assess_list,
+        name='administrator_work_order_assess_list'),
 
-    url(r'^administrator_work_order_assess_list/$', views.administrator_work_order_assess_list, name='administrator_work_order_assess_list'),
-
-    url(r'^administrator_work_order_assess_handle/$', views.administrator_work_order_assess_handle, name='administrator_work_order_assess_handle'),
+    url(r'^administrator_work_order_assess_handle/$', views.administrator_work_order_assess_handle,
+        name='administrator_work_order_assess_handle'),
 
     url(r'^administrator_order_list/$', views.administrator_order_list, name='administrator_order_list'),
 
@@ -108,7 +110,8 @@ urlpatterns = [
 
     url(r'^administrator_invoice_info/$', views.administrator_invoice_info, name='administrator_invoice_info'),
 
-    url(r'^administrator_coupon_distribute/$', views.administrator_coupon_distribute, name='administrator_coupon_distribute'),
+    url(r'^administrator_coupon_distribute/$', views.administrator_coupon_distribute,
+        name='administrator_coupon_distribute'),
 
     url(r'^administrator_coupon_list/$', views.administrator_coupon_list, name='administrator_coupon_list'),
 
@@ -121,5 +124,9 @@ urlpatterns = [
     url(r'^administrator_price_alter/$', views.administrator_price_alter, name='administrator_price_alter'),
 
     url(r'^administrator_message_send/$', views.administrator_message_send, name='administrator_message_send'),
+
+    url(r'^alipy_notify', views.alipy_notify, name='alipy_notify'),  # 支付完成后所做的跳转，用以修改支付状态
+
+
 
 ]
