@@ -39,11 +39,11 @@ urlpatterns = [
 
     url(r'^customer_project_list/$', views.customer_project_list, name='customer_project_list'),
 
-    url(r'^customer_project_delete/$',views.customer_project_delete,name='customer_project_delete'), # 用户删除项目
+    url(r'^customer_project_delete/$', views.customer_project_delete, name='customer_project_delete'),  # 用户删除项目
 
-    url(r'^customer_project_info/$',views.customer_project_info,name='customer_project_info'), # 用户查看项目信息
+    url(r'^customer_project_info/$', views.customer_project_info, name='customer_project_info'),  # 用户查看项目信息
 
-    url(r'^customer_project_alter/$',views.customer_project_alert,name='customer_project_alter'), # 用户修改项目
+    url(r'^customer_project_alter/$', views.customer_project_alert, name='customer_project_alter'),  # 用户修改项目
 
     url(r'^customer_file_upload/$', views.customer_file_upload, name='customer_file_upload'),
 
@@ -106,9 +106,9 @@ urlpatterns = [
 
     url(r'^administrator_file_upload/$', views.administrator_file_upload, name='administrator_upload.html'),
 
-    url(r'^administrator_work_order_assess_list/$', views.administrator_work_order_assess_list, name='administrator_work_order_assess_list'),
-  
-  
+    url(r'^administrator_work_order_assess_list/$', views.administrator_work_order_assess_list,
+        name='administrator_work_order_assess_list'),
+
     url(r'^administrator_work_order_assess_handle/$', views.administrator_work_order_assess_handle,
         name='administrator_work_order_assess_handle'),
 
