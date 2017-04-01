@@ -1,0 +1,57 @@
+{% extends 'customer_side.html' %}
+{% block title %}发票管理{% endblock %}
+{% block content %}
+    <section id="content">
+        <section class="vbox">
+            <section class="scrollable padder">
+                <ul class="breadcrumb no-border no-radius b-b b-light pull-in">
+                    <li><a href="/"><i class="fa fa-home"></i> 主页</a></li>
+                    <li class="active">用户订单</li>
+                </ul>
+                <section class="panel panel-default">
+                    <div style="border:0px solid; width:auto; height: auto; overflow:auto;">
+                        <table data-toggle="table"
+                                {#               data-url="/gh/get/response.json/wenzhixin/bootstrap-table/tree/master/docs/data/data1/"#}
+                               data-search="true"
+                               data-sort-name="stargazers_count"
+                               data-sort-order="desc"
+                               data-show-refresh="true"
+                               data-show-toggle="true"
+                               data-show-columns="true">
+                            <thead>
+                            <tr>
+                                <th data-field="username" data-sortable="true">
+                                    <div style="font-weight: 900;font-size: medium">订单编号</div>
+                                </th>
+                                <th data-field="ID" data-sortable="true">
+                                    <div style="font-weight: 900;font-size: medium">项目名</div>
+                                </th>
+                                <th data-field="name" data-sortable="true">
+                                    <div style="font-weight: 900;font-size: medium">实付金额</div>
+                                </th>
+                                <th data-field="class" data-sortable="true">
+                                    <div style="font-weight: 900;font-size: medium">支付时间</div>
+                                </th>
+                                <th data-field="handle">
+                                    <div style="font-weight: 900;font-size: medium">操作</div>
+                                </th>
+                            </tr>
+                            </thead>
+{#                            {% for foo in orders %}#}
+{#                                <tr>#}
+{#                                    <td>{{ foo.username }}</td>#}
+{#                                    #}
+{#                                </tr>#}
+{#                            {% endfor %}#}
+
+                        </table>
+                    </div>
+
+
+                </section>
+            </section>
+        </section>
+    </section>
+    <a href="#" class="hide nav-off-screen-block" data-toggle="class:nav-off-screen" data-target="#nav"></a>
+
+{% endblock %}

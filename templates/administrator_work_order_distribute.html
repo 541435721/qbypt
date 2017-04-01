@@ -3,191 +3,191 @@
 {% block content %}
     <section id="content">
         <section class="vbox">
-    <section class="scrollable padder">
-    <ul class="breadcrumb no-border no-radius b-b b-light pull-in">
-                            <li><a href="/"><i class="fa fa-home"></i> 主页</a></li>
-                            <li class="active">项目分配</li>
-                        </ul>
-        <section class="panel panel-default">
-            <div style="border:0px solid; width:auto; height: auto; overflow:auto;">
-            <form  method="post">
-            {% csrf_token %}
-                <table data-toggle="table"
-               data-url="/gh/get/response.json/wenzhixin/bootstrap-table/tree/master/docs/data/data1/"
-               data-search="true"
-               data-sort-name="stargazers_count"
-               data-sort-order="desc"
-               data-show-refresh="true"
-               data-show-toggle="true"
-               data-show-columns="true">
-            <thead>
-            <tr>
-                <th data-field="checkbox" data-sortable="true">
-                    <div style="font-weight: 900;font-size: medium">选择</div>
-                </th>
-                <th data-field="username" data-sortable="true">
-                    <div style="font-weight: 900;font-size: medium">用户名</div>
-                </th>
-                <th data-field="name" data-sortable="true">
-                    <div style="font-weight: 900;font-size: medium">项目编号</div>
-                </th>
-                <th data-field="tel" data-sortable="true">
-                    <div style="font-weight: 900;font-size: medium">订单编号</div>
-                </th>
-                <th data-field="classify" data-sortable="true">
-                    <div style="font-weight: 900;font-size: medium">分类</div>
-                </th>
-                <th data-field="handle">
-                    <div style="font-weight: 900;font-size: medium">提交时间</div>
-                </th>
-                <th data-field="status">
-                    <div style="font-weight: 900;font-size: medium">完成状态</div>
-                </th>
-                <th data-field="operate">
-                    <div style="font-weight: 900;font-size: medium">操作</div>
-                </th>
-            </tr>
-            </thead>
-                    {% for workOrder in workOrders %}
-                        <tr>
-                        <td>
-                            <input type="checkbox" name="projectCheckbox" value={{ workOrder.order_id }}>
-                        </td>
-                        <td>{{ workOrder.order.user.username }}</td>
-                         <td>{{ workOrder.project_id}}</td>
-                        <td>{{ workOrder.order_id }}</td>
-                        <td>{{ workOrder.project.classify }}</td>
-                         <td>{{ workOrder.order.start_date|date:"Y-m-d H:i:s" }}</td>
+            <section class="scrollable padder">
+                <ul class="breadcrumb no-border no-radius b-b b-light pull-in">
+                    <li><a href="/"><i class="fa fa-home"></i> 主页</a></li>
+                    <li class="active">项目分配</li>
+                </ul>
+                <section class="panel panel-default">
+                    <div style="border:0px solid; width:auto; height: auto; overflow:auto;">
+                        <form method="post">
+                            {% csrf_token %}
+                            <table data-toggle="table"
+                                   data-url="/gh/get/response.json/wenzhixin/bootstrap-table/tree/master/docs/data/data1/"
+                                   data-search="true"
+                                   data-sort-name="stargazers_count"
+                                   data-sort-order="desc"
+                                   data-show-refresh="true"
+                                   data-show-toggle="true"
+                                   data-show-columns="true">
+                                <thead>
+                                <tr>
+                                    <th data-field="checkbox" data-sortable="true">
+                                        <div style="font-weight: 900;font-size: medium">选择</div>
+                                    </th>
+                                    <th data-field="username" data-sortable="true">
+                                        <div style="font-weight: 900;font-size: medium">用户名</div>
+                                    </th>
+                                    <th data-field="name" data-sortable="true">
+                                        <div style="font-weight: 900;font-size: medium">项目编号</div>
+                                    </th>
+                                    <th data-field="tel" data-sortable="true">
+                                        <div style="font-weight: 900;font-size: medium">订单编号</div>
+                                    </th>
+                                    <th data-field="classify" data-sortable="true">
+                                        <div style="font-weight: 900;font-size: medium">分类</div>
+                                    </th>
+                                    <th data-field="handle">
+                                        <div style="font-weight: 900;font-size: medium">提交时间</div>
+                                    </th>
+                                    <th data-field="status">
+                                        <div style="font-weight: 900;font-size: medium">完成状态</div>
+                                    </th>
+                                    <th data-field="operate">
+                                        <div style="font-weight: 900;font-size: medium">操作</div>
+                                    </th>
+                                </tr>
+                                </thead>
+                                {% for workOrder in workOrders %}
+                                    <tr>
+                                        <td>
+                                            <input type="checkbox" name="projectCheckbox"
+                                                   value={{ workOrder.order_id }}>
+                                        </td>
+                                        <td>{{ workOrder.order.user.username }}</td>
+                                        <td>{{ workOrder.project_id }}</td>
+                                        <td>{{ workOrder.order_id }}</td>
+                                        <td>{{ workOrder.project.classify }}</td>
+                                        <td>{{ workOrder.order.start_date|date:"Y-m-d H:i:s" }}</td>
 
-                        <td>
-                            {% if workOrder.status == '0' %}
-                                未分配
-                            {% elif workOrder.status == '1' %}
-                                已分配
-                            {% endif %}
-                        </td>
+                                        <td>
+                                            {% if workOrder.status == '0' %}
+                                                未分配
+                                            {% elif workOrder.status == '1' %}
+                                                已分配
+                                            {% endif %}
+                                        </td>
 
-                        <td>
-{#                            <a href="javascript:deleteUser({{ people.user_id }})">删除</a>/#}
-                            <a href="javascript:user_info_change({{ workOrder.id }})">详情</a>
-                        </td>
-                    </tr>
-                    {% endfor %}
+                                        <td>
+                                            {#                            <a href="javascript:deleteUser({{ people.user_id }})">删除</a>/#}
+                                            <a href="javascript:user_info_change({{ workOrder.id }})">详情</a>
+                                        </td>
+                                    </tr>
+                                {% endfor %}
 
-     </table>
-            <table data-toggle="table"
-               data-url="/gh/get/response.json/wenzhixin/bootstrap-table/tree/master/docs/data/data1/"
-               data-search="true"
-               data-sort-name="stargazers_count"
-               data-sort-order="desc"
-               data-show-refresh="true"
-               data-show-toggle="true"
-               data-show-columns="true">
-            <thead>
-            <tr>
-                <th data-field="operate">
-                    <div style="font-weight: 900;font-size: medium">选择</div>
-                </th>
-                <th data-field="username" data-sortable="true">
-                    <div style="font-weight: 900;font-size: medium">账号</div>
-                </th>
-                <th data-field="name" data-sortable="true">
-                    <div style="font-weight: 900;font-size: medium">名字</div>
-                </th>
-                <th data-field="performance" data-sortable="true">
-                    <div style="font-weight: 900;font-size: medium">绩效</div>
-                </th>
-                <th data-field="number" data-sortable="true">
-                    <div style="font-weight: 900;font-size: medium">项目数</div>
-                </th>
-                <th data-field="time">
-                    <div style="font-weight: 900;font-size: medium">最近登陆时间</div>
-                </th>
+                            </table>
+                            <table data-toggle="table"
+                                   data-url="/gh/get/response.json/wenzhixin/bootstrap-table/tree/master/docs/data/data1/"
+                                   data-search="true"
+                                   data-sort-name="stargazers_count"
+                                   data-sort-order="desc"
+                                   data-show-refresh="true"
+                                   data-show-toggle="true"
+                                   data-show-columns="true">
+                                <thead>
+                                <tr>
+                                    <th data-field="operate">
+                                        <div style="font-weight: 900;font-size: medium">选择</div>
+                                    </th>
+                                    <th data-field="username" data-sortable="true">
+                                        <div style="font-weight: 900;font-size: medium">账号</div>
+                                    </th>
+                                    <th data-field="name" data-sortable="true">
+                                        <div style="font-weight: 900;font-size: medium">名字</div>
+                                    </th>
+                                    <th data-field="performance" data-sortable="true">
+                                        <div style="font-weight: 900;font-size: medium">绩效</div>
+                                    </th>
+                                    <th data-field="number" data-sortable="true">
+                                        <div style="font-weight: 900;font-size: medium">项目数</div>
+                                    </th>
+                                    <th data-field="time">
+                                        <div style="font-weight: 900;font-size: medium">最近登陆时间</div>
+                                    </th>
 
-            </tr>
-            </thead>
-                {% for processor in processors %}
-                        <tr>
-                        <td>
-                            <input type="radio" name="processorRadio" value={{ processor.worker_id }}>
-                        </td>
-                        <td>{{ processor.worker.id }}</td>
-                         <td>{{ processor.worker_name}}</td>
-                        <td>{{ processor.worker_performance }}</td>
-                        <td>{{ processor.project_number }}</td>
-                         <td>{{ processor.worker.last_login|date:"Y-m-d H:i:s" }}</td>
-                        </tr>
-                {% endfor %}
+                                </tr>
+                                </thead>
+                                {% for processor in processors %}
+                                    <tr>
+                                        <td>
+                                            <input type="radio" name="processorRadio" value={{ processor.worker_id }}>
+                                        </td>
+                                        <td>{{ processor.worker.id }}</td>
+                                        <td>{{ processor.worker_name }}</td>
+                                        <td>{{ processor.worker_performance }}</td>
+                                        <td>{{ processor.project_number }}</td>
+                                        <td>{{ processor.worker.last_login|date:"Y-m-d H:i:s" }}</td>
+                                    </tr>
+                                {% endfor %}
 
-            </table>
+                            </table>
+                            <table data-toggle="table"
+                                   data-url="/gh/get/response.json/wenzhixin/bootstrap-table/tree/master/docs/data/data1/"
+                                   data-search="true"
+                                   data-sort-name="stargazers_count"
+                                   data-sort-order="desc"
+                                   data-show-refresh="true"
+                                   data-show-toggle="true"
+                                   data-show-columns="true">
+                                <thead>
+                                <tr>
+                                    <th data-field="operate">
+                                        <div style="font-weight: 900;font-size: medium">选择</div>
+                                    </th>
+                                    <th data-field="username" data-sortable="true">
+                                        <div style="font-weight: 900;font-size: medium">账号</div>
+                                    </th>
+                                    <th data-field="name" data-sortable="true">
+                                        <div style="font-weight: 900;font-size: medium">名字</div>
+                                    </th>
+                                    <th data-field="performance" data-sortable="true">
+                                        <div style="font-weight: 900;font-size: medium">绩效</div>
+                                    </th>
+                                    <th data-field="number" data-sortable="true">
+                                        <div style="font-weight: 900;font-size: medium">项目数</div>
+                                    </th>
+                                    <th data-field="time">
+                                        <div style="font-weight: 900;font-size: medium">最近登陆时间</div>
+                                    </th>
 
-            <table data-toggle="table"
-               data-url="/gh/get/response.json/wenzhixin/bootstrap-table/tree/master/docs/data/data1/"
-               data-search="true"
-               data-sort-name="stargazers_count"
-               data-sort-order="desc"
-               data-show-refresh="true"
-               data-show-toggle="true"
-               data-show-columns="true">
-            <thead>
-            <tr>
-                <th data-field="operate">
-                    <div style="font-weight: 900;font-size: medium">选择</div>
-                </th>
-                <th data-field="username" data-sortable="true">
-                    <div style="font-weight: 900;font-size: medium">账号</div>
-                </th>
-                <th data-field="name" data-sortable="true">
-                    <div style="font-weight: 900;font-size: medium">名字</div>
-                </th>
-                <th data-field="performance" data-sortable="true">
-                    <div style="font-weight: 900;font-size: medium">绩效</div>
-                </th>
-                <th data-field="number" data-sortable="true">
-                    <div style="font-weight: 900;font-size: medium">项目数</div>
-                </th>
-                <th data-field="time">
-                    <div style="font-weight: 900;font-size: medium">最近登陆时间</div>
-                </th>
+                                </tr>
+                                </thead>
+                                {% for assessor in assessors %}
+                                    <tr>
+                                        <td>
+                                            <input type="radio" name="assessorRadio" value={{ assessor.worker_id }}>
+                                        </td>
+                                        <td>{{ assessor.worker.id }}</td>
+                                        <td>{{ assessor.worker_name }}</td>
+                                        <td>{{ assessor.worker_performance }}</td>
+                                        <td>{{ assessor.project_number }}</td>
+                                        <td>{{ assessor.worker.last_login|date:"Y-m-d H:i:s" }}</td>
+                                    </tr>
+                                {% endfor %}
 
-            </tr>
-            </thead>
-                {% for assessor in assessors %}
-                        <tr>
-                        <td>
-                            <input type="radio" name="assessorRadio" value={{ assessor.worker_id }}>
-                        </td>
-                        <td>{{ assessor.worker.id }}</td>
-                         <td>{{ assessor.worker_name}}</td>
-                        <td>{{ assessor.worker_performance }}</td>
-                        <td>{{ assessor.project_number }}</td>
-                         <td>{{ assessor.worker.last_login|date:"Y-m-d H:i:s" }}</td>
-                        </tr>
-                    {% endfor %}
-
-            </table>
-            <div class="">
+                            </table>
+                            <div class="">
                                 <button type="submit" class="btn btn-large btn-primary">分配</button>
                             </div>
-            </form>
-
-            </div>
-
-            <footer class="panel-footer">
-                <div class="row">
-                    <div class="col-sm-4 hidden-xs">
+                        </form>
 
                     </div>
-                    <div class="col-sm-4 text-center">
-                    </div>
-                    <div class="col-sm-4 text-right text-center-xs">
 
-                    </div>
-                </div>
-            </footer>
-        </section>
-    </section>
+                    <footer class="panel-footer">
+                        <div class="row">
+                            <div class="col-sm-4 hidden-xs">
+
+                            </div>
+                            <div class="col-sm-4 text-center">
+                            </div>
+                            <div class="col-sm-4 text-right text-center-xs">
+
+                            </div>
+                        </div>
+                    </footer>
                 </section>
+            </section>
+        </section>
     </section>
     <a href="#" class="hide nav-off-screen-block" data-toggle="class:nav-off-screen" data-target="#nav"></a>
 
