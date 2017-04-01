@@ -8,6 +8,7 @@ from django.contrib import messages
 from django.contrib.auth.models import User
 import json
 import uuid
+from django.utils import timezone
 import os, random
 import forms as xmqb_form
 import models as xmqb_model
@@ -706,6 +707,27 @@ def administrator_price_list(request):  # 管理员服务价格列表
     return render(request, 'administrator_price_list.html', {'parts': parts})
 
 
+def administrator_price_new(request):  # 管理员新增服务
+    if not request.user.is_authenticated():
+        return redirect('/login')
+    if not request.user.is_superuser == 1:
+        return redirect('/login')
+    if request.method == "POST":
+        form = xmqb_form.Add_Price(request.POST)
+        if form.is_valid():
+            classify = form.cleaned_data['classify']
+            price_name = form.cleaned_data['price_name']
+            price = form.cleaned_data['price']
+            dis_price = form.cleaned_data['discount_price']
+            record = xmqb_model.Price.objects.create(part_name=price_name, part_price=price, classify_id=classify,
+                                                     check_all_price=dis_price)
+            record.save()
+            return redirect('/administrator_price_list')
+
+    form = xmqb_form.Add_Price()
+    return render(request, 'administrator_price_new.html', {'form': form})
+
+
 def administrator_part_price_alter(request):  # 管理员服务价格修改
     if not request.user.is_authenticated():
         return redirect('/login')
@@ -744,7 +766,6 @@ def administrator_price_alter(request):  # 管理员订单价格修改
     if not request.user.is_superuser == 1:
         return redirect('/login')
     if request.method == 'GET':
-
         if request.GET['state']:
             order_id = request.GET['order_ID']
             state = request.GET['state']
@@ -772,13 +793,72 @@ def administrator_price_alter(request):  # 管理员订单价格修改
 
 
 def administrator_message_send(request):  # 管理员消息发送
+    if not request.user.is_authenticated():
+        return redirect('/login')
+    if not request.user.is_superuser == 1:
+        return redirect('/login')
+    if request.method == "GET":
+        forms = xmqb_form.Send_Message()
+        return render(request, 'administrator_message_send.html', {'form': forms})
+    if request.method == "POST":
+        forms = xmqb_form.Send_Message(request.POST)
+        if forms.is_valid():
+            receiver = forms.cleaned_data['receiver']
+            title = forms.cleaned_data['title']
+            context = forms.cleaned_data['context']
 
-    return render(request, 'administrator_message_send.html')
+            Title = title
+            Context = context
+            Is_read = 0
+            Send_worker_id = request.user.id
+            User_id = receiver
+
+            try:
+                message_record = xmqb_model.Message.objects.create(title=Title, message_content=Context,
+                                                                   is_read=Is_read,
+                                                                   send_worker_id=receiver, user_id=User_id)
+                message_record.save()
+                forms = xmqb_form.Send_Message()
+                return render(request, 'administrator_message_send.html', {'form': forms, 'type': 1})
+            except Exception, e:
+                forms = xmqb_form.Send_Message()
+                return render(request, 'administrator_message_send.html', {'form': forms, 'type': 0})
+
+        else:
+            forms = xmqb_form.Send_Message()
+            return render(request, 'administrator_message_send.html', {'form': forms, 'type': 0})
 
 
 def administrator_message_receive(request):  # 管理员消息接受
+    if not request.user.is_authenticated():
+        return redirect('/login')
+    if not request.user.is_superuser == 1:
+        return redirect('/login')
+    record = xmqb_model.Message.objects.filter(user_id=request.user.id)
+    not_read = len(xmqb_model.Message.objects.filter(user_id=request.user.id, is_read=0))
+    return render(request, 'administrator_message_receive.html', {'messages': record, 'message': not_read})
 
-    return render(request, 'administrator_message_receive.html')
+
+def administrator_message_read(request):  # 阅读信息
+    if not request.user.is_authenticated():
+        return redirect('/login')
+    if not request.user.is_superuser == 1:
+        return redirect('/login')
+
+    if request.method == "GET":
+        id = request.GET['message']
+        record = xmqb_model.Message.objects.get(message=id)
+
+        forms = xmqb_form.Read_Message(
+            initial={'receiver': record.user_id, 'title': record.title, 'context': record.message_content})
+
+        record.is_read = 1
+        record.read_time = timezone.localtime(timezone.now()).strftime("%Y-%m-%d %H:%M:%S")
+        record.save()
+
+        return render(request, 'administrator_message_read.html', {'form': forms})
+    else:
+        return redirect('/administrator_message_receive')
 
 
 def alipy_notify(request):

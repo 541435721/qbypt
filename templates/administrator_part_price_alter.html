@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+<form method="post" role="form" action="/administrator_part_price_alter/">
+    {% csrf_token %}
+    <fieldset>
+        <p>服务编号：{{ form.order_id }}</p>
+        <p>服务名称:<input type="text" value="{{ name }}" readonly="readonly"></p>
+        <p>当前价格:{{ form.old_price }}</p>
+        <p>新价格:{{ form.set_price }}</p>
+        <button type="submit">提交</button>
+    </fieldset>
+
+</form>
+</body>
+</html>
