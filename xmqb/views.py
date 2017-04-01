@@ -844,7 +844,21 @@ def administrator_order_list(request):  # 管理员订单列表查看
 
 
 def administrator_order_info(request):  # 管理员订单信息查看
-    render(request, 'administrator_order_list.html')
+    if not request.user.is_authenticated():
+        return redirect('/login')
+    if not request.user.is_superuser == 1:
+        return redirect('/login')
+    if request.method == "GET":
+        order_id = request.GET['order_id']
+        record = xmqb_model.Order.objects.get(order=order_id)
+
+        form = xmqb_form.Order_Detial(initial={'order_id': record.order,
+                                               'user_name': record.user,
+                                               'create_time': record.project.create_time,
+                                               'order_price': record.order_price})
+        return render(request, 'administrator_order_info.html', {'form': form})
+    else:
+        return redirect('/administrator_order_list')
 
 
 def administrator_invoice_list(request):  # 管理员发票列表

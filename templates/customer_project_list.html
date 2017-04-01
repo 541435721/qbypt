@@ -2,7 +2,7 @@
 {% load static %}
 {% block title %}查看项目{% endblock %}
 {% block content %}
-    <script src="{% static 'js/jquery.js' %}"></script>  
+    <script src="{% static 'js/jquery.js' %}"></script>
 
 <section class="scrollable padder">
         <div class="m-b-md">
@@ -80,7 +80,6 @@
                                     {% elif foo.status == '2' %}
                                         <a href="javascript:customer_project_info({{ foo.project }})">查看</a>
                                     {% endif %}
->>>
                                 </td>
                             </tr>
                         {% endfor %}
@@ -131,15 +130,15 @@
         function displayProject(orderId) {
             location.href = "/display_project/?order_id=" + orderId + "";
         }
-    try {
-    var index = parent.layer.getFrameIndex(window.name);
-    if (index) {
-        parent.location.reload();
-        parent.layer.close(index);
-    }
-} catch (err) {
+        try {
+            var index = parent.layer.getFrameIndex(window.name);
+            if (index) {
+                parent.location.reload();
+                parent.layer.close(index);
+            }
+        } catch (err) {
 
-}
+        }
         function customer_project_info(project_id) {
             location.href = "/customer_project_info/?project_id=" + project_id;
 
@@ -150,7 +149,7 @@
                 area: ['700px', '530px'],
                 fix: false, //不固定
                 maxmin: true,
-                content: '/customer_file_upload/?project_ID='+project_ID
+                content: '/customer_file_upload/?project_ID=' + project_ID
             });
         }
     </script>

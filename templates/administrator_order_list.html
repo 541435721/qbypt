@@ -66,6 +66,7 @@
                                         {% else %}
                                             <a href="/administrator_price_alter/?state=1&order_ID={{ foo.order }}">完成支付</a>
                                             <a href="javascript:change_price('{{ foo.order }}',{{ foo.order_price }})">修改价格</a>
+                                            <a href="/administrator_order_info/?order_id={{ foo.order }}">查看</a>
                                         {% endif %}
                                         <script>
                                             try {
