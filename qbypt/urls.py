@@ -121,12 +121,15 @@ urlpatterns = [
 
     url(r'^administrator_price_list/$', views.administrator_price_list, name='administrator_price_list'),
 
+    url(r'^administrator_part_price_alter/$', views.administrator_part_price_alter,
+        name='administrator_part_price_alter'),
+
     url(r'^administrator_price_alter/$', views.administrator_price_alter, name='administrator_price_alter'),
 
     url(r'^administrator_message_send/$', views.administrator_message_send, name='administrator_message_send'),
 
+    url(r'^administrator_message_receive/$', views.administrator_message_receive, name='administrator_message_receive'),
+
     url(r'^alipy_notify', views.alipy_notify, name='alipy_notify'),  # 支付完成后所做的跳转，用以修改支付状态
-
-
 
 ]

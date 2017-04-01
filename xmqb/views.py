@@ -254,8 +254,8 @@ def customer_project_new(request):  # 用户新建项目
                 price += part.part_price
 
             order = xmqb_model.Order.objects.create(
-                order=time.strftime('%y%m%d%H%M%S') + str((request.user.id) % 10000).zfill(4) + str(
-                    (random.randint(0, 100) % 100)).zfill(2),
+                order=str(time.strftime('%y%m%d%H%M%S') + str((request.user.id) % 10000).zfill(4) + str(
+                    (random.randint(0, 100) % 100)).zfill(2)),
                 user=request.user, project=project, classify=classify, order_type=u'新建',
                 order_price=price)  # 生成工程的同时再生成 对应的订单
             order.save()
@@ -283,7 +283,6 @@ def customer_file_upload(request):
         upload_name = request.POST['id_upload_name']
         print project_ID, classify, upload_name
         if len(upload_name) > 0:
-            print 111111111111111
             project = xmqb_model.Project.objects.get(project=project_ID)
             project.upload_name = upload_name
             project.status = '1'
@@ -698,16 +697,88 @@ def administrator_coupon_alter(request):  # 管理员优惠券修改
     render(request, 'administrator_coupon_alter.html')
 
 
-def administrator_price_list(request):  # 管理员价格列表
-    render(request, 'administrator_price_alter.html')
+def administrator_price_list(request):  # 管理员服务价格列表
+    if not request.user.is_authenticated():
+        return redirect('/login')
+    if not request.user.is_superuser == 1:
+        return redirect('/login')
+    parts = xmqb_model.Price.objects.all()
+    return render(request, 'administrator_price_list.html', {'parts': parts})
 
 
-def administrator_price_alter(request):  # 管理员价格修改
-    render(request, 'administrator_price_alter.html')
+def administrator_part_price_alter(request):  # 管理员服务价格修改
+    if not request.user.is_authenticated():
+        return redirect('/login')
+    if not request.user.is_superuser == 1:
+        return redirect('/login')
+    if request.method == 'GET':
+        part_id = request.GET['part_ID']
+        old_price = request.GET['part_price']
+        name = xmqb_model.Price.objects.get(part=int(part_id))
+
+        change_price_form = xmqb_form.ChangePriceForm(initial={
+            'old_price': old_price,
+            'order_id': part_id,
+        })
+        return render(request, 'administrator_part_price_alter.html',
+                      {'form': change_price_form, "name": name.part_name})
+    if request.method == 'POST':
+        change_price_form = xmqb_form.ChangePriceForm(request.POST)
+        if change_price_form.is_valid():
+            order_id = change_price_form.cleaned_data['order_id']
+            set_price = change_price_form.cleaned_data['set_price']
+            order = xmqb_model.Price.objects.get(part=order_id)
+            order.part_price = set_price
+            order.save()
+            return redirect('/administrator_price_list')
+        else:
+            print 'invalid'
+    else:
+        print 'invalid'
+    return redirect('/administrator_price_list')
+
+
+def administrator_price_alter(request):  # 管理员订单价格修改
+    if not request.user.is_authenticated():
+        return redirect('/login')
+    if not request.user.is_superuser == 1:
+        return redirect('/login')
+    if request.method == 'GET':
+
+        if request.GET['state']:
+            order_id = request.GET['order_ID']
+            state = request.GET['state']
+            record = xmqb_model.Order.objects.get(order=order_id)
+            record.is_pay = state
+            record.save()
+            return redirect('/administrator_order_list')
+
+        order_id = request.GET['order_ID']
+        old_price = request.GET['order_price']
+        change_price_form = xmqb_form.ChangePriceForm(initial={
+            'old_price': old_price,
+            'order_id': order_id,
+        })
+        return render(request, 'administrator_price_alter.html', {'form': change_price_form})
+    if request.method == 'POST':
+        change_price_form = xmqb_form.ChangePriceForm(request.POST)
+        if change_price_form.is_valid():
+            order_id = change_price_form.cleaned_data['order_id']
+            set_price = change_price_form.cleaned_data['set_price']
+            order = xmqb_model.Order.objects.get(order=order_id)
+            order.order_price = set_price
+            order.save()
+        return redirect('/administrator_order_list')
 
 
 def administrator_message_send(request):  # 管理员消息发送
-    render(request, 'administrator_message_send.html')
+
+    return render(request, 'administrator_message_send.html')
+
+
+def administrator_message_receive(request):  # 管理员消息接受
+
+    return render(request, 'administrator_message_receive.html')
 
 
 def alipy_notify(request):

@@ -127,7 +127,7 @@ class ProjectForm(forms.Form):
                                    error_messages={'required': u'项目名称不能为空'})
     classify = forms.ChoiceField(widget=forms.Select(
         attrs={'class': 'form-control m-b parsley-validated', 'onchange': 'javascript:change_checkbox()'}),
-                                 label=u'类型', required=True, choices=tuple(classify_choice))  # 表单项目类型选择 下拉框
+        label=u'类型', required=True, choices=tuple(classify_choice))  # 表单项目类型选择 下拉框
 
     upload_name = forms.CharField(widget=forms.TextInput(attrs={'class': 'form-control'}),
                                   max_length=1000, required=False, label=u'文件名', )
@@ -324,3 +324,14 @@ class MessageForm(forms.ModelForm):
 
     message_content = forms.CharField(widget=forms.Textarea(
         attrs={'class': "form-control", 'rows': "6", 'data-minwords': "6", 'data-required': "true"}), label=u'备注')
+
+
+class ChangePriceForm(forms.Form):
+    order_id = forms.CharField(widget=forms.TextInput(attrs={'readonly': 'readonly'}), label=u'订单编号')
+    old_price = forms.CharField(widget=forms.TextInput(attrs={'readonly': 'readonly'}), label=u'订单金额')
+    set_price = forms.CharField(widget=forms.TextInput(), label=u'修改金额')
+
+    def __init__(self, *args, **kwargs):  # 初始化的方法
+        super(ChangePriceForm, self).__init__(*args, **kwargs)
+
+    pass
