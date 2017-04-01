@@ -20,7 +20,6 @@ import xmqb.views as views
 from django.views.static import serve
 import settings
 
-
 urlpatterns = [
     url(r'^$', views.index, name='index'),
 
@@ -30,7 +29,7 @@ urlpatterns = [
 
     url(r'^register/$', views.register, name='register'),
 
-    url(r'^checkcode/$', views.CheckCode , name='CheckCode'),  # 图片验证码生成方法
+    url(r'^checkcode/$', views.CheckCode, name='CheckCode'),  # 图片验证码生成方法
 
     url(r'^customer_user_info/$', views.customer_user_info, name='customer_user_info'),
 
@@ -39,6 +38,12 @@ urlpatterns = [
     url(r'^customer_password_change/$', views.customer_password_change, name='customer_password_change'),
 
     url(r'^customer_project_list/$', views.customer_project_list, name='customer_project_list'),
+
+    url(r'^customer_project_delete/$',views.customer_project_delete,name='customer_project_delete'), # 用户删除项目
+
+    url(r'^customer_project_info/$',views.customer_project_info,name='customer_project_info'), # 用户查看项目信息
+
+    url(r'^customer_project_alter/$',views.customer_project_alert,name='customer_project_alter'), # 用户修改项目
 
     url(r'^customer_file_upload/$', views.customer_file_upload, name='customer_file_upload'),
 
@@ -88,21 +93,24 @@ urlpatterns = [
 
     url(r'^administrator_project_alter/$', views.administrator_project_alter, name='administrator_project_alter'),
 
-
     url(r'^administrator_project_delete/$', views.administrator_project_delete, name='administrator_project_delete'),
 
-    url(r'^administrator_work_order_distribute/$', views.administrator_work_order_distribute, name='administrator_work_order_distribute'),
+    url(r'^administrator_work_order_distribute/$', views.administrator_work_order_distribute,
+        name='administrator_work_order_distribute'),
 
-    url(r'^administrator_work_order_handle_list/$', views.administrator_work_order_handle_list, name='administrator_work_order_handle_list'),
+    url(r'^administrator_work_order_handle_list/$', views.administrator_work_order_handle_list,
+        name='administrator_work_order_handle_list'),
 
-
-    url(r'^administrator_work_order_handle/$', views.administrator_work_order_handle, name='administrator_work_order_handle'),
+    url(r'^administrator_work_order_handle/$', views.administrator_work_order_handle,
+        name='administrator_work_order_handle'),
 
     url(r'^administrator_file_upload/$', views.administrator_file_upload, name='administrator_upload.html'),
 
     url(r'^administrator_work_order_assess_list/$', views.administrator_work_order_assess_list, name='administrator_work_order_assess_list'),
-
-    url(r'^administrator_work_order_assess_handle/$', views.administrator_work_order_assess_handle, name='administrator_work_order_assess_handle'),
+  
+  
+    url(r'^administrator_work_order_assess_handle/$', views.administrator_work_order_assess_handle,
+        name='administrator_work_order_assess_handle'),
 
     url(r'^administrator_order_list/$', views.administrator_order_list, name='administrator_order_list'),
 
@@ -114,7 +122,8 @@ urlpatterns = [
 
     url(r'^administrator_invoice_info/$', views.administrator_invoice_info, name='administrator_invoice_info'),
 
-    url(r'^administrator_coupon_distribute/$', views.administrator_coupon_distribute, name='administrator_coupon_distribute'),
+    url(r'^administrator_coupon_distribute/$', views.administrator_coupon_distribute,
+        name='administrator_coupon_distribute'),
 
     url(r'^administrator_coupon_list/$', views.administrator_coupon_list, name='administrator_coupon_list'),
 
@@ -124,8 +133,19 @@ urlpatterns = [
 
     url(r'^administrator_price_list/$', views.administrator_price_list, name='administrator_price_list'),
 
+    url(r'^administrator_price_new/$', views.administrator_price_new, name='administrator_price_new'),
+
+    url(r'^administrator_part_price_alter/$', views.administrator_part_price_alter,
+        name='administrator_part_price_alter'),
+
     url(r'^administrator_price_alter/$', views.administrator_price_alter, name='administrator_price_alter'),
 
     url(r'^administrator_message_send/$', views.administrator_message_send, name='administrator_message_send'),
+
+    url(r'^administrator_message_receive/$', views.administrator_message_receive, name='administrator_message_receive'),
+
+    url(r'^administrator_message_read/$', views.administrator_message_read, name='administrator_message_read'),
+
+    url(r'^alipy_notify', views.alipy_notify, name='alipy_notify'),  # 支付完成后所做的跳转，用以修改支付状态
 
 ]

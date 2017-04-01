@@ -1,0 +1,82 @@
+{% extends 'administrator_side.html' %}
+{% block title %}读信息{% endblock %}
+{% block content %}
+    {% load static %}
+    <link rel="stylesheet" type="text/css" href="{% static 'simditor/styles/simditor.css' %}"/>
+    <link rel="stylesheet" type="text/css" href="{% static 'css/normalize.css' %}"/>
+    <link rel="stylesheet" type="text/css" href="{% static 'fonts/font-awesome-4.2.0/css/font-awesome.min.css' %}"/>
+    <link rel="stylesheet" type="text/css" href="{% static 'css/demo.css' %}"/>
+    <link rel="stylesheet" type="text/css" href="{% static 'css/component.css' %}"/>
+
+    <script type="text/javascript" src="{% static 'simditor/scripts/jquery.min.js' %}"></script>
+    <script type="text/javascript" src="{% static 'simditor/scripts/module.js' %}"></script>
+    <script type="text/javascript" src="{% static 'simditor/scripts/hotkeys.js' %}"></script>
+    <script type="text/javascript" src="{% static 'simditor/scripts/uploader.js' %}"></script>
+    <script type="text/javascript" src="{% static 'simditor/scripts/simditor.js' %}"></script>
+    <script src="{% static 'js/classie.js' %}"></script>
+
+    <section id="content">
+        <section class="vbox">
+            <section class="scrollable padder">
+                <ul class="breadcrumb no-border no-radius b-b b-light pull-in">
+                    <li><a href="/"><i class="fa fa-home"></i> 主页</a></li>
+                    <li class="active">读信息</li>
+                </ul>
+                <form role="form" action="/administrator_message_send/" method="post">
+                    <section class="content">
+                    <span class="input input--hoshi">
+                        {{ form.receiver }}
+                        <label class="input__label input__label--hoshi input__label--hoshi-color-1" for="receiver">
+						<span class="input__label-content input__label-content--hoshi">发件人</span>
+					</label>
+                    </span><br>
+                        <span class="input input--hoshi">
+                        {{ form.title }}
+                        <label class="input__label input__label--hoshi input__label--hoshi-color-1" for="title">
+						<span class="input__label-content input__label-content--hoshi">主题</span>
+					</label>
+                    </span>
+                        {{ form.context }}
+
+                        <script>
+
+                            var editor = new Simditor({
+                                textarea: $('#editor')
+                            });
+
+                            (function () {
+
+                                [].slice.call(document.querySelectorAll('input.input__field')).forEach(function (inputEl) {
+                                    // in case the input is already filled..
+                                    if (inputEl.value.trim() !== '') {
+                                        classie.add(inputEl.parentNode, 'input--filled');
+                                    }
+
+                                    // events:
+                                    inputEl.addEventListener('focus', onInputFocus);
+                                    inputEl.addEventListener('blur', onInputBlur);
+                                });
+
+                                function onInputFocus(ev) {
+                                    classie.add(ev.target.parentNode, 'input--filled');
+                                }
+
+                                function onInputBlur(ev) {
+                                    if (ev.target.value.trim() === '') {
+                                        classie.remove(ev.target.parentNode, 'input--filled');
+                                    }
+                                }
+
+                            })();
+                        </script>
+                    </section>
+                </form>
+
+            </section>
+        </section>
+    </section>
+
+
+    <a href="#" class="hide nav-off-screen-block" data-toggle="class:nav-off-screen" data-target="#nav"></a>
+
+{% endblock %}

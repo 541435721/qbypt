@@ -127,7 +127,7 @@ class ProjectForm(forms.Form):
                                    error_messages={'required': u'项目名称不能为空'})
     classify = forms.ChoiceField(widget=forms.Select(
         attrs={'class': 'form-control m-b parsley-validated', 'onchange': 'javascript:change_checkbox()'}),
-                                 label=u'类型', required=True, choices=tuple(classify_choice))  # 表单项目类型选择 下拉框
+        label=u'类型', required=True, choices=tuple(classify_choice))  # 表单项目类型选择 下拉框
 
     upload_name = forms.CharField(widget=forms.TextInput(attrs={'class': 'form-control'}),
                                   max_length=1000, required=False, label=u'文件名', )
@@ -324,3 +324,53 @@ class MessageForm(forms.ModelForm):
 
     message_content = forms.CharField(widget=forms.Textarea(
         attrs={'class': "form-control", 'rows': "6", 'data-minwords': "6", 'data-required': "true"}), label=u'备注')
+
+
+class ChangePriceForm(forms.Form):
+    order_id = forms.CharField(widget=forms.TextInput(attrs={'readonly': 'readonly'}), label=u'订单编号')
+    old_price = forms.CharField(widget=forms.TextInput(attrs={'readonly': 'readonly'}), label=u'订单金额')
+    set_price = forms.CharField(widget=forms.TextInput(), label=u'修改金额')
+
+    def __init__(self, *args, **kwargs):  # 初始化的方法
+        super(ChangePriceForm, self).__init__(*args, **kwargs)
+
+
+class Send_Message(forms.Form):
+    receiver = forms.CharField(
+        widget=forms.TextInput(attrs={'class': "input__field input__field--hoshi", 'id': "receiver"}), label='收件人')
+    title = forms.CharField(
+        widget=forms.TextInput(attrs={'class': "input__field input__field--hoshi", 'id': "title"}), label='主题')
+    context = forms.CharField(widget=forms.Textarea(attrs={'id': 'editor'}), label='正文')
+
+    def __init__(self, *args, **kwargs):  # 初始化的方法
+        super(Send_Message, self).__init__(*args, **kwargs)
+
+
+class Read_Message(forms.Form):
+    receiver = forms.CharField(
+        widget=forms.TextInput(
+            attrs={'class': "input__field input__field--hoshi", 'id': "receiver", 'readonly': 'readonly'}), label='收件人')
+    title = forms.CharField(
+        widget=forms.TextInput(
+            attrs={'class': "input__field input__field--hoshi", 'id': "title", 'readonly': 'readonly'}), label='主题')
+    context = forms.CharField(widget=forms.Textarea(attrs={'id': 'editor', 'readonly': 'readonly'}), label='正文')
+
+    def __init__(self, *args, **kwargs):  # 初始化的方法
+        super(Read_Message, self).__init__(*args, **kwargs)
+
+
+class Add_Price(forms.Form):  # 增加服务表单
+    classify_choice = []
+    for obj in models.Classify.objects.all():
+        classify_choice.append((obj.classify, obj.classify_name))
+
+    classify = forms.ChoiceField(widget=forms.Select(
+        attrs={'class': 'form-control m-b parsley-validated', 'onchange': 'javascript:change_checkbox()'}),
+        label=u'类型', required=True, choices=tuple(classify_choice))  # 表单项目类型选择 下拉框
+
+    price_name = forms.CharField(widget=forms.TextInput(), label='服务名称')
+    price = forms.IntegerField(widget=forms.TextInput(), label='服务价格')
+    discount_price = forms.IntegerField(widget=forms.TextInput(), label='折扣价格')
+
+    def __init__(self, *args, **kwargs):  # 初始化的方法
+        super(Add_Price, self).__init__(*args, **kwargs)

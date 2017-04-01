@@ -8,8 +8,8 @@
           content="app, web app, responsive, admin dashboard, admin, flat, flat ui, ui kit, off screen nav"/>
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
     <link rel="stylesheet" href="{% static 'css/app.v2.css' %}" type="text/css"/>
-    <link rel="stylesheet" href="../static/css/combo.select.css" type="text/css"/>
-    <link rel="stylesheet" href="../static/js/calendar/bootstrap_calendar.css" type="text/css" cache="false"/>
+    <link rel="stylesheet" href="{% static 'css/combo.select.css' %}" type="text/css"/>
+    <link rel="stylesheet" href="{% static 'js/calendar/bootstrap_calendar.css' %}" type="text/css" cache="false"/>
     <!--[if lt IE 9]> <script src="js/ie/html5shiv.js" cache="false"></script> <script src="js/ie/respond.min.js" cache="false"></script> <script src="js/ie/excanvas.js" cache="false"></script>
     <![endif]-->
 </head>
@@ -49,7 +49,7 @@
         </ul>
         <ul class="nav navbar-nav navbar-right hidden-xs nav-user">
             <li class="hidden-xs"><a href="#" class="dropdown-toggle dk" data-toggle="dropdown"> <i
-                    class="fa fa-bell"></i> <span class="badge badge-sm up bg-danger m-l-n-sm count">2</span> </a>
+                    class="fa fa-bell"></i> <span class="badge badge-sm up bg-danger m-l-n-sm count">{{ message }}</span> </a>
                 <section class="dropdown-menu aside-xl">
                     <section class="panel bg-white">
                         <header class="panel-heading b-light bg-light"><strong>You have <span class="count">2</span>
@@ -150,17 +150,28 @@
                                             <li><a href="/administrator_work_order_distribute/" target="_blank"> <i
                                                     class="fa fa-angle-right"></i>
                                                 <span>项目分配</span> </a></li>
-                                            {#                                            <li><a href="layout-c.html"> <i class="fa fa-angle-right"></i>#}
-                                            {#                                                <span>新建项目</span> </a></li>#}
                                         </ul>
                                     </li>
+                                    <li><a href="/administrator_price_list/"> <i class="fa fa-envelope-o icon">
+                                        <b class="bg-primary dker"></b> </i> <span>单价管理</span>
+                                    </a></li>
                                     <li><a href="/administrator_order_list/"> <i class="fa fa-envelope-o icon">
                                         <b class="bg-primary dker"></b> </i> <span>订单管理</span>
                                     </a></li>
-
-                                    <li><a href="mail.html"> <b class="badge bg-danger pull-right">3</b> <i
+                                    <li><a href="#"> <b class="badge bg-danger pull-right">{{ message }}</b> <i
                                             class="fa fa-envelope-o icon"> <b class="bg-primary dker"></b> </i> <span>消息中心</span>
-                                    </a></li>
+                                    </a>
+                                        <ul class="nav lt">
+                                            <li><a href="/administrator_message_send/"> <i
+                                                    class="fa fa-angle-right"></i>
+                                                <span>发件箱</span> </a></li>
+
+                                            <li><a href="/administrator_message_receive/"> <i
+                                                    class="fa fa-angle-right"></i>
+                                                <span>收件箱</span> </a></li>
+                                        </ul>
+                                    </li>
+
                                     <li><a href="notebook.html"> <i class="fa fa-pencil icon"> <b class="bg-info"></b>
                                     </i> <span>意见反馈</span> </a></li>
                                 </ul>
@@ -214,32 +225,11 @@
         </section>
     </section>
 </section>
-<script src="../../../static/js/app.v2.js"></script> <!-- Bootstrap --> <!-- App -->
-<script src="../../../static/js/charts/easypiechart/jquery.easy-pie-chart.js" cache="false"></script>
-<script src="../../../static/js/charts/sparkline/jquery.sparkline.min.js" cache="false"></script>
-<script src="../../../static/js/charts/flot/jquery.flot.min.js" cache="false"></script>
-<script src="../../../static/js/charts/flot/jquery.flot.tooltip.min.js" cache="false"></script>
-<script src="../../../static/js/layer.js"></script>
-<script src="../../../static/js/charts/flot/jquery.flot.resize.js" cache="false"></script>
-<script src="../../../static/js/charts/flot/jquery.flot.grow.js" cache="false"></script>
-<script src="../../../static/js/charts/flot/demo.js" cache="false"></script>
-<script src="../../../static/js/calendar/bootstrap_calendar.js" cache="false"></script>
-<script src="../../../static/js/calendar/demo.js" cache="false"></script>
-<script src="../../../static/js/sortable/jquery.sortable.js" cache="false"></script>
-<script src="../../../static/js/jquery.combo.select.js"></script>
-
-<!-- Uploadify Core JavaScript -->
-<link href="../../../static/css/uploadify.css" type="text/css" rel="stylesheet">
-<script src="../../../static/js/jquery.uploadify.min.js"></script>
-<script src="../../../static/js/swfobject.js"></script>
-<script src="../../../static/js/upload_deal.js"></script>
-<script src="../../../static/js/layer.js"></script>
-<script src="../../../static/js/jquery.combo.select.js"></script>
-
 {# 可用于表格排序筛选的样式 #}
-
-<link href="../../../static/css/bootstrap-table.css" rel="stylesheet">
-<script src="../../../static/js/bootstrap-table.js"></script>
+<script src="{% static 'js/app.v2.js' %}"></script> <!-- Bootstrap --> <!-- App -->
+<script src="{% static 'js/layer.js' %}"></script>
+<link href="{% static 'css/bootstrap-table.css' %}" rel="stylesheet">
+<script src="{% static 'js/bootstrap-table.js' %}"></script>
 
 </body>
 </html>

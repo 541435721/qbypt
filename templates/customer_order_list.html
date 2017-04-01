@@ -1,4 +1,4 @@
-{% extends 'administrator_side.html' %}
+{% extends 'customer_side.html' %}
 {% block title %}订单管理{% endblock %}
 {% block content %}
     <section id="content">
@@ -30,10 +30,10 @@
                                     <div style="font-weight: 900;font-size: medium">订单类型</div>
                                 </th>
                                 <th data-field="class" data-sortable="true">
-                                    <div style="font-weight: 900;font-size: medium">订单价格</div>
+                                    <div style="font-weight: 900;font-size: medium">订单状态</div>
                                 </th>
                                 <th data-field="create_time" data-sortable="true">
-                                    <div style="font-weight: 900;font-size: medium">订单状态</div>
+                                    <div style="font-weight: 900;font-size: medium">订单价格</div>
                                 </th>
                                 <th data-field="status" data-sortable="true">
                                     <div style="font-weight: 900;font-size: medium">支付状态</div>
@@ -45,15 +45,15 @@
                             </thead>
                             {% for foo in orders %}
                                 <tr>
-                                    <td>{{ foo.user.username }}</td>
-                                    <td>{{ foo.order }}</td>
-                                    <td>{{ foo.classify_id }}</td>
-                                    <td>{{ foo.order_price }}</td>
+                                    <td>{{ foo.username }}</td>
+                                    <td>{{ foo.out_trade_no }}</td>
+                                    <td>{{ foo.classify_name }}</td>
                                     <td>{% if foo.is_complete %}
                                         已完成
                                     {% else %}
                                         未完成
                                     {% endif %}</td>
+                                    <td>{{ foo.order_price }}</td>
                                     <td>{% if foo.is_pay %}
                                         已支付
                                     {% else %}
@@ -62,34 +62,14 @@
 
                                     <td>
                                         {% if foo.is_pay %}
-                                            <a href="/administrator_price_alter/?state=0&order_ID={{ foo.order }}">取消支付</a>
+                                            <p></p>
                                         {% else %}
-                                            <a href="/administrator_price_alter/?state=1&order_ID={{ foo.order }}">完成支付</a>
-                                            <a href="javascript:change_price('{{ foo.order }}',{{ foo.order_price }})">修改价格</a>
+                                            <a href="{{ foo.url }}" target="_blank" >支付</a>
                                         {% endif %}
-                                        <script>
-                                            try {
-                                                var index = parent.layer.getFrameIndex(window.name);
-                                                if (index) {
-                                                    parent.location.reload();
-                                                    parent.layer.close(index);
-                                                }
-                                            } catch (err) {
-                                            }
-
-                                            function change_price(order_ID, order_Price) {
-                                                var index = layer.open({
-                                                    type: 2,
-                                                    area: ['700px', '530px'],
-                                                    fix: false, //不固定
-                                                    maxmin: true,
-                                                    content: '/administrator_price_alter/?order_ID=' + order_ID + '&order_price=' + order_Price
-                                                });
-                                            }
-                                        </script>
                                     </td>
                                 </tr>
                             {% endfor %}
+
                         </table>
                     </div>
 
@@ -100,21 +80,4 @@
     </section>
     <a href="#" class="hide nav-off-screen-block" data-toggle="class:nav-off-screen" data-target="#nav"></a>
 
-    <script>
-        function administrator_project_alter(project_id) {
-            location.href = "/administrator_project_alter/?project_id=" + project_id;
-        }
-
-        function deleteProject(orderId) {
-            if (confirm("您确定要删除么，记录删除后将无法找回")) {
-                location.href = "/delete_project?method=deleteProject&orderId=" + orderId + "";
-            }
-        }
-        function administrator_project_info(project_id) {
-            location.href = "/administrator_project_info/?project_id=" + project_id;
-        }
-        function createProject() {
-            location.href = "/display_project/?order_id=" + orderId + "";
-        }
-    </script>
 {% endblock %}
