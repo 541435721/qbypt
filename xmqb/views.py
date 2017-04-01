@@ -501,7 +501,7 @@ def profile_upload(file, request):  # 处理文件函数，函数之间共享网
     classify = request.GET['classify']
     request.session['classify'] = classify
     project = xmqb_model.Project.objects.get(project=project_ID)
-    user = project.use
+    user = project.user
     sub_dir = 'DICOM'
     if not request.user.is_superuser:
         sub_dir = 'DICOM'
