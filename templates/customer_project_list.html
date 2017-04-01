@@ -2,17 +2,9 @@
 {% load static %}
 {% block title %}查看项目{% endblock %}
 {% block content %}
-    <script src="{% static 'js/jquery.js' %}"></script>
-    {% if method == '1' %}
-        <script>
-            alert("文件上传成功");
-            parent.location.reload();
-            var index = parent.layer.getFrameIndex(window.name); //先得到当前iframe层的索引
-            parent.layer.close(index);
-        </script>
-    {% endif %}
+    <script src="{% static 'js/jquery.js' %}"></script>  
 
-    <section class="scrollable padder">
+<section class="scrollable padder">
         <div class="m-b-md">
             <h3 class="m-b-none" style="font-family: 微软雅黑">查看项目</h3>
         </div>
@@ -88,7 +80,7 @@
                                     {% elif foo.status == '2' %}
                                         <a href="javascript:customer_project_info({{ foo.project }})">查看</a>
                                     {% endif %}
-
+>>>
                                 </td>
                             </tr>
                         {% endfor %}
@@ -139,8 +131,18 @@
         function displayProject(orderId) {
             location.href = "/display_project/?order_id=" + orderId + "";
         }
+    try {
+    var index = parent.layer.getFrameIndex(window.name);
+    if (index) {
+        parent.location.reload();
+        parent.layer.close(index);
+    }
+} catch (err) {
+
+}
         function customer_project_info(project_id) {
             location.href = "/customer_project_info/?project_id=" + project_id;
+
         }
         function upload_file(project_ID) {
             var index = layer.open({
@@ -148,7 +150,7 @@
                 area: ['700px', '530px'],
                 fix: false, //不固定
                 maxmin: true,
-                content: '/customer_file_upload/?porject_ID=' + project_ID
+                content: '/customer_file_upload/?project_ID='+project_ID
             });
         }
     </script>

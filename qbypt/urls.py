@@ -17,6 +17,8 @@ Including another URLconf
 from django.conf.urls import url
 from django.contrib.auth.views import logout
 import xmqb.views as views
+from django.views.static import serve
+import settings
 
 urlpatterns = [
     url(r'^$', views.index, name='index'),
@@ -37,11 +39,11 @@ urlpatterns = [
 
     url(r'^customer_project_list/$', views.customer_project_list, name='customer_project_list'),
 
-    url(r'^customer_project_delete/$',views.customer_project_delete,name='customer_project_delete'), # 用户删除项目
+    url(r'^customer_project_delete/$', views.customer_project_delete, name='customer_project_delete'),  # 用户删除项目
 
-    url(r'^customer_project_info/$',views.customer_project_info,name='customer_project_info'), # 用户查看项目信息
+    url(r'^customer_project_info/$', views.customer_project_info, name='customer_project_info'),  # 用户查看项目信息
 
-    url(r'^customer_project_alter/$',views.customer_project_alert,name='customer_project_alter'), # 用户修改项目
+    url(r'^customer_project_alter/$', views.customer_project_alert, name='customer_project_alter'),  # 用户修改项目
 
     url(r'^customer_file_upload/$', views.customer_file_upload, name='customer_file_upload'),
 
@@ -75,6 +77,8 @@ urlpatterns = [
 
     url(r'^profile_upload/$', views.profile_upload, name='profile_upload'),
 
+    url(r'^download/(?P<path>.*)$', serve, {'document_root': settings.DOWNLOAD_DIR, 'show_indexes': False}),
+
     url(r'^administrator_user_info_list/$', views.administrator_user_info_list, name='administrator_user_info_list'),
 
     url(r'^administrator_user_info_alter/$', views.administrator_user_info_alter, name='administrator_user_info_alter'),
@@ -99,6 +103,8 @@ urlpatterns = [
 
     url(r'^administrator_work_order_handle/$', views.administrator_work_order_handle,
         name='administrator_work_order_handle'),
+
+    url(r'^administrator_file_upload/$', views.administrator_file_upload, name='administrator_upload.html'),
 
     url(r'^administrator_work_order_assess_list/$', views.administrator_work_order_assess_list,
         name='administrator_work_order_assess_list'),
@@ -127,12 +133,19 @@ urlpatterns = [
 
     url(r'^administrator_price_list/$', views.administrator_price_list, name='administrator_price_list'),
 
+    url(r'^administrator_price_new/$', views.administrator_price_new, name='administrator_price_new'),
+
+    url(r'^administrator_part_price_alter/$', views.administrator_part_price_alter,
+        name='administrator_part_price_alter'),
+
     url(r'^administrator_price_alter/$', views.administrator_price_alter, name='administrator_price_alter'),
 
     url(r'^administrator_message_send/$', views.administrator_message_send, name='administrator_message_send'),
 
+    url(r'^administrator_message_receive/$', views.administrator_message_receive, name='administrator_message_receive'),
+
+    url(r'^administrator_message_read/$', views.administrator_message_read, name='administrator_message_read'),
+
     url(r'^alipy_notify', views.alipy_notify, name='alipy_notify'),  # 支付完成后所做的跳转，用以修改支付状态
-
-
 
 ]

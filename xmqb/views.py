@@ -8,9 +8,11 @@ from django.contrib import messages
 from django.contrib.auth.models import User
 import json
 import uuid
+from django.utils import timezone
 import os, random
 import forms as xmqb_form
 import models as xmqb_model
+from django.db.models import Q
 import time
 # 图片验证码引用包
 import StringIO
@@ -48,7 +50,7 @@ def login(request):  # 登陆
                 return redirect('/administrator_project_list')
 
             elif request.user.is_superuser == 2:  # 处理员登录
-                return redirect('/administrator_work_order_handle')
+                return redirect('/administrator_work_order_handle_list')
 
             elif request.user.is_superuser == 3:  # 审核员登录
                 return redirect('/administrator_work_order_assess_list')
@@ -82,13 +84,15 @@ def register(request):  # 注册
             user_info.user_telephone = cellphone
             user_info.save()
             auth.login(request, user)  # 用户登录
-            classifys=xmqb_model.Classify.objects.all()
+            classifys = xmqb_model.Classify.objects.all()
             for item in classifys:
                 print item.classify_name
                 # timefield需要的格式 YYYY-MM-DD HH:MM 暂定优惠券有效时间为60天
-                coupon=xmqb_model.Coupon(coupon=str(user.id)+str(uuid.uuid1())[0:20],user=user,amount=500,rest_amount=500,type=item,
-                                         deliver_time=time.strftime('%Y-%m-%d %H:%M',time.localtime(time.time())),
-                                         deadline_time=time.strftime('%Y-%m-%d %H:%M',time.localtime(time.time()+60*60*24*60)))
+                coupon = xmqb_model.Coupon(coupon=str(user.id) + str(uuid.uuid1())[0:20], user=user, amount=500,
+                                           rest_amount=500, type=item,
+                                           deliver_time=time.strftime('%Y-%m-%d %H:%M', time.localtime(time.time())),
+                                           deadline_time=time.strftime('%Y-%m-%d %H:%M',
+                                                                       time.localtime(time.time() + 60 * 60 * 24 * 60)))
                 coupon.save()
             return render(request, 'index.html')
         else:
@@ -146,8 +150,8 @@ def customer_password_change(request):  # 修改密码
         form = xmqb_form.ChangePasswordForm(request.POST)
         if form.is_valid():
             identifying_code = form.cleaned_data['identifying_code']
+
             newpassword = form.cleaned_data['password']
-            print request.session['CheckCode1']
             if request.user.is_authenticated():
                 user = request.user
                 user.set_password(newpassword)
@@ -222,10 +226,11 @@ def customer_project_new(request):  # 用户新建项目
         form = xmqb_form.ProjectForm(request.POST)
         if form.is_valid():
             classify = xmqb_model.Classify.objects.get(classify=form.cleaned_data['classify'])
-            print classify
             project = xmqb_model.Project.objects.create(user=request.user, classify=classify,
+
                                                         project=time.strftime('%y%m%d%H%M%S') + str(
                                                             (request.user.id) % 100000).zfill(4))
+
             project.project_name = form.cleaned_data['project_name']
             project.classify = classify
             project.status = 0
@@ -253,8 +258,8 @@ def customer_project_new(request):  # 用户新建项目
                 price += part.part_price
 
             order = xmqb_model.Order.objects.create(
-                order=time.strftime('%y%m%d%H%M%S') + str((request.user.id) % 10000).zfill(4) + str(
-                    (random.randint(0, 100) % 100)).zfill(2),
+                order=str(time.strftime('%y%m%d%H%M%S') + str((request.user.id) % 10000).zfill(4) + str(
+                    (random.randint(0, 100) % 100)).zfill(2)),
                 user=request.user, project=project, classify=classify, order_type=u'新建',
                 order_price=price)  # 生成工程的同时再生成 对应的订单
             order.save()
@@ -269,7 +274,6 @@ def customer_project_new(request):  # 用户新建项目
         form = xmqb_form.ProjectForm()
         part = xmqb_model.Price.objects.all()
         part_relation = xmqb_model.PartRelation.objects.all()
-        print len(part_relation)
         return render(request, 'customer_project_new.html',
                       {'form': form, 'part': part, 'part_relation': part_relation})
 
@@ -280,9 +284,8 @@ def customer_file_upload(request):
         project_ID = request.POST['project_ID']
         classify = request.POST['id_classify']
         upload_name = request.POST['id_upload_name']
-        print project_ID, classify, upload_name
+        upload_name = str(upload_name).replace("\"", "")
         if len(upload_name) > 0:
-            print 111111111111111
             project = xmqb_model.Project.objects.get(project=project_ID)
             project.upload_name = upload_name
             project.status = '1'
@@ -291,7 +294,7 @@ def customer_file_upload(request):
         else:
             return render(request, 'customer_project_list.html', {'method': '0'})
     else:
-        project_ID = request.GET['porject_ID']
+        project_ID = request.GET['project_ID']
         project = xmqb_model.Project.objects.get(project=project_ID)
         return render(request, 'customer_upload.html', {'project': project})
 
@@ -382,6 +385,7 @@ def customer_project_alert(request):  # 用户修改项目
     projects = xmqb_model.Project.objects.all()
     return render(request, 'customer_project_alert.html', {'project': projects})
 
+
 def customer_project_delete(request):  # 用户项目删除
     if not request.user.is_authenticated():
         return redirect('/login')
@@ -394,17 +398,18 @@ def customer_project_delete(request):  # 用户项目删除
     # projects = xmqb_model.Project.objects.all()
     return redirect('/customer_project_list/')
 
+
 def customer_stl_show(request):  # 用户查看3D模型
     return render(request, 'customer_stl_show.html')
 
 
 def customer_order_list(request):  # 用户订单列表
-    orders=xmqb_model.Order.objects.filter(user=request.user)
-    pays=[]
+    orders = xmqb_model.Order.objects.filter(user=request.user)
+    pays = []
     for foo in orders:
-        if not foo.is_pay :
-            temp_url = {'is_complete':foo.is_complete,
-                        'username':foo.user.username,
+        if not foo.is_pay:
+            temp_url = {'is_complete': foo.is_complete,
+                        'username': foo.user.username,
                         'is_pay': foo.is_pay,
                         'project': foo.project,
                         'project_name': foo.project.project_name,
@@ -418,8 +423,8 @@ def customer_order_list(request):  # 用户订单列表
                                                                     notify_url='http://www.tencent.com/')
                         }
         else:
-            temp_url = {'is_complete':foo.is_complete,
-                        'username':foo.user.username,
+            temp_url = {'is_complete': foo.is_complete,
+                        'username': foo.user.username,
                         'is_pay': foo.is_pay,
                         'project': foo.project,
                         'project_name': foo.project.project_name,
@@ -430,7 +435,7 @@ def customer_order_list(request):  # 用户订单列表
                         'url': "/"
                         }
         pays.append(temp_url)
-    return render(request, 'customer_order_list.html',{'orders':pays})
+    return render(request, 'customer_order_list.html', {'orders': pays})
 
 
 def customer_order_info(request):  # 用户订单信息
@@ -495,14 +500,14 @@ def profile_upload(file, request):  # 处理文件函数，函数之间共享网
     project_ID = request.GET['project_id']
     classify = request.GET['classify']
     request.session['classify'] = classify
-    user = request.user
+    project = xmqb_model.Project.objects.get(project=project_ID)
+    user = project.use
     sub_dir = 'DICOM'
     if not request.user.is_superuser:
         sub_dir = 'DICOM'
         user = request.user
     else:
         sub_dir = 'STL'
-    print 'claddify', classify
     if file:  # 如果文件有效
         path = os.path.join(settings.BASE_DIR, 'upload') + '\\' + str(
             user.username) + '\\' + classify + '\\' + project_ID + '\\' + sub_dir  # 生成路径
@@ -510,6 +515,7 @@ def profile_upload(file, request):  # 处理文件函数，函数之间共享网
             os.makedirs(path)
         # file_name=str(uuid.uuid1())+".jpg"
         file_name = str(uuid.uuid1()) + '-' + file.name
+
         # fname = os.path.join(settings.MEDIA_ROOT,filename)
         path_file = os.path.join(path, file_name)  # 将路径和文件名结合
         fp = open(path_file, 'wb')  # 以二进制方法写文件，生成对象fb
@@ -564,8 +570,7 @@ def administrator_user_info_alter(request):  # 管理员用户个人信息修改
         return render(request, 'administrator_user_info_alter.html', {'form': form, 'show_id': Id})
     else:
         form = xmqb_form.UserInform(request.POST)
-        print form.is_valid()
-        print form.errors
+
         if form.is_valid():
             user_info = xmqb_model.UserInfo.objects.get(user=user)
             user_info.user_name = form.cleaned_data['user_name']
@@ -679,7 +684,7 @@ def administrator_project_alter(request):  # 管理员项目信息修改
 
     else:
         form = xmqb_form.ProjectForm(request.POST)
-        print form.is_valid()
+
         if form.is_valid():
             project = xmqb_model.Project.objects.get(project=project_id)
             project.project_name = form.cleaned_data['project_name']
@@ -762,11 +767,63 @@ def administrator_work_order_distribute(request):  # 管理工单分配
 
 
 def administrator_work_order_handle_list(request):  # 工单处理列表
-    render(request, 'administrator_work_order_handle_list.html')
+    if not request.user.is_authenticated():
+        return redirect('/login')
+    if not request.user.is_superuser == 2:
+        return redirect('/login')
+    workOrders = xmqb_model.WorkOrder.objects.filter(processor=request.user)
+    return render(request, 'administrator_work_order_handle_list.html', {'workOrders': workOrders})
 
 
 def administrator_work_order_handle(request):  # 工单处理
-    render(request, 'administrator_work_order_handle.html')
+    if not request.user.is_authenticated():
+        return redirect('/login')
+    if not request.user.is_superuser == 2:
+        return redirect('/login')
+    workorder = xmqb_model.WorkOrder.objects.get(order=request.GET['workorder_id'])
+    if request.method == 'GET':
+        project_id = workorder.project_id
+        project = xmqb_model.Project.objects.get(project=project_id)
+        parts = xmqb_model.ProjectPart.objects.filter(project=project)
+
+        form = xmqb_form.ProjectForm(initial={
+            'project_name': project.project_name,
+            'classify': project.classify,
+            'patient_name': project.patient_name,
+            'patient_sex': project.patient_sex,
+            'patient_age': project.patient_age,
+            'patient_address': project.patient_address,
+            'remark': project.remark
+        })
+        return render(request, 'administrator_work_order_handle.html',
+                      {'form': form, 'project': project, 'parts': parts})
+    else:
+        workorder.status = 2
+        workorder.save()
+        workOrders = xmqb_model.WorkOrder.objects.filter(processor=request.user)
+        return render(request, 'administrator_work_order_handle_list.html', {'workOrders': workOrders})
+
+
+def administrator_file_upload(request):
+    if request.method == 'GET':
+        project_ID = request.GET['project_ID']
+        project = xmqb_model.Project.objects.get(project=project_ID)
+        part_id = request.GET['part']
+        part = xmqb_model.ProjectPart.objects.get(project=project, part=part_id)
+        return render(request, 'administrator_upload.html', {'project': project, 'part': part})
+    else:
+        project_ID = request.POST['project_ID']
+        part_id = request.POST['id_part']
+        project = xmqb_model.Project.objects.get(project=project_ID)
+        part = xmqb_model.ProjectPart.objects.get(project=project, part=part_id)
+        upload_name = request.POST['id_upload_name']
+        upload_name = str(upload_name).replace("\"", "")
+        if len(upload_name) > 0:
+            part.directory = upload_name
+            part.save()
+            return render(request, 'administrator_work_order_handle.html', {'method': '1'})
+        else:
+            return render(request, 'administrator_work_order_handle.html', {'method': '0'})
 
 
 def administrator_work_order_assess_list(request):  # 工单审核列表
@@ -818,16 +875,167 @@ def administrator_coupon_alter(request):  # 管理员优惠券修改
     render(request, 'administrator_coupon_alter.html')
 
 
-def administrator_price_list(request):  # 管理员价格列表
-    render(request, 'administrator_price_alter.html')
+def administrator_price_list(request):  # 管理员服务价格列表
+    if not request.user.is_authenticated():
+        return redirect('/login')
+    if not request.user.is_superuser == 1:
+        return redirect('/login')
+    parts = xmqb_model.Price.objects.all()
+    return render(request, 'administrator_price_list.html', {'parts': parts})
 
 
-def administrator_price_alter(request):  # 管理员价格修改
-    render(request, 'administrator_price_alter.html')
+def administrator_price_new(request):  # 管理员新增服务
+    if not request.user.is_authenticated():
+        return redirect('/login')
+    if not request.user.is_superuser == 1:
+        return redirect('/login')
+    if request.method == "POST":
+        form = xmqb_form.Add_Price(request.POST)
+        if form.is_valid():
+            classify = form.cleaned_data['classify']
+            price_name = form.cleaned_data['price_name']
+            price = form.cleaned_data['price']
+            dis_price = form.cleaned_data['discount_price']
+            record = xmqb_model.Price.objects.create(part_name=price_name, part_price=price, classify_id=classify,
+                                                     check_all_price=dis_price)
+            record.save()
+            return redirect('/administrator_price_list')
+
+    form = xmqb_form.Add_Price()
+    return render(request, 'administrator_price_new.html', {'form': form})
+
+
+def administrator_part_price_alter(request):  # 管理员服务价格修改
+    if not request.user.is_authenticated():
+        return redirect('/login')
+    if not request.user.is_superuser == 1:
+        return redirect('/login')
+    if request.method == 'GET':
+        part_id = request.GET['part_ID']
+        old_price = request.GET['part_price']
+        name = xmqb_model.Price.objects.get(part=int(part_id))
+
+        change_price_form = xmqb_form.ChangePriceForm(initial={
+            'old_price': old_price,
+            'order_id': part_id,
+        })
+        return render(request, 'administrator_part_price_alter.html',
+                      {'form': change_price_form, "name": name.part_name})
+    if request.method == 'POST':
+        change_price_form = xmqb_form.ChangePriceForm(request.POST)
+        if change_price_form.is_valid():
+            order_id = change_price_form.cleaned_data['order_id']
+            set_price = change_price_form.cleaned_data['set_price']
+            order = xmqb_model.Price.objects.get(part=order_id)
+            order.part_price = set_price
+            order.save()
+            return redirect('/administrator_price_list')
+        else:
+            print 'invalid'
+    else:
+        print 'invalid'
+    return redirect('/administrator_price_list')
+
+
+def administrator_price_alter(request):  # 管理员订单价格修改
+    if not request.user.is_authenticated():
+        return redirect('/login')
+    if not request.user.is_superuser == 1:
+        return redirect('/login')
+    if request.method == 'GET':
+        if request.GET['state']:
+            order_id = request.GET['order_ID']
+            state = request.GET['state']
+            record = xmqb_model.Order.objects.get(order=order_id)
+            record.is_pay = state
+            record.save()
+            return redirect('/administrator_order_list')
+
+        order_id = request.GET['order_ID']
+        old_price = request.GET['order_price']
+        change_price_form = xmqb_form.ChangePriceForm(initial={
+            'old_price': old_price,
+            'order_id': order_id,
+        })
+        return render(request, 'administrator_price_alter.html', {'form': change_price_form})
+    if request.method == 'POST':
+        change_price_form = xmqb_form.ChangePriceForm(request.POST)
+        if change_price_form.is_valid():
+            order_id = change_price_form.cleaned_data['order_id']
+            set_price = change_price_form.cleaned_data['set_price']
+            order = xmqb_model.Order.objects.get(order=order_id)
+            order.order_price = set_price
+            order.save()
+        return redirect('/administrator_order_list')
 
 
 def administrator_message_send(request):  # 管理员消息发送
-    render(request, 'administrator_message_send.html')
+    if not request.user.is_authenticated():
+        return redirect('/login')
+    if not request.user.is_superuser == 1:
+        return redirect('/login')
+    if request.method == "GET":
+        forms = xmqb_form.Send_Message()
+        return render(request, 'administrator_message_send.html', {'form': forms})
+    if request.method == "POST":
+        forms = xmqb_form.Send_Message(request.POST)
+        if forms.is_valid():
+            receiver = forms.cleaned_data['receiver']
+            title = forms.cleaned_data['title']
+            context = forms.cleaned_data['context']
+
+            Title = title
+            Context = context
+            Is_read = 0
+            Send_worker_id = request.user.id
+            User_id = receiver
+
+            try:
+                message_record = xmqb_model.Message.objects.create(title=Title, message_content=Context,
+                                                                   is_read=Is_read,
+                                                                   send_worker_id=receiver, user_id=User_id)
+                message_record.save()
+                forms = xmqb_form.Send_Message()
+                return render(request, 'administrator_message_send.html', {'form': forms, 'type': 1})
+            except Exception, e:
+                forms = xmqb_form.Send_Message()
+                return render(request, 'administrator_message_send.html', {'form': forms, 'type': 0})
+
+        else:
+            forms = xmqb_form.Send_Message()
+            return render(request, 'administrator_message_send.html', {'form': forms, 'type': 0})
+
+
+def administrator_message_receive(request):  # 管理员消息接受
+    if not request.user.is_authenticated():
+        return redirect('/login')
+    if not request.user.is_superuser == 1:
+        return redirect('/login')
+    record = xmqb_model.Message.objects.filter(user_id=request.user.id)
+    not_read = len(xmqb_model.Message.objects.filter(user_id=request.user.id, is_read=0))
+    return render(request, 'administrator_message_receive.html', {'messages': record, 'message': not_read})
+
+
+def administrator_message_read(request):  # 阅读信息
+    if not request.user.is_authenticated():
+        return redirect('/login')
+    if not request.user.is_superuser == 1:
+        return redirect('/login')
+
+    if request.method == "GET":
+        id = request.GET['message']
+        record = xmqb_model.Message.objects.get(message=id)
+
+        forms = xmqb_form.Read_Message(
+            initial={'receiver': record.user_id, 'title': record.title, 'context': record.message_content})
+
+        record.is_read = 1
+        record.read_time = timezone.localtime(timezone.now()).strftime("%Y-%m-%d %H:%M:%S")
+        record.save()
+
+        return render(request, 'administrator_message_read.html', {'form': forms})
+    else:
+        return redirect('/administrator_message_receive')
 
 
 def alipy_notify(request):
@@ -843,13 +1051,14 @@ def alipy_notify(request):
             thisproject = thisorder.project  # 将当前订单对应的项目设置为已支付状态
             thisproject.status = '2'
             # 支付完成生成工单,默认1号为审核员
-            processor=auth.models.User.objects.get(username=1)
-            worker=xmqb_model.Worker.objects.get(worker=processor)
-            workorder=xmqb_model.WorkOrder.objects.create(project=thisproject,order=thisorder,
-                                                          assessor=worker,processor=processor,status=0,
-                                                          plan_complete_time=time.strftime('%Y-%m-%d %H:%M', time.localtime(
-                                                              time.time() + 60 * 60 * 24 * 60))
-                                                          )
+            processor = auth.models.User.objects.get(username=1)
+            worker = xmqb_model.Worker.objects.get(worker=processor)
+            workorder = xmqb_model.WorkOrder.objects.create(project=thisproject, order=thisorder,
+                                                            assessor=worker, processor=processor, status=0,
+                                                            plan_complete_time=time.strftime('%Y-%m-%d %H:%M',
+                                                                                             time.localtime(
+                                                                                                 time.time() + 60 * 60 * 24 * 60))
+                                                            )
             workorder.save()
             thisorder.save()
             thisproject.save()

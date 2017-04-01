@@ -129,3 +129,5 @@ STATIC_URL = '/static/'
 
 STATICFILES_DIRS = (
     os.path.join(os.path.dirname(__file__), '../static/').replace('\\', '/'),)
+
+DOWNLOAD_DIR = os.path.join(BASE_DIR,'upload')

@@ -30,10 +30,10 @@
                                     <div style="font-weight: 900;font-size: medium">订单类型</div>
                                 </th>
                                 <th data-field="class" data-sortable="true">
-                                    <div style="font-weight: 900;font-size: medium">订单状态</div>
+                                    <div style="font-weight: 900;font-size: medium">订单价格</div>
                                 </th>
                                 <th data-field="create_time" data-sortable="true">
-                                    <div style="font-weight: 900;font-size: medium">订单价格</div>
+                                    <div style="font-weight: 900;font-size: medium">订单状态</div>
                                 </th>
                                 <th data-field="status" data-sortable="true">
                                     <div style="font-weight: 900;font-size: medium">支付状态</div>
@@ -48,12 +48,12 @@
                                     <td>{{ foo.user.username }}</td>
                                     <td>{{ foo.order }}</td>
                                     <td>{{ foo.classify_id }}</td>
+                                    <td>{{ foo.order_price }}</td>
                                     <td>{% if foo.is_complete %}
                                         已完成
                                     {% else %}
                                         未完成
                                     {% endif %}</td>
-                                    <td>{{ foo.order_price }}</td>
                                     <td>{% if foo.is_pay %}
                                         已支付
                                     {% else %}
@@ -62,14 +62,34 @@
 
                                     <td>
                                         {% if foo.is_pay %}
-                                            <p></p>
+                                            <a href="/administrator_price_alter/?state=0&order_ID={{ foo.order }}">取消支付</a>
                                         {% else %}
-                                            <a href="#">支付</a>
+                                            <a href="/administrator_price_alter/?state=1&order_ID={{ foo.order }}">完成支付</a>
+                                            <a href="javascript:change_price('{{ foo.order }}',{{ foo.order_price }})">修改价格</a>
                                         {% endif %}
+                                        <script>
+                                            try {
+                                                var index = parent.layer.getFrameIndex(window.name);
+                                                if (index) {
+                                                    parent.location.reload();
+                                                    parent.layer.close(index);
+                                                }
+                                            } catch (err) {
+                                            }
+
+                                            function change_price(order_ID, order_Price) {
+                                                var index = layer.open({
+                                                    type: 2,
+                                                    area: ['700px', '530px'],
+                                                    fix: false, //不固定
+                                                    maxmin: true,
+                                                    content: '/administrator_price_alter/?order_ID=' + order_ID + '&order_price=' + order_Price
+                                                });
+                                            }
+                                        </script>
                                     </td>
                                 </tr>
                             {% endfor %}
-
                         </table>
                     </div>
 
