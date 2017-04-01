@@ -235,7 +235,7 @@ def customer_file_upload(request):
         classify = request.POST['id_classify']
         upload_name = request.POST['id_upload_name']
         upload_name = str(upload_name).replace("\"", "")
-        if len(upload_name)>0:
+        if len(upload_name) > 0:
             project = xmqb_model.Project.objects.get(project=project_ID)
             project.upload_name = upload_name
             project.status = '1'
@@ -244,7 +244,7 @@ def customer_file_upload(request):
         else:
             return render(request, 'customer_project_list.html', {'method': '0'})
     else:
-        project_ID=request.GET['porject_ID']
+        project_ID=request.GET['project_ID']
         project=xmqb_model.Project.objects.get(project=project_ID)
         return render(request,'customer_upload.html',{'project':project})
 
@@ -326,7 +326,8 @@ def profile_upload(file, request):  # 处理文件函数，函数之间共享网
     project_ID=request.GET['project_id']
     classify=request.GET['classify']
     request.session['classify']=classify
-    user=request.user
+    project = xmqb_model.Project.objects.get(project=project_ID)
+    user = project.user
 
     sub_dir = 'DICOM'
     if not request.user.is_superuser:
@@ -600,21 +601,50 @@ def administrator_work_order_handle(request):  # 工单处理
         return redirect('/login')
     if not request.user.is_superuser == 2:
         return redirect('/login')
-    workorder =xmqb_model.WorkOrder.objects.get(order=request.GET['workorder_id'])
-    project_id = workorder.project_id
-    project = xmqb_model.Project.objects.get(project=project_id)
-    parts = xmqb_model.ProjectPart.objects.filter(project=project)
+    workorder = xmqb_model.WorkOrder.objects.get(order=request.GET['workorder_id'])
+    if request.method == 'GET':
+        project_id = workorder.project_id
+        project = xmqb_model.Project.objects.get(project=project_id)
+        parts = xmqb_model.ProjectPart.objects.filter(project=project)
 
-    form = xmqb_form.ProjectForm(initial={
-        'project_name': project.project_name,
-        'classify': project.classify,
-        'patient_name': project.patient_name,
-        'patient_sex': project.patient_sex,
-        'patient_age': project.patient_age,
-        'patient_address': project.patient_address,
-        'remark': project.remark
-    })
-    return render(request, 'administrator_work_order_handle.html', {'form': form, 'project': project, 'parts': parts})
+        form = xmqb_form.ProjectForm(initial={
+            'project_name': project.project_name,
+            'classify': project.classify,
+            'patient_name': project.patient_name,
+            'patient_sex': project.patient_sex,
+            'patient_age': project.patient_age,
+            'patient_address': project.patient_address,
+            'remark': project.remark
+        })
+        return render(request, 'administrator_work_order_handle.html', {'form': form, 'project': project, 'parts': parts})
+    else:
+        workorder.status = 2
+        workorder.save()
+        workOrders = xmqb_model.WorkOrder.objects.filter(processor=request.user)
+        return render(request, 'administrator_work_order_handle_list.html', {'workOrders': workOrders})
+
+
+def administrator_file_upload(request):
+    if request.method == 'GET':
+        project_ID = request.GET['project_ID']
+        project = xmqb_model.Project.objects.get(project=project_ID)
+        part_id = request.GET['part']
+        part = xmqb_model.ProjectPart.objects.get(project=project, part=part_id)
+        return render(request, 'administrator_upload.html', {'project': project, 'part': part})
+    else:
+        project_ID = request.POST['project_ID']
+        part_id = request.POST['id_part']
+        project = xmqb_model.Project.objects.get(project=project_ID)
+        part = xmqb_model.ProjectPart.objects.get(project=project, part=part_id)
+        upload_name = request.POST['id_upload_name']
+        upload_name = str(upload_name).replace("\"", "")
+        if len(upload_name) > 0:
+            part.directory = upload_name
+            part.save()
+            return render(request, 'administrator_work_order_handle.html', {'method': '1'})
+        else:
+            return render(request, 'administrator_work_order_handle.html', {'method': '0'})
+
 
 
 def administrator_work_order_assess_list(request):  # 工单审核列表

@@ -98,6 +98,8 @@ urlpatterns = [
 
     url(r'^administrator_work_order_handle/$', views.administrator_work_order_handle, name='administrator_work_order_handle'),
 
+    url(r'^administrator_file_upload/$', views.administrator_file_upload, name='administrator_upload.html'),
+
     url(r'^administrator_work_order_assess_list/$', views.administrator_work_order_assess_list, name='administrator_work_order_assess_list'),
 
     url(r'^administrator_work_order_assess_handle/$', views.administrator_work_order_assess_handle, name='administrator_work_order_assess_handle'),
