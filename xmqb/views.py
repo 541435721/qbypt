@@ -50,7 +50,7 @@ def login(request):  # 登陆
                 return redirect('/administrator_project_list')
 
             elif request.user.is_superuser == 2:  # 处理员登录
-                return redirect('/administrator_work_order_handle')
+                return redirect('/administrator_work_order_handle_list')
 
             elif request.user.is_superuser == 3:  # 审核员登录
                 return redirect('/administrator_work_order_assess_list')
@@ -146,10 +146,10 @@ def customer_account_info(request):  # 用户账号信息
 def customer_password_change(request):  # 修改密码
     if request.method == 'POST':
         form = xmqb_form.ChangePasswordForm(request.POST)
-        if form.is_valid():
-            identifying_code = form.cleaned_data['identifying_code']
-            newpassword = form.cleaned_data['password']
-            print request.session['CheckCode1']
+        if form.is_valid()
+            identifying_code=form.cleaned_data['identifying_code']
+
+            newpassword=form.cleaned_data['password']
             if request.user.is_authenticated():
                 user = request.user
                 user.set_password(newpassword)
@@ -223,11 +223,12 @@ def customer_project_new(request):  # 用户新建项目
     if (request.method == 'POST'):
         form = xmqb_form.ProjectForm(request.POST)
         if form.is_valid():
-            classify = xmqb_model.Classify.objects.get(classify=form.cleaned_data['classify'])
-            print classify
-            project = xmqb_model.Project.objects.create(user=request.user, classify=classify,
-                                                        project=time.strftime('%y%m%d%H%M%S') + str(
-                                                            (request.user.id) % 100000).zfill(4))
+            classify = xmqb_model.Classify.objects.get(classify=form.cleaned_data['classify']) 
+            project = xmqb_model.Project.objects.create(user=request.user,classify=classify,
+
+
+                                                        project=time.strftime('%y%m%d%H%M%S') + str((request.user.id)%100000).zfill(4))
+
             project.project_name = form.cleaned_data['project_name']
             project.classify = classify
             project.status = 0
@@ -271,18 +272,15 @@ def customer_project_new(request):  # 用户新建项目
         form = xmqb_form.ProjectForm()
         part = xmqb_model.Price.objects.all()
         part_relation = xmqb_model.PartRelation.objects.all()
-        print len(part_relation)
-        return render(request, 'customer_project_new.html',
-                      {'form': form, 'part': part, 'part_relation': part_relation})
-
+        return render(request, 'customer_project_new.html', {'form': form, 'part': part, 'part_relation': part_relation})
 
 @csrf_exempt
 def customer_file_upload(request):
-    if request.method == 'POST':
+    if request.method=='POST':
         project_ID = request.POST['project_ID']
         classify = request.POST['id_classify']
         upload_name = request.POST['id_upload_name']
-        print project_ID, classify, upload_name
+        upload_name = str(upload_name).replace("\"", "")
         if len(upload_name) > 0:
             project = xmqb_model.Project.objects.get(project=project_ID)
             project.upload_name = upload_name
@@ -292,10 +290,12 @@ def customer_file_upload(request):
         else:
             return render(request, 'customer_project_list.html', {'method': '0'})
     else:
-        project_ID = request.GET['porject_ID']
-        project = xmqb_model.Project.objects.get(project=project_ID)
-        return render(request, 'customer_upload.html', {'project': project})
+        project_ID=request.GET['project_ID']
+        project=xmqb_model.Project.objects.get(project=project_ID)
+        return render(request,'customer_upload.html',{'project':project})
 
+
+       
 
 def customer_project_info(request):  # 用户查看项目
     if not request.user.is_authenticated():
@@ -493,17 +493,17 @@ def uploadify_script(request):  # 前端 uploadify在后台的处理函数，用
 
 @csrf_exempt
 def profile_upload(file, request):  # 处理文件函数，函数之间共享网页传来的参数，传递request就好了想
-    project_ID = request.GET['project_id']
-    classify = request.GET['classify']
-    request.session['classify'] = classify
-    user = request.user
+    project_ID=request.GET['project_id']
+    classify=request.GET['classify']
+    request.session['classify']=classify
+    project = xmqb_model.Project.objects.get(project=project_ID)
+    user = project.use
     sub_dir = 'DICOM'
     if not request.user.is_superuser:
         sub_dir = 'DICOM'
         user = request.user
     else:
-        sub_dir = 'STL'
-    print 'claddify', classify
+        sub_dir='STL'
     if file:  # 如果文件有效
         path = os.path.join(settings.BASE_DIR, 'upload') + '\\' + str(
             user.username) + '\\' + classify + '\\' + project_ID + '\\' + sub_dir  # 生成路径
@@ -511,6 +511,7 @@ def profile_upload(file, request):  # 处理文件函数，函数之间共享网
             os.makedirs(path)
         # file_name=str(uuid.uuid1())+".jpg"
         file_name = str(uuid.uuid1()) + '-' + file.name
+
         # fname = os.path.join(settings.MEDIA_ROOT,filename)
         path_file = os.path.join(path, file_name)  # 将路径和文件名结合
         fp = open(path_file, 'wb')  # 以二进制方法写文件，生成对象fb
@@ -565,8 +566,7 @@ def administrator_user_info_alter(request):  # 管理员用户个人信息修改
         return render(request, 'administrator_user_info_alter.html', {'form': form, 'show_id': Id})
     else:
         form = xmqb_form.UserInform(request.POST)
-        print form.is_valid()
-        print form.errors
+
         if form.is_valid():
             user_info = xmqb_model.UserInfo.objects.get(user=user)
             user_info.user_name = form.cleaned_data['user_name']
@@ -680,7 +680,7 @@ def administrator_project_alter(request):  # 管理员项目信息修改
 
     else:
         form = xmqb_form.ProjectForm(request.POST)
-        print form.is_valid()
+
         if form.is_valid():
             project = xmqb_model.Project.objects.get(project=project_id)
             project.project_name = form.cleaned_data['project_name']
@@ -763,11 +763,63 @@ def administrator_work_order_distribute(request):  # 管理工单分配
 
 
 def administrator_work_order_handle_list(request):  # 工单处理列表
-    render(request, 'administrator_work_order_handle_list.html')
+    if not request.user.is_authenticated():
+        return redirect('/login')
+    if not request.user.is_superuser == 2:
+        return redirect('/login')
+    workOrders = xmqb_model.WorkOrder.objects.filter(processor=request.user)
+    return render(request, 'administrator_work_order_handle_list.html',{'workOrders':workOrders})
 
 
 def administrator_work_order_handle(request):  # 工单处理
-    render(request, 'administrator_work_order_handle.html')
+    if not request.user.is_authenticated():
+        return redirect('/login')
+    if not request.user.is_superuser == 2:
+        return redirect('/login')
+    workorder = xmqb_model.WorkOrder.objects.get(order=request.GET['workorder_id'])
+    if request.method == 'GET':
+        project_id = workorder.project_id
+        project = xmqb_model.Project.objects.get(project=project_id)
+        parts = xmqb_model.ProjectPart.objects.filter(project=project)
+
+        form = xmqb_form.ProjectForm(initial={
+            'project_name': project.project_name,
+            'classify': project.classify,
+            'patient_name': project.patient_name,
+            'patient_sex': project.patient_sex,
+            'patient_age': project.patient_age,
+            'patient_address': project.patient_address,
+            'remark': project.remark
+        })
+        return render(request, 'administrator_work_order_handle.html', {'form': form, 'project': project, 'parts': parts})
+    else:
+        workorder.status = 2
+        workorder.save()
+        workOrders = xmqb_model.WorkOrder.objects.filter(processor=request.user)
+        return render(request, 'administrator_work_order_handle_list.html', {'workOrders': workOrders})
+
+
+def administrator_file_upload(request):
+    if request.method == 'GET':
+        project_ID = request.GET['project_ID']
+        project = xmqb_model.Project.objects.get(project=project_ID)
+        part_id = request.GET['part']
+        part = xmqb_model.ProjectPart.objects.get(project=project, part=part_id)
+        return render(request, 'administrator_upload.html', {'project': project, 'part': part})
+    else:
+        project_ID = request.POST['project_ID']
+        part_id = request.POST['id_part']
+        project = xmqb_model.Project.objects.get(project=project_ID)
+        part = xmqb_model.ProjectPart.objects.get(project=project, part=part_id)
+        upload_name = request.POST['id_upload_name']
+        upload_name = str(upload_name).replace("\"", "")
+        if len(upload_name) > 0:
+            part.directory = upload_name
+            part.save()
+            return render(request, 'administrator_work_order_handle.html', {'method': '1'})
+        else:
+            return render(request, 'administrator_work_order_handle.html', {'method': '0'})
+
 
 
 def administrator_work_order_assess_list(request):  # 工单审核列表

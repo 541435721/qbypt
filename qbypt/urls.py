@@ -17,6 +17,8 @@ Including another URLconf
 from django.conf.urls import url
 from django.contrib.auth.views import logout
 import xmqb.views as views
+from django.views.static import serve
+import settings
 
 urlpatterns = [
     url(r'^$', views.index, name='index'),
@@ -75,6 +77,8 @@ urlpatterns = [
 
     url(r'^profile_upload/$', views.profile_upload, name='profile_upload'),
 
+    url(r'^download/(?P<path>.*)$', serve, {'document_root': settings.DOWNLOAD_DIR, 'show_indexes': False}),
+
     url(r'^administrator_user_info_list/$', views.administrator_user_info_list, name='administrator_user_info_list'),
 
     url(r'^administrator_user_info_alter/$', views.administrator_user_info_alter, name='administrator_user_info_alter'),
@@ -100,9 +104,11 @@ urlpatterns = [
     url(r'^administrator_work_order_handle/$', views.administrator_work_order_handle,
         name='administrator_work_order_handle'),
 
-    url(r'^administrator_work_order_assess_list/$', views.administrator_work_order_assess_list,
-        name='administrator_work_order_assess_list'),
+    url(r'^administrator_file_upload/$', views.administrator_file_upload, name='administrator_upload.html'),
 
+    url(r'^administrator_work_order_assess_list/$', views.administrator_work_order_assess_list, name='administrator_work_order_assess_list'),
+  
+  
     url(r'^administrator_work_order_assess_handle/$', views.administrator_work_order_assess_handle,
         name='administrator_work_order_assess_handle'),
 
