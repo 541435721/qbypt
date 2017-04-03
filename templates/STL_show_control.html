@@ -111,53 +111,36 @@
                              data-size="5px" data-color="#333333"> <!-- nav -->
                             <nav class="nav-primary hidden-xs">
                                 <ul class="nav">
-                                    <li><a href="/" class="active"> <i class="fa fa-user icon"> <b
-                                            class="bg-danger"></b> </i> <span class="pull-right"> <i
-                                            class="fa fa-angle-up text"></i> <i
-                                            class="fa fa-angle-down text-active"></i> </span> <span>个人中心</span> </a>
-                                        <ul class="nav lt">
-                                            <li><a href="/customer_user_info/"> <i class="fa fa-angle-right"></i>
-                                                <span>基本信息</span> </a></li>
-                                            <li><a href="/customer_account_info/"> <i class="fa fa-angle-right"></i>
-                                                <span>安全信息</span> </a></li>
-                                        </ul>
-                                    </li>
-                                    <li><a href="#layout"> <i class="fa fa-columns icon"> <b class="bg-warning"></b>
-                                    </i> <span class="pull-right"> <i class="fa fa-angle-down text"></i> <i
-                                            class="fa fa-angle-up text-active"></i> </span> <span>项目管理</span> </a>
-                                        <ul class="nav lt">
-                                            <li><a href="/customer_project_list/"> <i class="fa fa-angle-right"></i>
-                                                <span>项目清单</span> </a></li>
-                                            <li><a href="/customer_stl_show/"> <i
-                                                    class="fa fa-angle-right"></i>
-                                                <span>查看项目</span> </a></li>
-                                            {#                                            <li><a href="layout-c.html"> <i class="fa fa-angle-right"></i>#}
-                                            {#                                                <span>新建项目</span> </a></li>#}
-                                            <li>
-                                                <a href="/customer_project_new">
-                                                    <i class="fa fa-angle-right"></i>
-                                                    <span>新建项目</span>
-                                                </a>
-                                            </li>
-                                        </ul>
-                                    </li>
-                                    <li><a href="#uikit"> <i class="fa fa-dollar icon"> <b class="bg-success"></b> </i>
+                                    {% for foo in project.part_name %}
+                                        <li><a href="#uikit"> <i class="fa fa-dollar icon"> <b class="bg-success"></b>
+                                        </i>
+                                            <span class="pull-right"> <i class="fa fa-angle-down text"></i> <i
+                                                    class="fa fa-angle-up text-active"></i> </span>
+                                            <span>{{ foo }}</span> </a>
+                                            <ul class="nav lt">
+                                                <input id="changer1" type="color"
+                                                       onchange="javascript:void(0)">
+                                                <input id="r1" type="range" min="0" max="100" step="1" value="100"
+                                                       onchange="javascript:void(0)"><br>
+                                            </ul>
+                                        </li>
+                                    {% endfor %}
+                                    <li><a href="#uikit"> <i class="fa fa-dollar icon"> <b class="bg-success"></b>
+                                    </i>
                                         <span class="pull-right"> <i class="fa fa-angle-down text"></i> <i
-                                                class="fa fa-angle-up text-active"></i> </span> <span>财务中心</span> </a>
-                                        <ul class="nav lt">
-                                            <li><a href="/customer_order_list"> <i class="fa fa-angle-right"></i>
-                                                <span>我的订单</span> </a></li>
-                                            <li><a href="/customer_invoice_list"> <b
-                                                    class="badge bg-info pull-right"></b> <i
-                                                    class="fa fa-angle-right"></i> <span>发票管理</span> </a></li>
-                                        </ul>
+                                                class="fa fa-angle-up text-active"></i> </span>
+                                        <span>显示所有</span> </a>
+                                        {% for foo in project.part_name %}
+                                            <ul class="nav lt">
+                                                <input id="changer1" type="color"
+                                                       onchange="javascript:void(0)">
+                                                <input id="r1" type="range" min="0" max="100" step="1" value="100"
+                                                       onchange="javascript:void(0)"><br>
+                                            </ul>
+                                        {% endfor %}
+
                                     </li>
 
-                                    <li><a href="mail.html"> <b class="badge bg-danger pull-right">3</b> <i
-                                            class="fa fa-envelope-o icon"> <b class="bg-primary dker"></b> </i> <span>消息中心</span>
-                                    </a></li>
-                                    <li><a href="#"> <i class="fa fa-pencil icon"> <b class="bg-info"></b>
-                                    </i> <span>意见反馈</span> </a></li>
                                 </ul>
                             </nav>
                             <!-- / nav --> </div>

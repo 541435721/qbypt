@@ -10,7 +10,7 @@ function doNothing() {
 }
 
 var container, stats;
-
+var index;
 var camera, cameraTarget, scene, renderer;
 
 var camera_p_x = 100;
@@ -118,11 +118,8 @@ scene.add(light);
 
 renderer = new THREE.WebGLRenderer({antialias: true});
 renderer.setClearColor(0x000000);
-renderer.setSize(window.innerWidth * (10 / 12) * 0.93, (window.innerHeight - 30) * 0.93);
-// alert(canvas_div.clientWidth);alert(window.innerWidth);
-
-// renderer.setSize(canvas_div.clientWidth,window.innerHeight*0.85);
-
+// renderer.setSize(window.innerWidth * (10 / 12) * 0.8, (window.innerHeight - 30) * 0.3);
+renderer.setSize(canvas_div.clientWidth, canvas_div.clientHeight);
 renderer.domElement.setAttribute('id', 'cvs');
 //renderer.domElement.addEventListener('mousewheel', scaleCanvas, false);
 
@@ -139,6 +136,7 @@ controls.noPan = false;
 
 controls.staticMoving = true;
 controls.dynamicDampingFactor = 0.3;
+
 controls.keys = [65, 83, 68];
 
 
@@ -150,21 +148,30 @@ camera.position.set(camera_p_x, camera_p_y, camera_p_z);
 
 camera.position.set(camera_p_x, camera_p_y, camera_p_z);
 camera.lookAt(cameraTarget);
-
+//修改元素宽度的方法，window.innerHeight代表窗口当前的宽度
+renderer.setSize(canvas_div.clientWidth, window.innerHeight);
+//根据窗口宽度的变化来改变元素宽度
+window.addEventListener('resize', onWindowResize, false);
+function onWindowResize() {
+    renderer.setSize(canvas_div.clientWidth, window.innerHeight);
+    camera.aspect = window.innerWidth / window.innerHeight;
+    camera.updateProjectionMatrix();
+    controls.handleResize();
+}
 
 function init(path, id, c) {
     var loader = new THREE.STLLoader();
     var mesh;
-    var index = layer.load(1, {
-        shade: [0.1, '#fff'] //0.1透明度的白色背景
-    });
+    //var index = layer.load(1, {
+    //    shade: [0.1, '#fff'] //0.1透明度的白色背景
+    //});
 
 
     loader.load(path, function (geo) {
         geo.center();
         var num = path.lastIndexOf(".stl");
-        var p = document.getElementById('dis' + path.substring(path.lastIndexOf("/") + 1, num));
-        p.innerHTML = "X:" + calculateSize(geo)[0] + " Y:" + calculateSize(geo)[1] + " Z:" + calculateSize(geo)[2];
+        //var p = document.getElementById('dis' + path.substring(path.lastIndexOf("/") + 1, num));
+        //p.innerHTML = "X:" + calculateSize(geo)[0] + " Y:" + calculateSize(geo)[1] + " Z:" + calculateSize(geo)[2];
 
         var material = new THREE.MeshPhongMaterial({
             // color: color[c],
@@ -188,14 +195,16 @@ function init(path, id, c) {
         mesh.receiveShadow = true;
         mesh.name = 'actor' + id;
         scene.add(mesh);
-        layer.close(index);
+        //layer.close(index);
     });
 
 }
 
+
 function init2(path, c, id, opa) {
     var loader = new THREE.STLLoader();
     var mesh;
+
     offset = 0;
     loader.load(path, function (geo) {
         //geo.center();
@@ -246,11 +255,11 @@ function init2(path, c, id, opa) {
         //     document.getElementById('a' + i).removeAttribute('disabled');
         // }
         count--;
-        if(count<=0)
-        {
-            layer.close(index);
-        }
+
+        //if (count == 0)
+        //    layer.close(index);
     });
+
 }
 
 
