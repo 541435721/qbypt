@@ -126,9 +126,9 @@
                                                 <input id="changer{{ foo.0.1 }}" type="color"
                                                        onchange="javascript:change_color({{ foo.0.1 }},this.value)">
                                                 {# 取色器 #}&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp
-                                                <input id="r{{ foo.0.1 }}" type="range" min="0" max="100" step="1"
-                                                       value="100"
-                                                       onchange="javascript:change_transparency({{ foo.0.1 }},this.value)">
+                                                {#                                                <input id="r{{ foo.0.1 }}" type="range" min="0" max="100" step="1"#}
+                                                {#                                                       value="100" #}
+                                                {#                                                       onchange="javascript:change_transparency({{ foo.0.1 }},this.value)">#}
                                                 {# 滑动条 #}
                                                 <br>
                                             </ul>
@@ -168,7 +168,7 @@
                             color_id = 'changer' + id;
                             document.getElementById(color_id).value = color[id];
 
-                            for (var i = 0; i < color_board.length; i++) {
+                            for (var i = 1; i <= color_board.length; i++) {
                                 var selectedObject = scene.getObjectByName('actor' + i);
                                 if (selectedObject) {
                                     scene.remove(selectedObject);
@@ -178,9 +178,8 @@
                             animate();
                         }
                         function show_all() {
-
                             for (var i = 0; i < color_board.length; i++) {
-                                var selectedObject = scene.getObjectByName('actor' + i);
+                                var selectedObject = scene.getObjectByName('actor' + (i + 1));
                                 if (selectedObject) {
                                     scene.remove(selectedObject);
                                 }
@@ -189,7 +188,7 @@
 
                             var urls = {{ urls|safe }};
                             for (var x in urls) {
-                                show_all_stl(urls[x], '', x, 1.0);
+                                show_all_stl(urls[x], x, 1.0);
                                 color_id = 'changer_' + (parseInt(x) + 1);
                                 document.getElementById(color_id).value = color_board[x];
                             }

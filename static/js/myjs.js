@@ -185,7 +185,7 @@ function show_single_stl(path, id) {
 }
 
 
-function show_all_stl(path, c, id, opa) {
+function show_all_stl(path, id, opa) {
     var loader = new THREE.STLLoader();
     var mesh;
 
@@ -227,13 +227,12 @@ function show_all_stl(path, c, id, opa) {
 
         mesh.castShadow = true;
         mesh.receiveShadow = true;
-        mesh.name = 'actor' + id;
-        //alert(mesh.name);
+        mesh.name = 'actor' + (parseInt(id) + 1);
         scene.add(mesh);
         // for (var i = 1; i <= 8; i++) {
         //     document.getElementById('a' + i).removeAttribute('disabled');
         // }
-        count--;
+        // count--;
 
         //if (count == 0)
         //    layer.close(index);
