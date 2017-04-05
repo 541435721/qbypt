@@ -28,7 +28,7 @@
                 class="fa fa-cog"></i> </a></div>
         <ul class="nav navbar-nav hidden-xs">
             <li>
-                <div class="m-t m-l"><a href="price.html" class="dropdown-toggle btn btn-xs btn-primary"
+                <div class="m-t m-l"><a href="#" class="dropdown-toggle btn btn-xs btn-primary"
                                         title="Upgrade"><i class="fa fa-long-arrow-up"></i></a></div>
             </li>
         </ul>
@@ -112,16 +112,19 @@
                             <nav class="nav-primary hidden-xs">
                                 <ul class="nav">
                                     {% for foo in project.part_name %}
-                                        <li><a href="#uikit"> <i class="fa fa-dollar icon"> <b class="bg-success"></b>
+                                        <li><a href="#" onclick="javascript:choose_part('{{ foo }}')"> <i
+                                                class="fa fa-dollar icon">
+                                            <b class="bg-success"></b>
                                         </i>
                                             <span class="pull-right"> <i class="fa fa-angle-down text"></i> <i
                                                     class="fa fa-angle-up text-active"></i> </span>
-                                            <span>{{ foo }}</span> </a>
+                                            <span>{{ foo }}</span> </a> {# 器官名 #}
                                             <ul class="nav lt">
                                                 <input id="changer1" type="color"
-                                                       onchange="javascript:void(0)">
+                                                       onchange="javascript:change_color('{{ foo }}')"> {# 取色器 #}&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp
                                                 <input id="r1" type="range" min="0" max="100" step="1" value="100"
-                                                       onchange="javascript:void(0)"><br>
+                                                       onchange="javascript:change_transparency('{{ foo }}')"> {# 滑动条 #}
+                                                <br>
                                             </ul>
                                         </li>
                                     {% endfor %}
@@ -133,18 +136,28 @@
                                         {% for foo in project.part_name %}
                                             <ul class="nav lt">
                                                 <input id="changer1" type="color"
-                                                       onchange="javascript:void(0)">
+                                                       onchange="javascript:change_color('{{ foo }}')">
                                                 <input id="r1" type="range" min="0" max="100" step="1" value="100"
-                                                       onchange="javascript:void(0)"><br>
+                                                       onchange="javascript:change_transparency('{{ foo }}')"><br>
                                             </ul>
                                         {% endfor %}
-
                                     </li>
-
                                 </ul>
                             </nav>
-                            <!-- / nav --> </div>
+                        </div>
                     </section>
+                    <script>
+                        function choose_part(part_name) {
+                            alert('载入' + part_name);
+                        }
+                        function change_color(part_name) {
+                            alert('改变 ' + part_name + ' 颜色');
+                        }
+                        function change_transparency(part_name) {
+                            alert('改变 ' + part_name + ' 透明度');
+                        }
+
+                    </script>
                     <footer class="footer lt hidden-xs b-t b-dark">
                         <div id="chat" class="dropup">
                             <section class="dropdown-menu on aside-md m-l-n">

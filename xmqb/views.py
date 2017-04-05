@@ -475,6 +475,8 @@ def customer_order_pay(request):  # 用户订单付款
 
 
 def customer_invoice_list(request):  # 用户发票列表
+    if not request.user.is_authenticated():
+        return redirect('/login')
 
     return render(request, 'customer_invoice_list.html')
 

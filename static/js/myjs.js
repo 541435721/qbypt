@@ -118,8 +118,8 @@ scene.add(light);
 
 renderer = new THREE.WebGLRenderer({antialias: true});
 renderer.setClearColor(0x000000);
-// renderer.setSize(window.innerWidth * (10 / 12) * 0.8, (window.innerHeight - 30) * 0.3);
-renderer.setSize(canvas_div.clientWidth, canvas_div.clientHeight);
+renderer.setSize(window.innerWidth * (10 / 12) * 0.8, (window.innerHeight - 30) * 0.3);
+// renderer.setSize(canvas_div.clientWidth, canvas_div.clientHeight);
 renderer.domElement.setAttribute('id', 'cvs');
 //renderer.domElement.addEventListener('mousewheel', scaleCanvas, false);
 
@@ -159,7 +159,7 @@ function onWindowResize() {
     controls.handleResize();
 }
 
-function init(path, id, c) {
+function show_single_stl(path, id, c) {
     var loader = new THREE.STLLoader();
     var mesh;
     //var index = layer.load(1, {
@@ -201,7 +201,7 @@ function init(path, id, c) {
 }
 
 
-function init2(path, c, id, opa) {
+function show_all_stl(path, c, id, opa) {
     var loader = new THREE.STLLoader();
     var mesh;
 
@@ -293,7 +293,6 @@ function scaleCanvas(event) {
 }
 
 function animate() {
-
     requestAnimationFrame(animate);
     render();
     controls.update();
