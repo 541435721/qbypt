@@ -1,0 +1,51 @@
+{% extends 'customer_side.html' %}
+{% load static %}
+<script src="{% static 'js/jquery.js' %}"></script>
+{% block title %}项目管理{% endblock %}
+{% block content %}
+
+
+    <section id="content">
+        <section class="vbox">
+            <section class="scrollable padder">
+                <ul class="breadcrumb no-border no-radius b-b b-light pull-in">
+                    <li><a href="/"><i class="fa fa-home"></i> 主页</a></li>
+                    <li class="active">发票申请</li>
+                </ul>
+                <div class="col-sm-3 pull-left">
+                </div>
+                <div class="col-sm-5">
+                    <label> 订单编号 : </label>
+                    {{ order_id }}
+                    <form data-validate="parsley" id="projectform" class="ProjectFrom" action="/customer_invoice_demand/"
+                          method="post"
+                          role="form">
+                        {% csrf_token %}
+                        <fieldset>
+                            {% for field in form.visible_fields %}
+                                <input type="text" value="{{ order.order }}" name="order" style="display: none" />
+                                <input type="text" value="{{ order.order_price }}" name="amount" style="display: none" />
+                                <div class="form-group{% if field.errors %} has-error{% endif %}">
+                                    <label for="{{ field.label }}">{{ field.label }}</label>
+                                    {{ field }}
+                                    {% if field.help_text %}
+                                        <span class="help-block">{{ field.help_text|safe }}</span>
+                                    {% endif %}
+                                    {% for error in field.errors %}
+                                        <label class="control-label">{{ error }}</label>
+                                    {% endfor %}
+                                </div>
+                            {% endfor %}
+                        <label> 发票价格 :  </label>
+                        {{ order.order_price }}
+                            <div class="form-group-left">
+                                <button type="submit" class="btn btn-large btn-primary">申请</button>
+                            </div>
+                        </fieldset>
+                    </form>
+                </div>
+            </section>
+        </section>
+    </section>
+
+{% endblock %}

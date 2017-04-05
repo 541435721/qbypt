@@ -147,14 +147,58 @@
                         </div>
                     </section>
                     <script>
+
                         function choose_part(part_name) {
-                            alert('载入' + part_name);
+                            var k = 0, head, tail;
+                            var temp = parseInt(type);
+                            if ($("#display" + type).is(":hidden")) {
+                                controls.reset();
+                                for (var i = 0; i <= j; i++) {
+                                    var selectedObject = scene.getObjectByName('actor' + i);
+                                    if (selectedObject) {
+                                        scene.remove(selectedObject);
+                                    }
+                                }
+                                var selectedObject1 = scene.getObjectByName('actor');
+                                scene.remove(selectedObject1);
+
+                                $("#display" + type).slideDown(50);
+                            }
+                            else {
+                                $("#display" + type).slideUp(50);
+                            }
                         }
                         function change_color(part_name) {
-                            alert('改变 ' + part_name + ' 颜色');
+                            var selectedObject = scene.getObjectByName('actor' + id);
+                            if (selectedObject) {
+                                selectedObject.material.color = new THREE.Color(color);
+                                labels[id - 1] = 1;
+                                COLORS[id - 1] = color;
+                                if (document.getElementById("changer" + id)) {
+                                    document.getElementById("changer" + id).value = color;
+                                }
+                                if (document.getElementById("changer_" + id)) {
+                                    document.getElementById("changer_" + id).value = color;
+                                }
+                            } else {
+                                alert("没有找到目标" + 'actor' + id);
+                            }
+                            animate();
                         }
                         function change_transparency(part_name) {
-                            alert('改变 ' + part_name + ' 透明度');
+                            var ran = document.getElementById('r' + id);
+                            var value = ran.value;
+                            var selectedObject = scene.getObjectByName('actor' + id);
+                            selectedObject.material.opacity = value * 1.0 / 100;
+                            animate();
+                        }
+
+                        function project_select() {
+                            location.href = "/show_stl/?classify=" + $('#select_project').val() + "";
+                        }
+
+                        function project_selecter(type) {
+                            location.href = "/show_stl/?classify=" + type + "";
                         }
 
                     </script>

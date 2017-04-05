@@ -62,9 +62,14 @@
 
                                     <td>
                                         {% if foo.is_pay %}
-                                            <p></p>
+                                            {% if foo.is_complete == '1' %}
+                                            <a href="javascript:demand_invoice('{{ foo.out_trade_no }}')" >申请发票</a>
+                                            {% elif foo.is_complete == '2' %}
+                                            已申请发票
+                                            {% endif %}
                                         {% else %}
                                             <a href="{{ foo.url }}" target="_blank" >支付</a>
+                                            <a href="/alipy_notify?is_success=T&trade_status=TRADE_SUCCESS&out_trade_no={{ foo.out_trade_no }}">完成支付</a>
                                         {% endif %}
                                     </td>
                                 </tr>
@@ -79,5 +84,10 @@
         </section>
     </section>
     <a href="#" class="hide nav-off-screen-block" data-toggle="class:nav-off-screen" data-target="#nav"></a>
-
+    <script>
+    function demand_invoice(order_id)
+    {
+        location.href="/customer_invoice_demand/?order_id="+order_id+"";
+    }
+    </script>
 {% endblock %}

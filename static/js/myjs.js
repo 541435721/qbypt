@@ -2,6 +2,19 @@
  * Created by bxsh on 2016/8/23.
  */
 
+$('#accordion').accordion({
+    heightStyle: "content",
+});
+var side_bar = document.getElementById('side_bar');
+window.addEventListener('side_bar', onWindowResize, false);
+function onWindowResize() {
+    renderer.setSize(canvas_div.clientWidth, window.innerHeight);
+}
+
+
+var colors = new Array('Bisque', 'Red', 'Chocolate', 'DarkSlateBlue', 'Feldspar', 'HotPink', 'Brown', 'Green', 'Darkorange', 'Blue');
+        
+
 if (!Detector.webgl) Detector.addGetWebGLMessage();
 
 function doNothing() {

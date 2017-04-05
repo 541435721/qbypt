@@ -190,22 +190,14 @@ def customer_project_list(request):  # 用户项目列表
     if not request.user.is_authenticated():
         return redirect('/login/')
     projects = xmqb_model.Project.objects.filter(user=request.user)
-    pays = []
-    # 向前台传递这里生成的字典列表，包括项目信息，订单信息和支付链接
+    pros = []
     for foo in projects:
-        order = xmqb_model.Order.objects.get(project=foo.project)
         if foo.status == '1':
             temp_url = {'status': foo.status,
                         'project': foo.project,
                         'project_name': foo.project_name,
                         'classify_name': foo.classify.classify_name,
                         'create_time': foo.create_time,
-                        'price': order.order_price,
-                        'out_trade_no': order.order,
-                        'url': alipay.create_direct_pay_by_user_url(out_trade_no=order.order,
-                                                                    subject=u'测试', total_fee=order.order_price,
-                                                                    return_url='http://127.0.0.1:8000/customer_project_list',
-                                                                    notify_url='http://www.tencent.com/')
                         }
         else:
             temp_url = {'status': foo.status,
@@ -213,12 +205,9 @@ def customer_project_list(request):  # 用户项目列表
                         'project_name': foo.project_name,
                         'classify_name': foo.classify.classify_name,
                         'create_time': foo.create_time,
-                        'out_trade_no': order.order,
-                        'price': xmqb_model.Order.objects.get(project=foo.project).order_price,
-                        'url': "/"
                         }
-        pays.append(temp_url)
-    return render(request, 'customer_project_list.html', {'project': pays})
+        pros.append(temp_url)
+    return render(request, 'customer_project_list.html', {'project': pros})
 
 
 def customer_project_new(request):  # 用户新建项目
@@ -241,12 +230,6 @@ def customer_project_new(request):  # 用户新建项目
             project.patient_age = form.cleaned_data['patient_age']
             project.patient_address = form.cleaned_data['patient_address']
             project.remark = form.cleaned_data['remark']
-            upload_name = form.cleaned_data['upload_name']
-            project.upload_name = upload_name
-            if len(upload_name) > 0:
-                project.status = '1'
-            else:
-                project.status = '0'
             project.save()
 
             partlist = form.cleaned_data['part']
@@ -324,7 +307,6 @@ def customer_project_alert(request):  # 用户修改项目
     if not request.user.is_authenticated():
         return redirect('/login')
     project_id = request.GET['project_id']
-
     if request.method == 'GET':
         try:
             project = xmqb_model.Project.objects.get(project=project_id)
@@ -384,7 +366,7 @@ def customer_project_alert(request):  # 用户修改项目
                 project.status = 1
         else:
             return render(request, 'customer_project_alert.html', {'form': form})
-    projects = xmqb_model.Project.objects.all()
+    projects = xmqb_model.Project.objects.filter(user=request.user)
     return render(request, 'customer_project_alert.html', {'project': projects})
 
 
@@ -412,12 +394,17 @@ def customer_stl_show(request):  # 用户查看3D模型
                 url = u'' + DOWNLOAD_DIR + '/' + str(record.user.username) + '/' + str(record.classify_id) + '/' + str(
                     record.project) + '/STL/'
                 url = url.replace('\\', '/')
+                sub_url = u'' + '/download' + '/' + str(record.user.username) + '/' + str(record.classify_id) + '/' + str(
+                    record.project) + '/STL/'
+                sub_url = sub_url.replace('\\', '/')
                 part_url = os.listdir(url)
+                print part_url
                 part_name = copy.copy(part_url)
+                print part_name
                 for x in xrange(len(part_name)):
                     part_name[x] = part_name[x][0:-4]
                 for i in xrange(len(part_url)):
-                    part_url[i] = url + part_url[i]
+                    part_url[i] = sub_url + part_url[i]
                 project = {}
                 project = {'name': record.project_name,
                            'part_name': part_name,
@@ -477,13 +464,52 @@ def customer_order_pay(request):  # 用户订单付款
 def customer_invoice_list(request):  # 用户发票列表
     if not request.user.is_authenticated():
         return redirect('/login')
-
-    return render(request, 'customer_invoice_list.html')
+    orders=xmqb_model.Order.objects.filter(user=request.user,is_complete='1')
+    invoices=xmqb_model.Invoice.objects.filter(user=request.user)
+    return render(request, 'customer_invoice_list.html',{'orders':orders,'invoices':invoices})
 
 
 def customer_invoice_demand(request):  # 用户发票索取
+    if not request.user.is_authenticated():
+        return redirect('/login/')
+    if request.method=='GET':
+        order_id=request.GET['order_id']
+        form = xmqb_form.InvoiceDemandForm()
+        try:
+            order=xmqb_model.Order.objects.get(order=order_id)
+        except:
+            return render(request, 'customer_invoice_demand.html', {'order_id': order_id, 'form': form})
+        return render(request,'customer_invoice_demand.html',{'order_id':order_id,'form':form,'order':order})
+    if (request.method == 'POST'):
+        form = xmqb_form.InvoiceDemandForm(request.POST)
+        if form.is_valid():
+            order_id=request.POST['order']
+            amount=request.POST['amount']
+            order=xmqb_model.Order.objects.get(order=order_id) # 查找发票对应的订单
+            title=form.cleaned_data['title']
+            demand_type=form.cleaned_data['demand_type']
+            invoice_type=form.cleaned_data['invoice_type']
+            recipient_name=form.cleaned_data['recipient_name']
+            address=form.cleaned_data['address']
+            telephone=form.cleaned_data['telephone']
+            deliver_id=form.cleaned_data['deliver_id']
+            deliver_company=form.cleaned_data['deliver_company']
+            remark=form.cleaned_data['remark']
+            invoice=xmqb_model.Invoice.objects.create(title=title,demand_type=demand_type,order=order,user=order.user,
+                                                      invoice_type=invoice_type,recipient_name=recipient_name,
+                                                      address=address,telephone=telephone,deliver_id=deliver_id,
+                                                      deliver_company=deliver_company,remark=remark,amount=amount
+                                                      )
+            invoice.save()
+            order.is_complete='2'  # 申请发票成功后，修改订单状态
+            order.save()
+            return redirect('/customer_invoice_list')
+        else:
+            return render(request, 'customer_invoice_demand.html',{'form':form})
+    else:
+        form=xmqb_form.InvoiceDemandForm()
+        return render(request, 'customer_invoice_demand.html',{'form':form})
 
-    return render(request, 'customer_invoice_demand.html')
 
 
 def customer_invoice_info(request):  # 用户发票信息
@@ -1092,6 +1118,9 @@ def alipy_notify(request):
         if request.GET['is_success'] == 'T' and request.GET['trade_status'] == 'TRADE_SUCCESS':
             thisorder = xmqb_model.Order.objects.get(order=request.GET['out_trade_no'])
             thisorder.is_pay = True  # 将当前已支付的订单设置为已支付
+            thisorder.is_complete = '1'
+            thisorder.pay_date=plan_complete_time=time.strftime('%Y-%m-%d %H:%M',
+                                                                time.localtime(time.time()))
             thisproject = thisorder.project  # 将当前订单对应的项目设置为已支付状态
             thisproject.status = '2'
             # 支付完成生成工单,默认1号为审核员
@@ -1106,36 +1135,6 @@ def alipy_notify(request):
             workorder.save()
             thisorder.save()
             thisproject.save()
-            projects = xmqb_model.Project.objects.filter(user=request.user)
-            pays = []
-            # 向前台传递这里生成的字典列表，包括项目信息，订单信息和支付链接
-            for foo in projects:
-                order = xmqb_model.Order.objects.get(project=foo.project)
-                if foo.status == '1':
-                    temp_url = {'status': foo.status,
-                                'project': foo.project,
-                                'project_name': foo.project_name,
-                                'classify_name': foo.classify.classify_name,
-                                'create_time': foo.create_time,
-                                'price': order.order_price,
-                                'out_trade_no': order.order,
-                                'url': alipay.create_direct_pay_by_user_url(out_trade_no=order.order,
-                                                                            subject=u'测试', total_fee=order.order_price,
-                                                                            return_url='http://127.0.0.1:8000/customer_project_list',
-                                                                            # return_url是支付成功后跳转的链接
-                                                                            notify_url='http://www.tencent.com/')
-                                }
-                else:
-                    temp_url = {'status': foo.status,
-                                'project': foo.project,
-                                'project_name': foo.project_name,
-                                'classify_name': foo.classify.classify_name,
-                                'create_time': foo.create_time,
-                                'out_trade_no': order.order,
-                                'price': xmqb_model.Order.objects.get(project=foo.project).order_price,
-                                'url': "/"
-                                }
-                pays.append(temp_url)
-            return render(request, 'customer_project_list.html', {'project': pays})
+            return redirect('/customer_order_list')
         else:
             return render(request, 'index.html', {'dic': 'failed'})
