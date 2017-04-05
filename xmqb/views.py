@@ -202,10 +202,6 @@ def customer_project_list(request):  # 用户项目列表
                         'create_time': foo.create_time,
                         'price': order.order_price,
                         'out_trade_no': order.order,
-                        'url': alipay.create_direct_pay_by_user_url(out_trade_no=order.order,
-                                                                    subject=u'测试', total_fee=order.order_price,
-                                                                    return_url='http://127.0.0.1:8000/customer_project_list',
-                                                                    notify_url='http://www.tencent.com/')
                         }
         else:
             temp_url = {'status': foo.status,
@@ -579,10 +575,9 @@ def administrator_user_info_alter(request):  # 管理员用户个人信息修改
     Id = request.GET['user_id']
     user = xmqb_model.User.objects.get(id=Id)
     if not request.user.is_authenticated():
-        print 'not log in'
+
         return redirect('/weblogin')
     elif not request.user.is_superuser:
-        print 'not super user'
         return redirect('/')
     if request.method == 'GET':
         thisUser = xmqb_model.UserInfo.objects.get(user=user)
