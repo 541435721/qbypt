@@ -1,0 +1,29 @@
+{% extends 'customer_side.html' %}
+{% block title %}订单管理{% endblock %}
+{% block content %}
+    <section id="content">
+        <section class="vbox">
+            <section class="scrollable padder">
+                <ul class="breadcrumb no-border no-radius b-b b-light pull-in">
+                    <li><a href="/"><i class="fa fa-home"></i> 主页</a></li>
+                    <li class="active">订单详情：{{ order.order }}</li>
+                </ul>
+                <section class="panel panel-default">
+                    <div style="border:0px solid; width:auto; height: auto; overflow:auto;">
+                        <div style="text-align: center">
+                            <label>订单号：</label><input readonly="readonly" value="{{ order.order }}"><br>
+                            <label>项目号：</label><input readonly="readonly" value="{{ order.project }}"><br>
+                            <label>创建时间：</label><input readonly="readonly" value="{{ order.time }}"><br>
+                            <label>金额：</label><input readonly="readonly" value="{{ order.price }}"><br>
+                            <label>发票：</label><input readonly="readonly" value="{{ order.invoice }}"><br>
+                        </div>
+                    </div>
+
+
+                </section>
+            </section>
+        </section>
+    </section>
+    <a href="#" class="hide nav-off-screen-block" data-toggle="class:nav-off-screen" data-target="#nav"></a>
+
+{% endblock %}
