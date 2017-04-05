@@ -21,6 +21,7 @@ from xmqb.Helper import Checkcode
 # 支付用api
 from alipay_API import Alipay
 from qbypt.settings import DOWNLOAD_DIR
+import json
 
 # Create your views here.
 
@@ -428,7 +429,7 @@ def customer_stl_show(request):  # 用户查看3D模型
                            'part_name': part_name,
                            'stl_url': part_url,
                            'num': len(part_name)}
-                return render(request, 'stl_show.html', {'project': project})
+                return render(request, 'stl_show.html', {'project': project, 'urls': json.dumps(part_url)})
         except Exception, e:
             print e
             pass

@@ -208,7 +208,7 @@ function show_all_stl(path, c, id, opa) {
 
 
         var material = new THREE.MeshPhongMaterial({
-            color: color[c],
+            color: color_board[parseInt(id)],
             specular: 0x001111,
             shininess: 80,
             wireframe: false,
@@ -217,12 +217,7 @@ function show_all_stl(path, c, id, opa) {
             opacity: opa,
         });
 
-        if (labels[id - 1] == 1) {
-            material.color = new THREE.Color(COLORS[id - 1]);
-        } else {
-            material.color = new THREE.Color(color[c]);
-        }
-
+        material.color = new THREE.Color(color_board[parseInt(id)]);
         mesh = new THREE.Mesh(geo, material);
 
         //alert(mesh.position.x + " " + mesh.position.y + " " + mesh.position.z);
