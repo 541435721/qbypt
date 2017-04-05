@@ -374,3 +374,15 @@ class Add_Price(forms.Form):  # 增加服务表单
 
     def __init__(self, *args, **kwargs):  # 初始化的方法
         super(Add_Price, self).__init__(*args, **kwargs)
+
+
+class Order_Detial(forms.Form):
+    """"""
+    order_id = forms.CharField(widget=forms.TextInput(attrs={'readonly': 'readonly'}), label='订单号')
+    user_name = forms.CharField(widget=forms.TextInput(attrs={'readonly': 'readonly'}), label='用户名')
+    create_time = forms.CharField(widget=forms.TextInput(attrs={'readonly': 'readonly'}), label='创建时间')
+    order_price = forms.CharField(widget=forms.TextInput(attrs={'readonly': 'readonly'}), label='订单金额')
+
+    def __init__(self, *args, **kwargs):
+        """Constructor for Order_Detial"""
+        super(Order_Detial, self).__init__(*args, **kwargs)

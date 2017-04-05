@@ -14,11 +14,13 @@ import forms as xmqb_form
 import models as xmqb_model
 from django.db.models import Q
 import time
+import copy
 # 图片验证码引用包
 import StringIO
 from xmqb.Helper import Checkcode
 # 支付用api
 from alipay_API import Alipay
+from qbypt.settings import DOWNLOAD_DIR
 
 # Create your views here.
 
@@ -400,7 +402,33 @@ def customer_project_delete(request):  # 用户项目删除
 
 
 def customer_stl_show(request):  # 用户查看3D模型
-    return render(request, 'customer_stl_show.html')
+    if not request.user.is_authenticated():
+        return redirect('/login')
+    if request.method == "GET":
+        try:
+            project_id = request.GET['project_id']
+            if project_id:
+                record = xmqb_model.Project.objects.get(project=project_id)
+                url = u'' + DOWNLOAD_DIR + '/' + str(record.user.username) + '/' + str(record.classify_id) + '/' + str(
+                    record.project) + '/STL/'
+                url = url.replace('\\', '/')
+                part_url = os.listdir(url)
+                part_name = copy.copy(part_url)
+                for x in xrange(len(part_name)):
+                    part_name[x] = part_name[x][0:-4]
+                for i in xrange(len(part_url)):
+                    part_url[i] = url + part_url[i]
+                project = {}
+                project = {'name': record.project_name,
+                           'part_name': part_name,
+                           'stl_url': part_url}
+                return render(request, 'stl_show.html', {'project': project})
+        except Exception, e:
+            print e
+            pass
+
+    record = xmqb_model.Project.objects.filter(user_id=request.user, status__gte=1)
+    return render(request, 'customer_stl_show.html', {'project': record})
 
 
 def customer_order_list(request):  # 用户订单列表
@@ -447,6 +475,8 @@ def customer_order_pay(request):  # 用户订单付款
 
 
 def customer_invoice_list(request):  # 用户发票列表
+    if not request.user.is_authenticated():
+        return redirect('/login')
 
     return render(request, 'customer_invoice_list.html')
 
@@ -501,7 +531,7 @@ def profile_upload(file, request):  # 处理文件函数，函数之间共享网
     classify = request.GET['classify']
     request.session['classify'] = classify
     project = xmqb_model.Project.objects.get(project=project_ID)
-    user = project.use
+    user = project.user
     sub_dir = 'DICOM'
     if not request.user.is_superuser:
         sub_dir = 'DICOM'
@@ -844,7 +874,21 @@ def administrator_order_list(request):  # 管理员订单列表查看
 
 
 def administrator_order_info(request):  # 管理员订单信息查看
-    render(request, 'administrator_order_list.html')
+    if not request.user.is_authenticated():
+        return redirect('/login')
+    if not request.user.is_superuser == 1:
+        return redirect('/login')
+    if request.method == "GET":
+        order_id = request.GET['order_id']
+        record = xmqb_model.Order.objects.get(order=order_id)
+
+        form = xmqb_form.Order_Detial(initial={'order_id': record.order,
+                                               'user_name': record.user,
+                                               'create_time': record.project.create_time,
+                                               'order_price': record.order_price})
+        return render(request, 'administrator_order_info.html', {'form': form})
+    else:
+        return redirect('/administrator_order_list')
 
 
 def administrator_invoice_list(request):  # 管理员发票列表
