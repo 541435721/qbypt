@@ -10,6 +10,7 @@
     <link rel="stylesheet" href="{% static 'css/app.v2.css' %}" type="text/css"/>
     <link rel="stylesheet" href="{% static 'css/combo.select.css' %}" type="text/css"/>
     <link rel="stylesheet" href="{% static 'js/calendar/bootstrap_calendar.css' %}" type="text/css" cache="false"/>
+    <script src="{% static 'js/jquery.min.js' %}"></script>
     <!--[if lt IE 9]>
     <script src="{% static 'js/ie/html5shiv.js'%}" cache="false"></script>
     <script src="{% static 'js/ie/respond.min.js'%}" cache="false"></script>
@@ -112,18 +113,23 @@
                             <nav class="nav-primary hidden-xs">
                                 <ul class="nav">
                                     {% for foo in project.part_name %}
-                                        <li><a href="#" onclick="javascript:choose_part('{{ foo }}')"> <i
-                                                class="fa fa-dollar icon">
-                                            <b class="bg-success"></b>
-                                        </i>
+                                        <li><a href="#"
+                                               onclick="javascript:choose_part('{{ foo.1 }}','{{ foo.0.1 }}')">
+                                            <i
+                                                    class="fa fa-dollar icon">
+                                                <b class="bg-success"></b>
+                                            </i>
                                             <span class="pull-right"> <i class="fa fa-angle-down text"></i> <i
                                                     class="fa fa-angle-up text-active"></i> </span>
-                                            <span>{{ foo }}</span> </a> {# 器官名 #}
+                                            <span>{{ foo.0.0 }}</span> </a> {# 器官名 #}
                                             <ul class="nav lt">
-                                                <input id="changer1" type="color"
-                                                       onchange="javascript:change_color('{{ foo }}')"> {# 取色器 #}&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp
-                                                <input id="r1" type="range" min="0" max="100" step="1" value="100"
-                                                       onchange="javascript:change_transparency('{{ foo }}')"> {# 滑动条 #}
+                                                <input id="changer{{ foo.0.1 }}" type="color"
+                                                       onchange="javascript:change_color({{ foo.0.1 }},this.value)">
+                                                {# 取色器 #}&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp
+                                                <input id="r{{ foo.0.1 }}" type="range" min="0" max="100" step="1"
+                                                       value="100"
+                                                       onchange="javascript:change_transparency({{ foo.0.1 }},this.value)">
+                                                {# 滑动条 #}
                                                 <br>
                                             </ul>
                                         </li>
@@ -135,10 +141,11 @@
                                         <span>显示所有</span> </a>
                                         {% for foo in project.part_name %}
                                             <ul class="nav lt">
-                                                <input id="changer1" type="color"
+                                                <input id="changer_{{ foo.0.1 }}" type="color"
                                                        onchange="javascript:change_color('{{ foo }}')">
-                                                <input id="r1" type="range" min="0" max="100" step="1" value="100"
-                                                       onchange="javascript:change_transparency('{{ foo }}')"><br>
+                                                <input id="r_{{ foo.0.1 }}" type="range" min="0" max="100" step="1"
+                                                       value="100"
+                                                       onchange="javascript:void('{{ foo }}')"><br>
                                             </ul>
                                         {% endfor %}
                                     </li>
@@ -147,14 +154,47 @@
                         </div>
                     </section>
                     <script>
-                        function choose_part(part_name) {
-                            alert('载入' + part_name);
+
+                        $(document).ready(function () {
+                            var part_num = {{ project.num }};
+                            for (var i = 0; i < parseInt(part_num); i++) {
+                                color_board[i] = color[i % color.length];
+                            }
+                        });
+                        function choose_part(part_name, id) {
+                            controls.reset();
+                            color_id = 'changer' + id;
+                            document.getElementById(color_id).value = color[id];
+
+                            for (var i = 0; i <= 8; i++) {
+                                var selectedObject = scene.getObjectByName('actor' + i);
+                                if (selectedObject) {
+                                    scene.remove(selectedObject);
+                                }
+                            }
+                            show_single_stl(part_name, id);
+                            animate();
                         }
-                        function change_color(part_name) {
-                            alert('改变 ' + part_name + ' 颜色');
+                        function change_color(id, value) {
+                            var selectedObject = scene.getObjectByName('actor' + id);
+                            if (selectedObject) {
+                                color =
+                                    selectedObject.material.color = new THREE.Color(value);
+                                document.getElementById("changer" + id).value = value;
+                                document.getElementById("changer_" + id).value = value;
+                            } else {
+                                alert("没有找到目标" + 'actor' + id);
+                            }
+                            animate();
                         }
-                        function change_transparency(part_name) {
-                            alert('改变 ' + part_name + ' 透明度');
+                        function change_transparency(id, value) {
+                            var selectedObject = scene.getObjectByName('actor' + id);
+                            if (selectedObject) {
+                                selectedObject.material.opacity = value * 1.0 / 100;
+                            } else {
+                                alert("没有找到目标" + 'actor' + id);
+                            }
+                            animate();
                         }
 
                     </script>

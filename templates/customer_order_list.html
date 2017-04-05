@@ -64,7 +64,9 @@
                                         {% if foo.is_pay %}
                                             <p></p>
                                         {% else %}
-                                            <a href="{{ foo.url }}" target="_blank" >支付</a>
+                                            <a href="{{ foo.url }}" target="_blank">支付</a>
+                                            <a href="/customer_order_info/?order_id={{ foo.out_trade_no }}"
+                                               target="_blank">查看详情</a>
                                         {% endif %}
                                     </td>
                                 </tr>
