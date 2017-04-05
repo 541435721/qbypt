@@ -412,16 +412,22 @@ def customer_stl_show(request):  # 用户查看3D模型
                 url = u'' + DOWNLOAD_DIR + '/' + str(record.user.username) + '/' + str(record.classify_id) + '/' + str(
                     record.project) + '/STL/'
                 url = url.replace('\\', '/')
+                sub_url = u'' + '/download' + '/' + str(record.user.username) + '/' + str(
+                    record.classify_id) + '/' + str(record.project) + '/STL/'
+                sub_url = sub_url.replace('\\', '/')
                 part_url = os.listdir(url)
                 part_name = copy.copy(part_url)
+                index = []
                 for x in xrange(len(part_name)):
                     part_name[x] = part_name[x][0:-4]
+                    index.append(x + 1)
                 for i in xrange(len(part_url)):
-                    part_url[i] = url + part_url[i]
-                project = {}
+                    part_url[i] = sub_url + part_url[i]
+                part_name = zip(zip(part_name, index), part_url)
                 project = {'name': record.project_name,
                            'part_name': part_name,
-                           'stl_url': part_url}
+                           'stl_url': part_url,
+                           'num': len(part_name)}
                 return render(request, 'stl_show.html', {'project': project})
         except Exception, e:
             print e
@@ -467,6 +473,23 @@ def customer_order_list(request):  # 用户订单列表
 
 
 def customer_order_info(request):  # 用户订单信息
+    if not request.user.is_authenticated():
+        return redirect('/login')
+    if request.method == "GET":
+        record = xmqb_model.Order.objects.get(order=request.GET['order_id'])
+        invoice = xmqb_model.Invoice.objects.filter(order_id=record.order)
+        if invoice:
+            invoice = True
+        else:
+            invoice = False
+        order_detial = {'order': record.order,
+                        'time': record.start_date,
+                        'price': record.order_price,
+                        'invoice': invoice,
+                        'project': record.project_id}
+
+        return render(request, 'customer_order_info.html', {'order': order_detial})
+
     return render(request, 'customer_order_info.html')
 
 
@@ -495,11 +518,32 @@ def customer_coupon_list(request):  # 用户优惠券列表
 
 
 def customer_message_list(request):  # 用户消息列表
-    return render(request, 'customer_message_list.html')
+    if not request.user.is_authenticated():
+        return redirect('/login')
+    record = xmqb_model.Message.objects.filter(user_id=request.user.id)
+    print request.user.id
+    not_read = len(xmqb_model.Message.objects.filter(user_id=request.user.id, is_read=0))
+    return render(request, 'customer_message_receive.html', {'messages': record, 'message': not_read})
 
 
 def customer_message_info(request):  # 用户消息详情
-    return render(request, 'customer_message_info.html')
+    if not request.user.is_authenticated():
+        return redirect('/login')
+
+    if request.method == "GET":
+        id = request.GET['message']
+        record = xmqb_model.Message.objects.get(message=id)
+
+        forms = xmqb_form.Read_Message(
+            initial={'receiver': record.user_id, 'title': record.title, 'context': record.message_content})
+
+        record.is_read = 1
+        record.read_time = timezone.localtime(timezone.now()).strftime("%Y-%m-%d %H:%M:%S")
+        record.save()
+
+        return render(request, 'customer_message_read.html', {'form': forms})
+    else:
+        return redirect('/customer_message_receive')
 
 
 @csrf_exempt
