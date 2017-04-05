@@ -4,107 +4,116 @@
 {% block content %}
     <script src="{% static 'js/jquery.js' %}"></script>
 
-<section class="scrollable padder">
-        <div class="m-b-md">
-            <h3 class="m-b-none" style="font-family: 微软雅黑">查看项目</h3>
-        </div>
-
-        <div class="container">
-            <section class="panel panel-default">
-                <div style="border:0px solid; width:auto; height: auto; overflow:auto;">
-                    <table data-toggle="table"
-                            {#               data-url="/gh/get/response.json/wenzhixin/bootstrap-table/tree/master/docs/data/data1/"#}
-                           data-search="true"
-                           data-sort-name="stargazers_count"
-                           data-sort-order="desc"
-                           data-show-refresh="true"
-                           data-show-toggle="true"
-                           data-show-columns="true">
-                        <thead>
-                        <tr>
-                            <th data-field="ID" data-sortable="true">
-                                <div style="font-weight: 900;font-size: medium">项目编号</div>
-                            </th>
-                            <th data-field="name" data-sortable="true">
-                                <div style="font-weight: 900;font-size: medium">项目名</div>
-                            </th>
-                            <th data-field="class" data-sortable="true">
-                                <div style="font-weight: 900;font-size: medium">项目类别</div>
-                            </th>
-                            <th data-field="create_time" data-sortable="true">
-                                <div style="font-weight: 900;font-size: medium">创建时间</div>
-                            </th>
-                            <th data-field="status" data-sortable="true">
-                                <div style="font-weight: 900;font-size: medium">项目状态</div>
-                            </th>
-                            <th data-field="handle">
-                                <div style="font-weight: 900;font-size: medium">操作</div>
-                            </th>
-                        </tr>
-                        </thead>
-                        {% for foo in project %}
-                            <tr>
-                                <td>{{ foo.project }}</td>
-                                <td>{{ foo.project_name }}</td>
-                                <td>{{ foo.classify.classify_name }}</td>
-                                <td>{{ foo.create_time|date:"Y-m-d H:i:s" }}</td>
-
-
-                                <td>
-                                    {% if foo.status == '3' %}
-                                        已完成
-                                    {% elif foo.status == '2' %}
-                                        处理中
-                                    {% elif foo.status == '1' %}
-                                        待支付
-                                    {% elif foo.status == '0' %}
-                                        未上传文件
-                                    {% endif %}
-                                </td>
-
-                                <td>
-                                    {#                                    <a href="javascript:deleteProject({{ foo.project }})">删除</a>#}
-                                    {#                                    <a href="javascript:displayProject({{ foo.project }})">查看</a>#}
-                                    {#                                    <a href="javascript:upload_file({{ foo.project }})">上传文件</a>#}
-                                    {#                                    <a href="javascript:change_peoject({{ foo.project }})">修改</a>#}
-                                    {% if foo.status == '0' %}
-                                        <a href="javascript:customer_project_alter({{ foo.project }})">修改项目</a>
-                                        <a href="javascript:customer_project_delete({{ foo.project }})">删除</a>
-                                        <a href="javascript:upload_file({{ foo.project }})">上传文件</a>
-                                    {% elif foo.status == '1' %}
-                                        {#                                        接收来自后台生成的支付链接#}
-                                        <a href="{{ foo.url }}" target="_blank">支付</a>
-                                        <a href="javascript:customer_project_info({{ foo.project }})">查看</a>
-                                        {#                                        手动修改支付状态，不用付钱#}
-                                        <a href="/alipy_notify?is_success=T&trade_status=TRADE_SUCCESS&out_trade_no={{ foo.out_trade_no }}">完成支付</a>
-                                    {% elif foo.status == '2' %}
-                                        <a href="javascript:customer_project_info({{ foo.project }})">查看</a>
-                                    {% endif %}
-                                </td>
-                            </tr>
-                        {% endfor %}
-
-                    </table>
+    <section id="content">
+        <section class="vbox">
+            <section class="scrollable padder">
+                <ul class="breadcrumb no-border no-radius b-b b-light pull-in">
+                    <li><a href="/"><i class="fa fa-home"></i> 主页</a></li>
+                    <li class="active">项目管理</li>
+                    <li class="active">项目清单</li>
+                </ul>
+                <div class="m-b-md">
+                    {#                            <h3 class="m-b-none">个人中心</h3>#}
+                    <small></small>
                 </div>
+                <section class="panel panel-default">
+                    <div style="border:0px solid; width:auto; height: auto; overflow:auto;">
+                        <table data-toggle="table"
+                                {#               data-url="/gh/get/response.json/wenzhixin/bootstrap-table/tree/master/docs/data/data1/"#}
+                               data-search="true"
+                               data-sort-name="stargazers_count"
+                               data-sort-order="desc"
+                               data-show-refresh="true"
+                               data-show-toggle="true"
+                               data-show-columns="true">
+                            <thead>
+                            <tr>
+                                <th data-field="ID" data-sortable="true">
+                                    <div style="font-weight: 900;font-size: medium">项目编号</div>
+                                </th>
+                                <th data-field="name" data-sortable="true">
+                                    <div style="font-weight: 900;font-size: medium">项目名</div>
+                                </th>
+                                <th data-field="class" data-sortable="true">
+                                    <div style="font-weight: 900;font-size: medium">项目类别</div>
+                                </th>
+                                <th data-field="create_time" data-sortable="true">
+                                    <div style="font-weight: 900;font-size: medium">创建时间</div>
+                                </th>
+                                <th data-field="status" data-sortable="true">
+                                    <div style="font-weight: 900;font-size: medium">项目状态</div>
+                                </th>
+                                <th data-field="handle">
+                                    <div style="font-weight: 900;font-size: medium">操作</div>
+                                </th>
+                            </tr>
+                            </thead>
+                            {% for foo in project %}
+                                <tr>
+                                    <td>{{ foo.project }}</td>
+                                    <td>{{ foo.project_name }}</td>
+                                    <td>{{ foo.classify.classify_name }}</td>
+                                    <td>{{ foo.create_time|date:"Y-m-d H:i:s" }}</td>
 
-                <footer class="panel-footer">
-                    <div class="row">
-                        <div class="col-sm-4 hidden-xs">
 
-                        </div>
-                        <div class="col-sm-4 text-center">
-                            <a type="submit" class="btn btn-large btn-primary"
-                               href="/customer_project_new/">
-                                <font color="#00008b" size="3"><B>新建项目</B></font>
-                            </a>
-                        </div>
-                        <div class="col-sm-4 text-right text-center-xs">
+                                    <td>
+                                        {% if foo.status == '3' %}
+                                            已完成
+                                        {% elif foo.status == '2' %}
+                                            处理中
+                                        {% elif foo.status == '1' %}
+                                            待支付
+                                        {% elif foo.status == '0' %}
+                                            未上传文件
+                                        {% endif %}
+                                    </td>
 
-                        </div>
+                                    <td>
+                                        {#                                    <a href="javascript:deleteProject({{ foo.project }})">删除</a>#}
+                                        {#                                    <a href="javascript:displayProject({{ foo.project }})">查看</a>#}
+                                        {#                                    <a href="javascript:upload_file({{ foo.project }})">上传文件</a>#}
+                                        {#                                    <a href="javascript:change_peoject({{ foo.project }})">修改</a>#}
+                                        {% if foo.status == '0' %}
+                                            <a href="javascript:customer_project_alter({{ foo.project }})">修改项目</a>
+                                            <a href="javascript:customer_project_delete({{ foo.project }})">删除</a>
+                                            <a href="javascript:upload_file({{ foo.project }})">上传文件</a>
+                                        {% elif foo.status == '1' %}
+                                            {#                                        接收来自后台生成的支付链接#}
+                                            <a href="{{ foo.url }}" target="_blank">支付</a>
+                                            <a href="javascript:customer_project_info({{ foo.project }})">查看</a>
+                                            {#                                        手动修改支付状态，不用付钱#}
+                                            <a href="/alipy_notify?is_success=T&trade_status=TRADE_SUCCESS&out_trade_no={{ foo.out_trade_no }}">完成支付</a>
+                                        {% elif foo.status == '2' %}
+                                            <a href="javascript:customer_project_info({{ foo.project }})">查看</a>
+                                        {% endif %}
+                                    </td>
+                                </tr>
+                            {% endfor %}
+
+                        </table>
                     </div>
-                </footer>
+
+                    <footer class="panel-footer">
+                        <div class="row">
+                            <div class="col-sm-4 hidden-xs">
+
+                            </div>
+                            <div class="col-sm-4 text-center">
+                                <a type="submit" class="btn btn-large btn-primary"
+                                   href="/customer_project_new/">
+                                    <font color="#00008b" size="3"><B>新建项目</B></font>
+                                </a>
+                            </div>
+                            <div class="col-sm-4 text-right text-center-xs">
+
+                            </div>
+                        </div>
+                    </footer>
+                </section>
+                </div>
             </section>
-        </div>
+        </section>
+        <a href="#" class="hide nav-off-screen-block" data-toggle="class:nav-off-screen" data-target="#nav"></a>
     </section>
     <a href="#" class="hide nav-off-screen-block" data-toggle="class:nav-off-screen" data-target="#nav"></a>
 

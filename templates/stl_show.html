@@ -1,0 +1,40 @@
+{% extends 'STL_show_control.html' %}
+{% load static %}
+{% block title %}查看项目{% endblock %}
+{% block content %}
+    <script src="{% static 'js/jquery.js' %}"></script>
+    <script src="{% static 'js/layer.js' %}"></script>
+    <script type="text/javascript" src="{% static 'js/three.min.js' %}"></script>
+    <script type="text/javascript" src="{% static 'js/OrbitControls.js' %}"></script>
+    <script type="text/javascript" src="{% static 'js/TrackballControls.js' %}"></script>
+    <script type="text/javascript" src="{% static 'js/Detector.js' %}"></script>
+    <script type="text/javascript" src="{% static 'js/stats.min.js' %}"></script>
+    <script type="text/javascript" src="{% static 'js/STLLoader.js' %}"></script>
+
+    <section id="content">
+        <section class="vbox">
+            <section class="scrollable padder">
+                <ul class="breadcrumb no-border no-radius b-b b-light pull-in">
+                    <li><a href="/"><i class="fa fa-home"></i> 主页</a></li>
+                    <li class="active">项目管理</li>
+                    <li class="active">查看项目</li>
+                    <li class="active">{{ project.name }}</li>
+                </ul>
+                <div class="m-b-md">
+                    {#                            <h3 class="m-b-none">个人中心</h3>#}
+                    <small></small>
+                </div>
+                <div id="canvas_div"></div>
+                <script type="text/javascript" src="{% static 'js/myjs.js' %}"></script>
+                <script>
+                    init('{{ project.stl_url.0 }}', 1, 'Red');
+                    animate();
+                </script>
+
+            </section>
+        </section>
+        <a href="#" class="hide nav-off-screen-block" data-toggle="class:nav-off-screen" data-target="#nav"></a>
+    </section>
+    <a href="#" class="hide nav-off-screen-block" data-toggle="class:nav-off-screen" data-target="#nav"></a>
+
+{% endblock %}
