@@ -548,6 +548,8 @@ def customer_message_info(request):  # 用户消息详情
     else:
         return redirect('/customer_message_receive')
 
+def customer_suggestion(request):
+    return render(request, 'customer_suggestion.html')
 
 @csrf_exempt
 def uploadify_script(request):  # 前端 uploadify在后台的处理函数，用于上传文件的处理
@@ -1169,7 +1171,6 @@ def administrator_message_read(request):  # 阅读信息
         return render(request, 'administrator_message_read.html', {'form': forms})
     else:
         return redirect('/administrator_message_receive')
-
 
 def alipy_notify(request):
     if request.method == 'POST':
