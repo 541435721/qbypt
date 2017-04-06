@@ -232,6 +232,12 @@ def customer_project_new(request):  # 用户新建项目
             project.patient_age = form.cleaned_data['patient_age']
             project.patient_address = form.cleaned_data['patient_address']
             project.remark = form.cleaned_data['remark']
+            # upload_name = form.cleaned_data['upload_name']
+            # project.upload_name = upload_name
+            # if len(upload_name) > 0:
+            #     project.status = '1'
+            # else:
+            #     project.status = '0'
             project.save()
 
             partlist = form.cleaned_data['part']
@@ -309,6 +315,7 @@ def customer_project_alert(request):  # 用户修改项目
     if not request.user.is_authenticated():
         return redirect('/login')
     project_id = request.GET['project_id']
+
     if request.method == 'GET':
         try:
             project = xmqb_model.Project.objects.get(project=project_id)
@@ -335,6 +342,7 @@ def customer_project_alert(request):  # 用户修改项目
 
     else:
         form = xmqb_form.ProjectForm(request.POST)
+        print form.is_valid()
         if form.is_valid():
             project = xmqb_model.Project.objects.get(project=project_id)
             project.project_name = form.cleaned_data['project_name']
@@ -354,21 +362,33 @@ def customer_project_alert(request):  # 用户修改项目
                 except:
                     project_part = xmqb_model.ProjectPart.objects.create(project=project, part=part)
                     price += part.part_price
+                    project_part.save()
 
-                project_part.save()
+            if project.status == '3' or project.status == '2':  # 用户已付款的情况下修改订单
+                if not price == 0:
+                    order = xmqb_model.Order.objects.create(
+                        order=time.strftime('%y%m%d%H%M%S') + str((project.user.id) % 10000).zfill(4) + str(
+                            (random.randint(0, 100) % 100)).zfill(2),
+                        user=project.user, project=project, classify=project.classify, order_type=u'修改',
+                        order_price=price)  # 生成工程的同时再生成 对应的订单
+                    order.save()
+                    project.status = 1
+                    project.save()
+            else:  # 用户该项还没有付款情况下 修改订单
+                print '修改订单'
+                if not price == 0:
+                    project = xmqb_model.Project.objects.get(project=project_id)
+                    try:
+                        order = xmqb_model.Order.objects.get(project=project, is_pay=0)
+                        order.order_price += price
+                        order.save()
+                    except Exception, e:
+                        return HttpResponse('支付异常')
 
-            if not price == 0:
-                order = xmqb_model.Order.objects.create(
-                    order=time.strftime('%y%m%d%H%M%S') + str((project.user.id) % 10000).zfill(4) + str(
-                        (random.randint(0, 100) % 100)).zfill(2),
-                    user=project.user, project=project, classify=project.classify, order_type=u'修改',
-                    order_price=price)  # 生成工程的同时再生成 对应的订单
-                order.save()
-                project.status = 1
         else:
             return render(request, 'customer_project_alert.html', {'form': form})
     projects = xmqb_model.Project.objects.filter(user=request.user)
-    return render(request, 'customer_project_alert.html', {'project': projects})
+    return render(request, 'customer_project_list.html', {'project': projects})
 
 
 def customer_project_delete(request):  # 用户项目删除
@@ -396,18 +416,16 @@ def customer_stl_show(request):  # 用户查看3D模型
                     record.project) + '/STL/'
                 url = url.replace('\\', '/')
                 sub_url = u'' + '/download' + '/' + str(record.user.username) + '/' + str(
-                    record.classify_id) + '/' + str(
-                    record.project) + '/STL/'
+                    record.classify_id) + '/' + str(record.project) + '/STL/'
                 sub_url = sub_url.replace('\\', '/')
                 part_url = os.listdir(url)
-                index = []
                 part_name = copy.copy(part_url)
+                index = []
                 for x in xrange(len(part_name)):
                     part_name[x] = part_name[x][0:-4]
                     index.append(x + 1)
                 for i in xrange(len(part_url)):
                     part_url[i] = sub_url + part_url[i]
-                project = {}
                 part_name = zip(zip(part_name, index), part_url)
                 project = {'name': record.project_name,
                            'part_name': part_name,
@@ -418,7 +436,7 @@ def customer_stl_show(request):  # 用户查看3D模型
             print e
             pass
 
-    record = xmqb_model.Project.objects.filter(user_id=request.user, status__gte=1)
+    record = xmqb_model.Project.objects.filter(user_id=request.user, status__gte=3)
     return render(request, 'customer_stl_show.html', {'project': record})
 
 
@@ -458,6 +476,23 @@ def customer_order_list(request):  # 用户订单列表
 
 
 def customer_order_info(request):  # 用户订单信息
+    if not request.user.is_authenticated():
+        return redirect('/login')
+    if request.method == "GET":
+        record = xmqb_model.Order.objects.get(order=request.GET['order_id'])
+        invoice = xmqb_model.Invoice.objects.filter(order_id=record.order)
+        if invoice:
+            invoice = True
+        else:
+            invoice = False
+        order_detial = {'order': record.order,
+                        'time': record.start_date,
+                        'price': record.order_price,
+                        'invoice': invoice,
+                        'project': record.project_id}
+
+        return render(request, 'customer_order_info.html', {'order': order_detial})
+
     return render(request, 'customer_order_info.html')
 
 
@@ -468,52 +503,13 @@ def customer_order_pay(request):  # 用户订单付款
 def customer_invoice_list(request):  # 用户发票列表
     if not request.user.is_authenticated():
         return redirect('/login')
-    orders = xmqb_model.Order.objects.filter(user=request.user, is_complete='1')
-    invoices = xmqb_model.Invoice.objects.filter(user=request.user)
-    return render(request, 'customer_invoice_list.html', {'orders': orders, 'invoices': invoices})
+
+    return render(request, 'customer_invoice_list.html')
 
 
 def customer_invoice_demand(request):  # 用户发票索取
-    if not request.user.is_authenticated():
-        return redirect('/login/')
-    if request.method == 'GET':
-        order_id = request.GET['order_id']
-        form = xmqb_form.InvoiceDemandForm()
-        try:
-            order = xmqb_model.Order.objects.get(order=order_id)
-        except:
-            return render(request, 'customer_invoice_demand.html', {'order_id': order_id, 'form': form})
-        return render(request, 'customer_invoice_demand.html', {'order_id': order_id, 'form': form, 'order': order})
-    if (request.method == 'POST'):
-        form = xmqb_form.InvoiceDemandForm(request.POST)
-        if form.is_valid():
-            order_id = request.POST['order']
-            amount = request.POST['amount']
-            order = xmqb_model.Order.objects.get(order=order_id)  # 查找发票对应的订单
-            title = form.cleaned_data['title']
-            demand_type = form.cleaned_data['demand_type']
-            invoice_type = form.cleaned_data['invoice_type']
-            recipient_name = form.cleaned_data['recipient_name']
-            address = form.cleaned_data['address']
-            telephone = form.cleaned_data['telephone']
-            deliver_id = form.cleaned_data['deliver_id']
-            deliver_company = form.cleaned_data['deliver_company']
-            remark = form.cleaned_data['remark']
-            invoice = xmqb_model.Invoice.objects.create(title=title, demand_type=demand_type, order=order,
-                                                        user=order.user,
-                                                        invoice_type=invoice_type, recipient_name=recipient_name,
-                                                        address=address, telephone=telephone, deliver_id=deliver_id,
-                                                        deliver_company=deliver_company, remark=remark, amount=amount
-                                                        )
-            invoice.save()
-            order.is_complete = '2'  # 申请发票成功后，修改订单状态
-            order.save()
-            return redirect('/customer_invoice_list')
-        else:
-            return render(request, 'customer_invoice_demand.html', {'form': form})
-    else:
-        form = xmqb_form.InvoiceDemandForm()
-        return render(request, 'customer_invoice_demand.html', {'form': form})
+
+    return render(request, 'customer_invoice_demand.html')
 
 
 def customer_invoice_info(request):  # 用户发票信息
@@ -528,8 +524,9 @@ def customer_message_list(request):  # 用户消息列表
     if not request.user.is_authenticated():
         return redirect('/login')
     record = xmqb_model.Message.objects.filter(user_id=request.user.id)
+    print request.user.id
     not_read = len(xmqb_model.Message.objects.filter(user_id=request.user.id, is_read=0))
-    return render(request, 'customer_message_list.html', {'messages': record, 'message': not_read})
+    return render(request, 'customer_message_receive.html', {'messages': record, 'message': not_read})
 
 
 def customer_message_info(request):  # 用户消息详情
@@ -542,17 +539,17 @@ def customer_message_info(request):  # 用户消息详情
 
         forms = xmqb_form.Read_Message(
             initial={'receiver': record.user_id, 'title': record.title, 'context': record.message_content})
+
         record.is_read = 1
         record.read_time = timezone.localtime(timezone.now()).strftime("%Y-%m-%d %H:%M:%S")
         record.save()
 
-        return render(request, 'customer_message_info.html', {'form': forms})
+        return render(request, 'customer_message_read.html', {'form': forms})
     else:
-        return redirect('/customer_message_list')
+        return redirect('/customer_message_receive')
 
 
-def customer_suggestion(request):  # 意见反馈
-
+def customer_suggestion(request):
     return render(request, 'customer_suggestion.html')
 
 
@@ -747,7 +744,7 @@ def administrator_project_alter(request):  # 管理员项目信息修改
 
         except:
             return HttpResponse("请选择项目")
-
+        pass
         selected_parts = xmqb_model.ProjectPart.objects.filter(project=project)
         parts = xmqb_model.Price.objects.all()
         part_relation = xmqb_model.PartRelation.objects.all()
@@ -815,6 +812,7 @@ def administrator_project_delete(request):  # 管理员项目删除
         project.delete()
     except:
         return HttpResponse("此项目不存在")
+    pass
     projects = xmqb_model.Project.objects.all()
     return render(request, 'administrator_project_list.html', {'project': projects})
 
@@ -940,12 +938,16 @@ def administrator_work_order_assess_handle(request):  # 工单审核
     else:
         project_id = workorder.project_id
         project = xmqb_model.Project.objects.get(project=project_id)
+        order = workorder.order
         assess = request.POST.get('qualify')
         remark = request.POST.get('remark')
         if assess == '1':
             workorder.status = 4
             workorder.remark = remark
             project.status = '3'
+            order.is_complete = 1
+            order.save()
+            project.save()
         else:
             workorder.status = 3
             workorder.remark = remark
@@ -1183,9 +1185,6 @@ def alipy_notify(request):
         if request.GET['is_success'] == 'T' and request.GET['trade_status'] == 'TRADE_SUCCESS':
             thisorder = xmqb_model.Order.objects.get(order=request.GET['out_trade_no'])
             thisorder.is_pay = True  # 将当前已支付的订单设置为已支付
-            thisorder.is_complete = '1'
-            thisorder.pay_date = plan_complete_time = time.strftime('%Y-%m-%d %H:%M',
-                                                                    time.localtime(time.time()))
             thisproject = thisorder.project  # 将当前订单对应的项目设置为已支付状态
             thisproject.status = '2'
             # 支付完成生成工单,默认1号为审核员
