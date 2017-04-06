@@ -503,13 +503,51 @@ def customer_order_pay(request):  # 用户订单付款
 def customer_invoice_list(request):  # 用户发票列表
     if not request.user.is_authenticated():
         return redirect('/login')
-
-    return render(request, 'customer_invoice_list.html')
+    orders=xmqb_model.Order.objects.filter(user=request.user,is_complete='1')
+    invoices=xmqb_model.Invoice.objects.filter(user=request.user)
+    return render(request, 'customer_invoice_list.html',{'orders':orders,'invoices':invoices})
 
 
 def customer_invoice_demand(request):  # 用户发票索取
-
-    return render(request, 'customer_invoice_demand.html')
+    if not request.user.is_authenticated():
+        return redirect('/login/')
+    if request.method=='GET':
+        order_id=request.GET['order_id']
+        form = xmqb_form.InvoiceDemandForm()
+        try:
+            order=xmqb_model.Order.objects.get(order=order_id)
+        except:
+            return render(request, 'customer_invoice_demand.html', {'order_id': order_id, 'form': form})
+        return render(request,'customer_invoice_demand.html',{'order_id':order_id,'form':form,'order':order})
+    if (request.method == 'POST'):
+        form = xmqb_form.InvoiceDemandForm(request.POST)
+        if form.is_valid():
+            order_id=request.POST['order']
+            amount=request.POST['amount']
+            order=xmqb_model.Order.objects.get(order=order_id) # 查找发票对应的订单
+            title=form.cleaned_data['title']
+            demand_type=form.cleaned_data['demand_type']
+            invoice_type=form.cleaned_data['invoice_type']
+            recipient_name=form.cleaned_data['recipient_name']
+            address=form.cleaned_data['address']
+            telephone=form.cleaned_data['telephone']
+            deliver_id=form.cleaned_data['deliver_id']
+            deliver_company=form.cleaned_data['deliver_company']
+            remark=form.cleaned_data['remark']
+            invoice=xmqb_model.Invoice.objects.create(title=title,demand_type=demand_type,order=order,user=order.user,
+                                                      invoice_type=invoice_type,recipient_name=recipient_name,
+                                                      address=address,telephone=telephone,deliver_id=deliver_id,
+                                                      deliver_company=deliver_company,remark=remark,amount=amount
+                                                      )
+            invoice.save()
+            order.is_complete='2'  # 申请发票成功后，修改订单状态
+            order.save()
+            return redirect('/customer_invoice_list')
+        else:
+            return render(request, 'customer_invoice_demand.html',{'form':form})
+    else:
+        form=xmqb_form.InvoiceDemandForm()
+        return render(request, 'customer_invoice_demand.html',{'form':form})
 
 
 def customer_invoice_info(request):  # 用户发票信息
