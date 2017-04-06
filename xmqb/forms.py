@@ -129,8 +129,8 @@ class ProjectForm(forms.Form):
         attrs={'class': 'form-control m-b parsley-validated', 'onchange': 'javascript:change_checkbox()'}),
         label=u'类型', required=True, choices=tuple(classify_choice))  # 表单项目类型选择 下拉框
 
-    upload_name = forms.CharField(widget=forms.TextInput(attrs={'class': 'form-control'}),
-                                  max_length=1000, required=False, label=u'文件名', )
+    # upload_name = forms.CharField(widget=forms.TextInput(attrs={'class': 'form-control'}),
+    #                               max_length=1000, required=False, label=u'文件名', )
 
     part = forms.MultipleChoiceField(label=u'选择部位', widget=forms.CheckboxSelectMultiple(
         attrs={'onchange': 'javascript:get_relation_checkbox(this.value)'}), choices=part_choice,
@@ -196,17 +196,35 @@ class InvoiceDemandForm(forms.ModelForm):
                                     label=u'开具类型', required=True, choices=demand_choice)  # 发票开具类型下拉框
 
     invoice_type = forms.ChoiceField(widget=forms.Select(attrs={'class': 'form-control m-b parsley-validated'}),
-                                     label=u'发票类型', required=True, choices=demand_choice)  #
+                                     label=u'发票类型', required=True, choices=invoice_choice)  # 发票类型
 
-    recipients_name = forms.CharField(widget=forms.TextInput(attrs={'class': 'form-control'}),  # 收件人姓名
+    recipient_name = forms.CharField(widget=forms.TextInput(attrs={'class': 'form-control'}),  # 收件人姓名
                                       max_length=10, required=True, label=u'收件人',
-                                      error_messages={'required': u'收件人不能为空'})
+                                      error_messages={'required': u'请填写发票收件人姓名'})
 
     address = forms.CharField(widget=forms.TextInput(attrs={'class': 'form-control'}),  # 收件人地址
-                              max_length=30, required=True, label=u'收件人地址')
+                              max_length=30, required=True, label=u'地址',
+                              error_messages={'required': u'请填写接收发票的地址'})
 
     telephone = forms.CharField(widget=forms.TextInput(attrs={'class': 'form-control'}),  # 收件人电话
-                                max_length=15, required=True, label=u'收件人电话')
+                                max_length=15, required=True, label=u'收件人电话',
+                                error_messages={'required': u'请填写收件人电话'})
+
+    deliver_id = forms.CharField(widget=forms.TextInput(attrs={'class': 'form-control'}),  # 物流编号
+                                 max_length=30,required=True,label=u'物流编号',
+                                 error_messages={'required': u'请填写物流编号'})
+
+    deliver_company = forms.CharField(widget=forms.TextInput(attrs={'class': 'form-control'}),  # 物流公司
+                                      max_length=30,required=True,label=u'物流公司',
+                                      error_messages={'required': u'请填写物流公司'})
+
+    remark=forms.CharField(widget=forms.TextInput(attrs={'class': 'form-control'}),
+                           max_length=100,required=False,label=u'备注',)
+
+    class Meta:  # 和数据模型关联类ModelForm必要的子类
+        model = models.Invoice
+        fields = ['title','demand_type','invoice_type','recipient_name','address','telephone','deliver_id','deliver_company','remark']
+        exclude = ['order','amount','demand_time','deliver_time','status','user',]  # 剔除不要的表项
 
     def __init__(self, *args, **kwargs):  # 初始化的方法
         super(InvoiceDemandForm, self).__init__(*args, **kwargs)
