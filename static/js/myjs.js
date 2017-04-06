@@ -2,13 +2,26 @@
  * Created by bxsh on 2016/8/23.
  */
 
+$('#accordion').accordion({
+    heightStyle: "content",
+});
+var side_bar = document.getElementById('side_bar');
+window.addEventListener('side_bar', onWindowResize, false);
+function onWindowResize() {
+    renderer.setSize(canvas_div.clientWidth, window.innerHeight);
+}
+
+
+var colors = new Array('Bisque', 'Red', 'Chocolate', 'DarkSlateBlue', 'Feldspar', 'HotPink', 'Brown', 'Green', 'Darkorange', 'Blue');
+        
+
 if (!Detector.webgl) Detector.addGetWebGLMessage();
 
 function doNothing() {
     window.event.returnValue = false;
     return false;
 }
-color_board = new Array();
+
 var container, stats;
 var index;
 var camera, cameraTarget, scene, renderer;
@@ -26,19 +39,36 @@ var mesh_r_z = 0;
 var start_x = 0;
 var start_y = 0;
 
+var lis = new Array('Brown',
+    'Darkorange',
+    'Darkorange',
+    'Darkorange',
+    'Darkorange',
+    'HotPink',
+    'HotPink',
+    'HotPink',
+    'HotPink',
+    'HotPink',
+    'HotPink',
+    'HotPink',
+    'HotPink',
+    'HotPink',
+    'HotPink',
+    'HotPink'
+);
 
-var color = new Array(
-    '#FFE4C4',
-    '#ff5533',
-    '#D2691E',
-    '#483D8B',
-    '#D19275',
-    '#FF69B4',
-    '#A52A2A',
-    '#008000',
-    '#FF8C00',
-    '#0000FF');
-
+var color = {
+    'Bisque': '#FFE4C4',
+    'Red': '#ff5533',
+    'Chocolate': '#D2691E',
+    'DarkSlateBlue': '#483D8B',
+    'Feldspar': '#D19275',
+    'HotPink': '#FF69B4',
+    'Brown': '#A52A2A',
+    'Green': '#008000',
+    'Darkorange': '#FF8C00',
+    'Blue': '#0000FF',
+};
 // new added
 var labels = new Array();
 var COLORS = new Array();
@@ -142,7 +172,7 @@ function onWindowResize() {
     controls.handleResize();
 }
 
-function show_single_stl(path, id) {
+function show_single_stl(path, id, c) {
     var loader = new THREE.STLLoader();
     var mesh;
     //var index = layer.load(1, {
@@ -165,9 +195,8 @@ function show_single_stl(path, id) {
         if (labels[id - 1] == 1) {
             material.color = new THREE.Color(COLORS[id - 1]);
         } else {
-            // material.color = new THREE.Color(color[c]);
+            material.color = new THREE.Color(color[c]);
         }
-        material.color = new THREE.Color(color[id % color.length]);
         mesh = new THREE.Mesh(geo, material);
 
 
