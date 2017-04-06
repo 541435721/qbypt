@@ -364,7 +364,7 @@ def customer_project_alert(request):  # 用户修改项目
                     price += part.part_price
                     project_part.save()
 
-            if project.status == '3' or project.status == '2':  # 用户已付款的情况下修改订单
+            if project.status == '3' or project.status == '2':          # 用户已付款的情况下修改订单
                 if not price == 0:
                     order = xmqb_model.Order.objects.create(
                         order=time.strftime('%y%m%d%H%M%S') + str((project.user.id) % 10000).zfill(4) + str(
@@ -374,15 +374,15 @@ def customer_project_alert(request):  # 用户修改项目
                     order.save()
                     project.status = 1
                     project.save()
-            else:  # 用户该项还没有付款情况下 修改订单
+            else:                                                       # 用户该项还没有付款情况下 修改订单
                 print '修改订单'
                 if not price == 0:
                     project = xmqb_model.Project.objects.get(project=project_id)
                     try:
-                        order = xmqb_model.Order.objects.get(project=project, is_pay=0)
+                        order = xmqb_model.Order.objects.get(project=project,is_pay=0)
                         order.order_price += price
                         order.save()
-                    except Exception, e:
+                    except Exception,e:
                         return HttpResponse('支付异常')
 
         else:
@@ -548,10 +548,8 @@ def customer_message_info(request):  # 用户消息详情
     else:
         return redirect('/customer_message_receive')
 
-
 def customer_suggestion(request):
     return render(request, 'customer_suggestion.html')
-
 
 @csrf_exempt
 def uploadify_script(request):  # 前端 uploadify在后台的处理函数，用于上传文件的处理
@@ -909,7 +907,7 @@ def administrator_file_upload(request):
 
 def administrator_work_order_assess_list(request):  # 工单审核列表
     assessor = xmqb_model.Worker.objects.get(worker=request.user)
-    workOrders = xmqb_model.WorkOrder.objects.filter(Q(status=2) | Q(status=3) | Q(status=4), assessor=assessor)
+    workOrders = xmqb_model.WorkOrder.objects.filter(Q(status=2) | Q(status=3) | Q(status=4),assessor=assessor)
     return render(request, 'administrator_work_order_assess_list.html', {'workOrders': workOrders})
 
 
@@ -1173,7 +1171,6 @@ def administrator_message_read(request):  # 阅读信息
         return render(request, 'administrator_message_read.html', {'form': forms})
     else:
         return redirect('/administrator_message_receive')
-
 
 def alipy_notify(request):
     if request.method == 'POST':
