@@ -122,6 +122,8 @@ urlpatterns = [
 
     url(r'^administrator_invoice_info/$', views.administrator_invoice_info, name='administrator_invoice_info'),
 
+    url(r'^administrator_invoice_create/$',views.administrator_invoice_create,name='administrator_invoice_create'),
+
     url(r'^administrator_coupon_distribute/$', views.administrator_coupon_distribute,
         name='administrator_coupon_distribute'),
 

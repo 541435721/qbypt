@@ -1,0 +1,68 @@
+{% extends 'administrator_side.html' %}
+{% load static %}
+<script src="{% static 'js/jquery.js' %}"></script>
+{% block title %}项目管理{% endblock %}
+{% block content %}
+    <section id="content">
+        <section class="vbox">
+            <section class="scrollable padder">
+                <ul class="breadcrumb no-border no-radius b-b b-light pull-in">
+                    <li><a href="/"><i class="fa fa-home"></i> 主页</a></li>
+                    <li class="active">发票申请</li>
+                </ul>
+                <div class="col-sm-3 pull-left">
+                </div>
+                <div class="col-sm-5">
+                    <label> 订单编号 : </label>
+                    {{ order_id }}
+                    <form data-validate="parsley" id="projectform" class="ProjectFrom"
+                          action="/administrator_invoice_handle/"
+                          method="post"
+                          role="form">
+                        {% csrf_token %}
+                        <fieldset>
+                            <input type="text" value="{{ order.order }}" name="order" />
+                            <input type="text" value="{{ order.order_price }}" name="amount" />
+                            <div class="form-group{% if field.errors %} has-error{% endif %}">
+                                <label >{{ form.deliver_id.label }}</label>
+                                {{ form.deliver_id }}
+                                {% if form.deliver_id.help_text %}
+                                    <span class="help-block">{{ form.deliver_id.help_text|safe }}</span>
+                                {% endif %}
+                                {% for error in form.deliver_id.errors %}
+                                    <label class="control-label">{{ error }}</label>
+                                {% endfor %}
+                            </div>
+                            <div class="form-group{% if form.deliver_company.errors %} has-error{% endif %}">
+                                <label >{{ form.deliver_company.label }}</label>
+                                {{ form.deliver_company }}
+                                {% if form.deliver_company.help_text %}
+                                    <span class="help-block">{{ form.deliver_company.help_text|safe }}</span>
+                                {% endif %}
+                                {% for error in form.deliver_company.errors %}
+                                    <label class="control-label">{{ error }}</label>
+                                {% endfor %}
+                            </div>
+                            <div class="form-group{% if form.remark.errors %} has-error{% endif %}">
+                                <label >{{ form.remark.label }}</label>
+                                {{ form.remark }}
+                                {% if form.remark.help_text %}
+                                    <span class="help-block">{{ form.remark.help_text|safe }}</span>
+                                {% endif %}
+                                {% for error in form.remark.errors %}
+                                    <label class="control-label">{{ error }}</label>
+                                {% endfor %}
+                            </div>
+                            <label> 发票价格 : </label>
+                            {{ order.order_price }}
+                            <div class="form-group-left">
+                                <button type="submit" class="btn btn-large btn-primary">确认</button>
+                            </div>
+                        </fieldset>
+                    </form>
+                </div>
+            </section>
+        </section>
+    </section>
+
+{% endblock %}
