@@ -1,0 +1,102 @@
+{% extends 'assessor_side.html' %}
+{% block title %}项目管理{% endblock %}
+{% block content %}
+    <section id="content">
+        <section class="vbox">
+    <section class="scrollable padder">
+    <ul class="breadcrumb no-border no-radius b-b b-light pull-in">
+                            <li><a href="/"><i class="fa fa-home"></i> 主页</a></li>
+                            <li class="active">项目分配</li>
+                        </ul>
+        <section class="panel panel-default">
+            <div style="border:0px solid; width:auto; height: auto; overflow:auto;">
+
+                <table data-toggle="table"
+               data-url="/gh/get/response.json/wenzhixin/bootstrap-table/tree/master/docs/data/data1/"
+               data-search="true"
+               data-sort-name="stargazers_count"
+               data-sort-order="desc"
+               data-show-refresh="true"
+               data-show-toggle="true"
+               data-show-columns="true">
+            <thead>
+            <tr>
+                <th data-field="username" data-sortable="true">
+                    <div style="font-weight: 900;font-size: medium">用户名</div>
+                </th>
+                <th data-field="orderId" data-sortable="true">
+                    <div style="font-weight: 900;font-size: medium">工单编号</div>
+                </th>
+                <th data-field="classify" data-sortable="true">
+                    <div style="font-weight: 900;font-size: medium">建模类型</div>
+                </th>
+                <th data-field="finishTime">
+                    <div style="font-weight: 900;font-size: medium">预计完成时间</div>
+                </th>
+                <th data-field="processor">
+                    <div style="font-weight: 900;font-size: medium">处理员</div>
+                </th>
+                <th data-field="assessor">
+                    <div style="font-weight: 900;font-size: medium">审核员</div>
+                </th>
+                <th data-field="status">
+                    <div style="font-weight: 900;font-size: medium">完成状态</div>
+                </th>
+                <th data-field="operate">
+                    <div style="font-weight: 900;font-size: medium">操作</div>
+                </th>
+            </tr>
+            </thead>
+                    {% for workOrder in workOrders %}
+                        <tr>
+                        <td>{{ workOrder.order.user.username }}</td>
+                         <td>{{ workOrder.order_id}}</td>
+                        <td>{{ workOrder.project.classify.classify_name }}</td>
+                        <td>{{ workOrder.plan_complete_time|date:"Y-m-d H:i:s" }}</td>
+                        <td>{{ workOrder.processor.first_name}}</td>
+                        <td>{{ workOrder.assessor.worker_name }}</td>
+                        <td>
+                            {% if workOrder.status == '0' %}
+                                未分配
+                            {% elif workOrder.status == '1' %}
+                                已分配
+                            {% elif workOrder.status == '2' %}
+                                未审核
+                            {% elif workOrder.status == '3' %}
+                                不合格
+                            {% elif workOrder.status == '4' %}
+                                已完成
+                            {% endif %}
+                        </td>
+                        <td>
+{#                            <a href="javascript:deleteUser({{ people.user_id }})">删除</a>/#}
+                            <a href="/administrator_work_order_assess_handle/?workorder_id={{ workOrder.order_id }}">处理</a>
+                        </td>
+                    </tr>
+                    {% endfor %}
+
+     </table>
+
+
+
+            </div>
+
+            <footer class="panel-footer">
+                <div class="row">
+                    <div class="col-sm-4 hidden-xs">
+
+                    </div>
+                    <div class="col-sm-4 text-center">
+                    </div>
+                    <div class="col-sm-4 text-right text-center-xs">
+
+                    </div>
+                </div>
+            </footer>
+        </section>
+    </section>
+                </section>
+    </section>
+    <a href="#" class="hide nav-off-screen-block" data-toggle="class:nav-off-screen" data-target="#nav"></a>
+
+{% endblock %}

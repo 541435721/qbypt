@@ -190,18 +190,15 @@ def customer_project_list(request):  # 用户项目列表
     if not request.user.is_authenticated():
         return redirect('/login/')
     projects = xmqb_model.Project.objects.filter(user=request.user)
-    pays = []
+    pros = []
     # 向前台传递这里生成的字典列表，包括项目信息，订单信息和支付链接
     for foo in projects:
-        order = xmqb_model.Order.objects.get(project=foo.project)
         if foo.status == '1':
             temp_url = {'status': foo.status,
                         'project': foo.project,
                         'project_name': foo.project_name,
                         'classify_name': foo.classify.classify_name,
                         'create_time': foo.create_time,
-                        'price': order.order_price,
-                        'out_trade_no': order.order,
                         }
         else:
             temp_url = {'status': foo.status,
@@ -209,12 +206,9 @@ def customer_project_list(request):  # 用户项目列表
                         'project_name': foo.project_name,
                         'classify_name': foo.classify.classify_name,
                         'create_time': foo.create_time,
-                        'out_trade_no': order.order,
-                        'price': xmqb_model.Order.objects.get(project=foo.project).order_price,
-                        'url': "/"
                         }
-        pays.append(temp_url)
-    return render(request, 'customer_project_list.html', {'project': pays})
+        pros.append(temp_url)
+    return render(request, 'customer_project_list.html', {'project': pros})
 
 
 def customer_project_new(request):  # 用户新建项目
@@ -347,7 +341,6 @@ def customer_project_alert(request):  # 用户修改项目
 
     else:
         form = xmqb_form.ProjectForm(request.POST)
-        print form.is_valid()
         if form.is_valid():
             project = xmqb_model.Project.objects.get(project=project_id)
             project.project_name = form.cleaned_data['project_name']
@@ -380,7 +373,7 @@ def customer_project_alert(request):  # 用户修改项目
                 project.status = 1
         else:
             return render(request, 'customer_project_alert.html', {'form': form})
-    projects = xmqb_model.Project.objects.all()
+    projects = xmqb_model.Project.objects.filter(user=request.user)
     return render(request, 'customer_project_alert.html', {'project': projects})
 
 
@@ -429,7 +422,7 @@ def customer_stl_show(request):  # 用户查看3D模型
             print e
             pass
 
-    record = xmqb_model.Project.objects.filter(user_id=request.user, status__gte=1)
+    record = xmqb_model.Project.objects.filter(user_id=request.user, status__gte=3)
     return render(request, 'customer_stl_show.html', {'project': record})
 
 
@@ -584,7 +577,7 @@ def profile_upload(file, request):  # 处理文件函数，函数之间共享网
         if not os.path.exists(path):  # 如果路径不存在 就生成
             os.makedirs(path)
         # file_name=str(uuid.uuid1())+".jpg"
-        file_name = str(uuid.uuid1()) + '-' + file.name
+        file_name = file.name
 
         # fname = os.path.join(settings.MEDIA_ROOT,filename)
         path_file = os.path.join(path, file_name)  # 将路径和文件名结合
@@ -811,7 +804,7 @@ def administrator_work_order_distribute(request):  # 管理工单分配
     if not request.user.is_superuser == 1:
         return redirect('/login')
     if request.method == 'GET':
-        workOrders = xmqb_model.WorkOrder.objects.all()
+        workOrders = xmqb_model.WorkOrder.objects.filter(Q(status=0) | Q(status=1))
         processors = xmqb_model.Worker.objects.filter(worker_position='处理员')
         assessors = xmqb_model.Worker.objects.filter(worker_position='审核员')
         return render(request, 'administrator_work_order_distribute.html',
@@ -828,7 +821,7 @@ def administrator_work_order_distribute(request):  # 管理工单分配
             workOrder.processor = processor
             workOrder.status = 1
             workOrder.save()
-        workOrders = xmqb_model.WorkOrder.objects.all()
+        workOrders = xmqb_model.WorkOrder.objects.filter(Q(status=0) | Q(status=1))
         processors = xmqb_model.Worker.objects.filter(worker_position='处理员')
         assessors = xmqb_model.Worker.objects.filter(worker_position='审核员')
         return render(request, 'administrator_work_order_distribute.html',
@@ -896,11 +889,49 @@ def administrator_file_upload(request):
 
 
 def administrator_work_order_assess_list(request):  # 工单审核列表
-    render(request, 'administrator_work_order_assess.html')
+    assessor = xmqb_model.Worker.objects.get(worker=request.user)
+    workOrders = xmqb_model.WorkOrder.objects.filter(Q(status=2) | Q(status=3) | Q(status=4),assessor=assessor)
+    return render(request, 'administrator_work_order_assess_list.html', {'workOrders': workOrders})
 
 
 def administrator_work_order_assess_handle(request):  # 工单审核
-    render(request, 'administrator_work_order_assess.html')
+    if not request.user.is_authenticated():
+        return redirect('/login')
+    if not request.user.is_superuser == 3:
+        return redirect('/login')
+    workorder = xmqb_model.WorkOrder.objects.get(order=request.GET['workorder_id'])
+    if request.method == 'GET':
+        project_id = workorder.project_id
+        project = xmqb_model.Project.objects.get(project=project_id)
+        parts = xmqb_model.ProjectPart.objects.filter(project=project)
+
+        form = xmqb_form.ProjectForm(initial={
+            'project_name': project.project_name,
+            'classify': project.classify,
+            'patient_name': project.patient_name,
+            'patient_sex': project.patient_sex,
+            'patient_age': project.patient_age,
+            'patient_address': project.patient_address,
+            'remark': project.remark
+        })
+        return render(request, 'administrator_work_order_assess_handle.html',
+                      {'form': form, 'project': project, 'parts': parts})
+    else:
+        project_id = workorder.project_id
+        project = xmqb_model.Project.objects.get(project=project_id)
+        assess = request.POST.get('qualify')
+        remark = request.POST.get('remark')
+        if assess == '1':
+            workorder.status = 4
+            workorder.remark = remark
+            project.status = '3'
+        else:
+            workorder.status = 3
+            workorder.remark = remark
+        workorder.save()
+        assessor = xmqb_model.Worker.objects.get(worker=request.user)
+        workOrders = xmqb_model.WorkOrder.objects.filter(Q(status=2) | Q(status=3) | Q(status=4), assessor=assessor)
+        return render(request, 'administrator_work_order_assess_list.html', {'workOrders': workOrders})
 
 
 def administrator_order_list(request):  # 管理员订单列表查看
@@ -1145,36 +1176,6 @@ def alipy_notify(request):
             workorder.save()
             thisorder.save()
             thisproject.save()
-            projects = xmqb_model.Project.objects.filter(user=request.user)
-            pays = []
-            # 向前台传递这里生成的字典列表，包括项目信息，订单信息和支付链接
-            for foo in projects:
-                order = xmqb_model.Order.objects.get(project=foo.project)
-                if foo.status == '1':
-                    temp_url = {'status': foo.status,
-                                'project': foo.project,
-                                'project_name': foo.project_name,
-                                'classify_name': foo.classify.classify_name,
-                                'create_time': foo.create_time,
-                                'price': order.order_price,
-                                'out_trade_no': order.order,
-                                'url': alipay.create_direct_pay_by_user_url(out_trade_no=order.order,
-                                                                            subject=u'测试', total_fee=order.order_price,
-                                                                            return_url='http://127.0.0.1:8000/customer_project_list',
-                                                                            # return_url是支付成功后跳转的链接
-                                                                            notify_url='http://www.tencent.com/')
-                                }
-                else:
-                    temp_url = {'status': foo.status,
-                                'project': foo.project,
-                                'project_name': foo.project_name,
-                                'classify_name': foo.classify.classify_name,
-                                'create_time': foo.create_time,
-                                'out_trade_no': order.order,
-                                'price': xmqb_model.Order.objects.get(project=foo.project).order_price,
-                                'url': "/"
-                                }
-                pays.append(temp_url)
-            return render(request, 'customer_project_list.html', {'project': pays})
+            return redirect('/customer_order_list')
         else:
             return render(request, 'index.html', {'dic': 'failed'})

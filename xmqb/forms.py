@@ -129,8 +129,8 @@ class ProjectForm(forms.Form):
         attrs={'class': 'form-control m-b parsley-validated', 'onchange': 'javascript:change_checkbox()'}),
         label=u'类型', required=True, choices=tuple(classify_choice))  # 表单项目类型选择 下拉框
 
-    upload_name = forms.CharField(widget=forms.TextInput(attrs={'class': 'form-control'}),
-                                  max_length=1000, required=False, label=u'文件名', )
+    # upload_name = forms.CharField(widget=forms.TextInput(attrs={'class': 'form-control'}),
+    #                               max_length=1000, required=False, label=u'文件名', )
 
     part = forms.MultipleChoiceField(label=u'选择部位', widget=forms.CheckboxSelectMultiple(
         attrs={'onchange': 'javascript:get_relation_checkbox(this.value)'}), choices=part_choice,
