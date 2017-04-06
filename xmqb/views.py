@@ -400,17 +400,17 @@ def customer_stl_show(request):  # 用户查看3D模型
                     record.project) + '/STL/'
                 sub_url = sub_url.replace('\\', '/')
                 part_url = os.listdir(url)
-                print part_url
+                index = []
                 part_name = copy.copy(part_url)
-                print part_name
                 for x in xrange(len(part_name)):
                     part_name[x] = part_name[x][0:-4]
+                    index.append(x + 1)
                 for i in xrange(len(part_url)):
                     part_url[i] = sub_url + part_url[i]
                 project = {}
+                part_name = zip(zip(part_name, index), part_url)
                 project = {'name': record.project_name,
                            'part_name': part_name,
-
                            'stl_url': part_url,
                            'num': len(part_name)}
                 return render(request, 'stl_show.html', {'project': project, 'urls': json.dumps(part_url)})

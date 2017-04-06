@@ -1,0 +1,67 @@
+<script src="../static/js/jquery.js"></script>
+{% extends 'customer_side.html' %}
+{% block title %}发票查看{% endblock %}
+{% block content %}
+    <script>
+        function chooseParts(parts) {
+            document.getElementById('id_part_' + String(parseInt(parts) - 1)).checked = true
+            document.getElementById('id_part_' + String(parseInt(parts) - 1)).disabled = 'disabled'
+        }
+        function displayParts() {
+            var id = document.getElementsByName('part');
+            for (var i = 0; i < id.length; i++) {
+                if (id[i].checked == false) {
+                    id[i].parentNode.parentNode.style.display = "none";
+                }
+            }
+        }
+        function disable() {
+            var d = document.getElementById("myfield");
+            for (var i = 0; i < d.childNodes.length; i++) {
+                if (d.childNodes[i].disabled != null) {
+
+                    d.childNodes[i].disabled = "disabled";
+                }
+            }
+        }
+
+    </script>
+    <section id="content">
+        <section class="vbox">
+            <section class="scrollable padder">
+                <ul class="breadcrumb no-border no-radius b-b b-light pull-in">
+                    <li><a href="/"><i class="fa fa-home"></i> 主页</a></li>
+                    <li class="active">查看项目</li>
+                </ul>
+                <div class="col-sm-3 pull-left">
+                </div>
+                <div class="col-sm-5">
+                    <form data-validate="parsley" class="ProjectFrom" action="/administrator_project_list/"
+                          method="post"
+                          role="form">
+                        {% csrf_token %}
+                        <fieldset>
+                            <label>订单编号：</label>
+                            {{ order.order }}
+                            {#                            <div id="myfield" class="form-group{% if field.errors %} has-error{% endif %}">#}
+                            {#                            {% for field in form.visible_fields %}#}
+                            {##}
+                            {#                                    <label for="{{ field.label }}">{{ field.label }}</label>#}
+                            {#                                    {{ field}}#}
+                            {#                                    {% if field.help_text %}#}
+                            {#                                        <span class="help-block">{{ field.help_text|safe }}</span>#}
+                            {#                                    {% endif %}#}
+                            {#                                    {% for error in field.errors %}#}
+                            {#                                        <label class="control-label">{{ error }}</label>#}
+                            {#                                    {% endfor %}#}
+                            {##}
+                            {#                            {% endfor %}#}
+                            {#                            </div>#}
+                        </fieldset>
+                    </form>
+                </div>
+            </section>
+        </section>
+    </section>
+
+{% endblock %}
