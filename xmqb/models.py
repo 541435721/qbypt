@@ -107,9 +107,11 @@ class Order(models.Model):
 
     order_price = models.IntegerField(null=False, blank=True)  # 价格
 
-    is_complete = models.BooleanField(default=False)  # 完成状态 0未完成 1已完成
+    is_complete = models.CharField(max_length=30, null=False, blank=False,default='0')  # 完成状态 0未完成 1已完成，没有发票 2已完成，有发票
 
     start_date = models.DateTimeField(auto_now_add=True, null=True)  # 下订单时间
+
+    pay_date=models.DateTimeField(auto_now_add=False, null=True)   # 支付时间
 
     expire_date = models.DateTimeField(auto_now_add=False, null=True)  # 过期时间
 

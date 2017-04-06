@@ -10,7 +10,6 @@
     <link rel="stylesheet" href="{% static 'css/app.v2.css' %}" type="text/css"/>
     <link rel="stylesheet" href="{% static 'css/combo.select.css' %}" type="text/css"/>
     <link rel="stylesheet" href="{% static 'js/calendar/bootstrap_calendar.css' %}" type="text/css" cache="false"/>
-    <script src="{% static 'js/jquery.min.js' %}"></script>
     <!--[if lt IE 9]>
     <script src="{% static 'js/ie/html5shiv.js'%}" cache="false"></script>
     <script src="{% static 'js/ie/respond.min.js'%}" cache="false"></script>
@@ -113,16 +112,15 @@
                             <nav class="nav-primary hidden-xs">
                                 <ul class="nav">
                                     {% for foo in project.part_name %}
-                                        <li><a href="#"
-                                               onclick="javascript:choose_part('{{ foo.1 }}','{{ foo.0.1 }}')">
-                                            <i
-                                                    class="fa fa-dollar icon">
-                                                <b class="bg-success"></b>
-                                            </i>
+                                        <li><a href="#" onclick="javascript:choose_part('{{ foo }}')"> <i
+                                                class="fa fa-dollar icon">
+                                            <b class="bg-success"></b>
+                                        </i>
                                             <span class="pull-right"> <i class="fa fa-angle-down text"></i> <i
                                                     class="fa fa-angle-up text-active"></i> </span>
-                                            <span>{{ foo.0.0 }}</span> </a> {# 器官名 #}
+                                            <span>{{ foo }}</span> </a> {# 器官名 #}
                                             <ul class="nav lt">
+ 
                                                 <input id="changer{{ foo.0.1 }}" type="color"
                                                        onchange="javascript:change_color({{ foo.0.1 }},this.value)">
                                                 {# 取色器 #}&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp
@@ -130,6 +128,8 @@
                                                 {#                                                       value="100" #}
                                                 {#                                                       onchange="javascript:change_transparency({{ foo.0.1 }},this.value)">#}
                                                 {# 滑动条 #}
+
+ 
                                                 <br>
                                             </ul>
                                         </li>
@@ -143,11 +143,15 @@
                                         <span>显示所有</span> </a>
                                         {% for foo in project.part_name %}
                                             <ul class="nav lt">
+ 
                                                 <input id="changer_{{ foo.0.1 }}" type="color"
                                                        onchange="javascript:change_color('{{ foo.0.1 }}',this.value)">
                                                 <input id="r_{{ foo.0.1 }}" type="range" min="0" max="100" step="1"
                                                        value="100"
                                                        onchange="javascript:change_transparency('{{ foo.0.1 }}',this.value)"><br>
+
+
+
                                             </ul>
                                         {% endfor %}
                                     </li>
@@ -157,6 +161,7 @@
                     </section>
                     <script>
 
+ 
                         $(document).ready(function () {
                             var part_num = {{ project.num }};
                             for (var i = 0; i < parseInt(part_num); i++) {
@@ -172,11 +177,20 @@
                                 var selectedObject = scene.getObjectByName('actor' + i);
                                 if (selectedObject) {
                                     scene.remove(selectedObject);
+
+                        
+ 
                                 }
+                                var selectedObject1 = scene.getObjectByName('actor');
+                                scene.remove(selectedObject1);
+
+                                $("#display" + type).slideDown(50);
                             }
-                            show_single_stl(part_name, id);
-                            animate();
+                            else {
+                                $("#display" + type).slideUp(50);
+                            }
                         }
+ 
                         function show_all() {
                             for (var i = 0; i < color_board.length; i++) {
                                 var selectedObject = scene.getObjectByName('actor' + (i + 1));
@@ -200,20 +214,27 @@
                                     selectedObject.material.color = new THREE.Color(value);
                                 document.getElementById("changer" + id).value = value;
                                 document.getElementById("changer_" + id).value = value;
-                                color_board[parseInt(id) - 1] = value;
+                                color_board[parseInt(id) - 1] = value;                  
+ 
                             } else {
                                 alert("没有找到目标" + 'actor' + id);
                             }
                             animate();
                         }
-                        function change_transparency(id, value) {
+                        function change_transparency(part_name) {
+                            var ran = document.getElementById('r' + id);
+                            var value = ran.value;
                             var selectedObject = scene.getObjectByName('actor' + id);
-                            if (selectedObject) {
-                                selectedObject.material.opacity = value * 1.0 / 100;
-                            } else {
-                                alert("没有找到目标" + 'actor' + id);
-                            }
+                            selectedObject.material.opacity = value * 1.0 / 100;
                             animate();
+                        }
+
+                        function project_select() {
+                            location.href = "/show_stl/?classify=" + $('#select_project').val() + "";
+                        }
+
+                        function project_selecter(type) {
+                            location.href = "/show_stl/?classify=" + type + "";
                         }
 
                     </script>

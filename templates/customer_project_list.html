@@ -79,7 +79,7 @@
                                             <a href="javascript:upload_file({{ foo.project }})">上传文件</a>
                                         {% elif foo.status == '1' %}
                                             {#                                        接收来自后台生成的支付链接#}
-                                            <a href="{{ foo.url }}" target="_blank">支付</a>
+{#                                            <a href="{{ foo.url }}" target="_blank">支付</a>#}
                                             <a href="javascript:customer_project_info({{ foo.project }})">查看</a>
                                             {#                                        手动修改支付状态，不用付钱#}
 {#                                            <a href="/alipy_notify?is_success=T&trade_status=TRADE_SUCCESS&out_trade_no={{ foo.out_trade_no }}">完成支付</a>#}

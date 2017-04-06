@@ -232,12 +232,6 @@ def customer_project_new(request):  # 用户新建项目
             project.patient_age = form.cleaned_data['patient_age']
             project.patient_address = form.cleaned_data['patient_address']
             project.remark = form.cleaned_data['remark']
-            upload_name = form.cleaned_data['upload_name']
-            project.upload_name = upload_name
-            if len(upload_name) > 0:
-                project.status = '1'
-            else:
-                project.status = '0'
             project.save()
 
             partlist = form.cleaned_data['part']
@@ -315,7 +309,6 @@ def customer_project_alert(request):  # 用户修改项目
     if not request.user.is_authenticated():
         return redirect('/login')
     project_id = request.GET['project_id']
-
     if request.method == 'GET':
         try:
             project = xmqb_model.Project.objects.get(project=project_id)
@@ -402,20 +395,21 @@ def customer_stl_show(request):  # 用户查看3D模型
                 url = u'' + DOWNLOAD_DIR + '/' + str(record.user.username) + '/' + str(record.classify_id) + '/' + str(
                     record.project) + '/STL/'
                 url = url.replace('\\', '/')
-                sub_url = u'' + '/download' + '/' + str(record.user.username) + '/' + str(
-                    record.classify_id) + '/' + str(record.project) + '/STL/'
+                sub_url = u'' + '/download' + '/' + str(record.user.username) + '/' + str(record.classify_id) + '/' + str(
+                    record.project) + '/STL/'
                 sub_url = sub_url.replace('\\', '/')
                 part_url = os.listdir(url)
+                print part_url
                 part_name = copy.copy(part_url)
-                index = []
+                print part_name
                 for x in xrange(len(part_name)):
                     part_name[x] = part_name[x][0:-4]
-                    index.append(x + 1)
                 for i in xrange(len(part_url)):
                     part_url[i] = sub_url + part_url[i]
-                part_name = zip(zip(part_name, index), part_url)
+                project = {}
                 project = {'name': record.project_name,
                            'part_name': part_name,
+ 
                            'stl_url': part_url,
                            'num': len(part_name)}
                 return render(request, 'stl_show.html', {'project': project, 'urls': json.dumps(part_url)})
@@ -463,23 +457,6 @@ def customer_order_list(request):  # 用户订单列表
 
 
 def customer_order_info(request):  # 用户订单信息
-    if not request.user.is_authenticated():
-        return redirect('/login')
-    if request.method == "GET":
-        record = xmqb_model.Order.objects.get(order=request.GET['order_id'])
-        invoice = xmqb_model.Invoice.objects.filter(order_id=record.order)
-        if invoice:
-            invoice = True
-        else:
-            invoice = False
-        order_detial = {'order': record.order,
-                        'time': record.start_date,
-                        'price': record.order_price,
-                        'invoice': invoice,
-                        'project': record.project_id}
-
-        return render(request, 'customer_order_info.html', {'order': order_detial})
-
     return render(request, 'customer_order_info.html')
 
 
@@ -490,13 +467,52 @@ def customer_order_pay(request):  # 用户订单付款
 def customer_invoice_list(request):  # 用户发票列表
     if not request.user.is_authenticated():
         return redirect('/login')
-
-    return render(request, 'customer_invoice_list.html')
+    orders=xmqb_model.Order.objects.filter(user=request.user,is_complete='1')
+    invoices=xmqb_model.Invoice.objects.filter(user=request.user)
+    return render(request, 'customer_invoice_list.html',{'orders':orders,'invoices':invoices})
 
 
 def customer_invoice_demand(request):  # 用户发票索取
+    if not request.user.is_authenticated():
+        return redirect('/login/')
+    if request.method=='GET':
+        order_id=request.GET['order_id']
+        form = xmqb_form.InvoiceDemandForm()
+        try:
+            order=xmqb_model.Order.objects.get(order=order_id)
+        except:
+            return render(request, 'customer_invoice_demand.html', {'order_id': order_id, 'form': form})
+        return render(request,'customer_invoice_demand.html',{'order_id':order_id,'form':form,'order':order})
+    if (request.method == 'POST'):
+        form = xmqb_form.InvoiceDemandForm(request.POST)
+        if form.is_valid():
+            order_id=request.POST['order']
+            amount=request.POST['amount']
+            order=xmqb_model.Order.objects.get(order=order_id) # 查找发票对应的订单
+            title=form.cleaned_data['title']
+            demand_type=form.cleaned_data['demand_type']
+            invoice_type=form.cleaned_data['invoice_type']
+            recipient_name=form.cleaned_data['recipient_name']
+            address=form.cleaned_data['address']
+            telephone=form.cleaned_data['telephone']
+            deliver_id=form.cleaned_data['deliver_id']
+            deliver_company=form.cleaned_data['deliver_company']
+            remark=form.cleaned_data['remark']
+            invoice=xmqb_model.Invoice.objects.create(title=title,demand_type=demand_type,order=order,user=order.user,
+                                                      invoice_type=invoice_type,recipient_name=recipient_name,
+                                                      address=address,telephone=telephone,deliver_id=deliver_id,
+                                                      deliver_company=deliver_company,remark=remark,amount=amount
+                                                      )
+            invoice.save()
+            order.is_complete='2'  # 申请发票成功后，修改订单状态
+            order.save()
+            return redirect('/customer_invoice_list')
+        else:
+            return render(request, 'customer_invoice_demand.html',{'form':form})
+    else:
+        form=xmqb_form.InvoiceDemandForm()
+        return render(request, 'customer_invoice_demand.html',{'form':form})
 
-    return render(request, 'customer_invoice_demand.html')
 
 
 def customer_invoice_info(request):  # 用户发票信息
@@ -508,32 +524,11 @@ def customer_coupon_list(request):  # 用户优惠券列表
 
 
 def customer_message_list(request):  # 用户消息列表
-    if not request.user.is_authenticated():
-        return redirect('/login')
-    record = xmqb_model.Message.objects.filter(user_id=request.user.id)
-    print request.user.id
-    not_read = len(xmqb_model.Message.objects.filter(user_id=request.user.id, is_read=0))
-    return render(request, 'customer_message_receive.html', {'messages': record, 'message': not_read})
+    return render(request, 'customer_message_list.html')
 
 
 def customer_message_info(request):  # 用户消息详情
-    if not request.user.is_authenticated():
-        return redirect('/login')
-
-    if request.method == "GET":
-        id = request.GET['message']
-        record = xmqb_model.Message.objects.get(message=id)
-
-        forms = xmqb_form.Read_Message(
-            initial={'receiver': record.user_id, 'title': record.title, 'context': record.message_content})
-
-        record.is_read = 1
-        record.read_time = timezone.localtime(timezone.now()).strftime("%Y-%m-%d %H:%M:%S")
-        record.save()
-
-        return render(request, 'customer_message_read.html', {'form': forms})
-    else:
-        return redirect('/customer_message_receive')
+    return render(request, 'customer_message_info.html')
 
 
 @csrf_exempt
@@ -1163,6 +1158,9 @@ def alipy_notify(request):
         if request.GET['is_success'] == 'T' and request.GET['trade_status'] == 'TRADE_SUCCESS':
             thisorder = xmqb_model.Order.objects.get(order=request.GET['out_trade_no'])
             thisorder.is_pay = True  # 将当前已支付的订单设置为已支付
+            thisorder.is_complete = '1'
+            thisorder.pay_date=plan_complete_time=time.strftime('%Y-%m-%d %H:%M',
+                                                                time.localtime(time.time()))
             thisproject = thisorder.project  # 将当前订单对应的项目设置为已支付状态
             thisproject.status = '2'
             # 支付完成生成工单,默认1号为审核员
