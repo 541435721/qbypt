@@ -232,12 +232,12 @@ def customer_project_new(request):  # 用户新建项目
             project.patient_age = form.cleaned_data['patient_age']
             project.patient_address = form.cleaned_data['patient_address']
             project.remark = form.cleaned_data['remark']
-            upload_name = form.cleaned_data['upload_name']
-            project.upload_name = upload_name
-            if len(upload_name) > 0:
-                project.status = '1'
-            else:
-                project.status = '0'
+            # upload_name = form.cleaned_data['upload_name']
+            # project.upload_name = upload_name
+            # if len(upload_name) > 0:
+            #     project.status = '1'
+            # else:
+            #     project.status = '0'
             project.save()
 
             partlist = form.cleaned_data['part']
@@ -342,6 +342,7 @@ def customer_project_alert(request):  # 用户修改项目
 
     else:
         form = xmqb_form.ProjectForm(request.POST)
+        print form.is_valid()
         if form.is_valid():
             project = xmqb_model.Project.objects.get(project=project_id)
             project.project_name = form.cleaned_data['project_name']
@@ -361,21 +362,33 @@ def customer_project_alert(request):  # 用户修改项目
                 except:
                     project_part = xmqb_model.ProjectPart.objects.create(project=project, part=part)
                     price += part.part_price
+                    project_part.save()
 
-                project_part.save()
+            if project.status == '3' or project.status == '2':          # 用户已付款的情况下修改订单
+                if not price == 0:
+                    order = xmqb_model.Order.objects.create(
+                        order=time.strftime('%y%m%d%H%M%S') + str((project.user.id) % 10000).zfill(4) + str(
+                            (random.randint(0, 100) % 100)).zfill(2),
+                        user=project.user, project=project, classify=project.classify, order_type=u'修改',
+                        order_price=price)  # 生成工程的同时再生成 对应的订单
+                    order.save()
+                    project.status = 1
+                    project.save()
+            else:                                                       # 用户该项还没有付款情况下 修改订单
+                print '修改订单'
+                if not price == 0:
+                    project = xmqb_model.Project.objects.get(project=project_id)
+                    try:
+                        order = xmqb_model.Order.objects.get(project=project,is_pay=0)
+                        order.order_price += price
+                        order.save()
+                    except Exception,e:
+                        return HttpResponse('支付异常')
 
-            if not price == 0:
-                order = xmqb_model.Order.objects.create(
-                    order=time.strftime('%y%m%d%H%M%S') + str((project.user.id) % 10000).zfill(4) + str(
-                        (random.randint(0, 100) % 100)).zfill(2),
-                    user=project.user, project=project, classify=project.classify, order_type=u'修改',
-                    order_price=price)  # 生成工程的同时再生成 对应的订单
-                order.save()
-                project.status = 1
         else:
             return render(request, 'customer_project_alert.html', {'form': form})
     projects = xmqb_model.Project.objects.filter(user=request.user)
-    return render(request, 'customer_project_alert.html', {'project': projects})
+    return render(request, 'customer_project_list.html', {'project': projects})
 
 
 def customer_project_delete(request):  # 用户项目删除
@@ -727,7 +740,7 @@ def administrator_project_alter(request):  # 管理员项目信息修改
 
         except:
             return HttpResponse("请选择项目")
-
+        pass
         selected_parts = xmqb_model.ProjectPart.objects.filter(project=project)
         parts = xmqb_model.Price.objects.all()
         part_relation = xmqb_model.PartRelation.objects.all()
@@ -795,6 +808,7 @@ def administrator_project_delete(request):  # 管理员项目删除
         project.delete()
     except:
         return HttpResponse("此项目不存在")
+    pass
     projects = xmqb_model.Project.objects.all()
     return render(request, 'administrator_project_list.html', {'project': projects})
 
@@ -920,12 +934,16 @@ def administrator_work_order_assess_handle(request):  # 工单审核
     else:
         project_id = workorder.project_id
         project = xmqb_model.Project.objects.get(project=project_id)
+        order = workorder.order
         assess = request.POST.get('qualify')
         remark = request.POST.get('remark')
         if assess == '1':
             workorder.status = 4
             workorder.remark = remark
             project.status = '3'
+            order.is_complete = 1
+            order.save()
+            project.save()
         else:
             workorder.status = 3
             workorder.remark = remark
