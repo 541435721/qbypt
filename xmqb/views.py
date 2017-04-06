@@ -528,7 +528,6 @@ def customer_message_list(request):  # 用户消息列表
     not_read = len(xmqb_model.Message.objects.filter(user_id=request.user.id, is_read=0))
     return render(request, 'customer_message_receive.html', {'messages': record, 'message': not_read})
 
-
 def customer_message_info(request):  # 用户消息详情
     if not request.user.is_authenticated():
         return redirect('/login')

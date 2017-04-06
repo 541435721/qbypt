@@ -3,9 +3,6 @@
 <script src="{% static 'js/jquery.js' %}"></script>
 {% block title %}项目管理{% endblock %}
 {% block content %}
-
-
-
     <script>
         var partClass = new Array()               //用来记录类型和部位选项的关系 是1对多的关系
         var partPrice = new Array()
@@ -101,11 +98,17 @@
                 <div class="col-sm-3 pull-left">
                 </div>
                 <div class="col-sm-5">
-                    <form data-validate="parsley" id="projectform" class="ProjectFrom" action="/customer_project_new/"
+                    <form data-validate="parsley" class="ProjectFrom" action="/customer_project_new/"
                           method="post"
                           role="form">
+                    <section class="panel panel-default">
+                    <header class="panel-heading"><span class="h4" style="font-family: 微软雅黑">新建项目</span>
+                            </header>
+                    <div class="panel-body">
                         {% csrf_token %}
                         <fieldset>
+                        <div class="panel-body">
+                        <div class="form-group pull-in clearfix">
                             {% for field in form.visible_fields %}
                                 <div class="form-group{% if field.errors %} has-error{% endif %}">
                                     <label for="{{ field.label }}">{{ field.label }}</label>
@@ -144,20 +147,19 @@
                             <label>所需费用为：</label>
                             <span id="price">0</span>
                             <label>元</label>
-                            <div class="form-group-left">
-                                <button type="submit" class="btn btn-large btn-primary">提交资料</button>
-                            </div>
+
+                        </div>
+                        </div>
                         </fieldset>
+                    <footer class="panel-footer text-right bg-light lter">
+                                    <button type="submit" class="btn btn-success btn-s-xs">提交资料</button>
+                                </footer>
+                    </div>
+                    </section>
                     </form>
                 </div>
             </section>
         </section>
     </section>
-    {##}
-    {#    <script>#}
-    {#        var test1 = document.getElementById('id_part_1');#}
-    {#        test1.checked=true;#}
-    {#        test1.onclick=function(){return false;};#}
-    {#    </script>#}
 
 {% endblock %}
