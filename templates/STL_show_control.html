@@ -126,15 +126,17 @@
                                                 <input id="changer{{ foo.0.1 }}" type="color"
                                                        onchange="javascript:change_color({{ foo.0.1 }},this.value)">
                                                 {# 取色器 #}&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp
-                                                <input id="r{{ foo.0.1 }}" type="range" min="0" max="100" step="1"
-                                                       value="100"
-                                                       onchange="javascript:change_transparency({{ foo.0.1 }},this.value)">
+                                                {#                                                <input id="r{{ foo.0.1 }}" type="range" min="0" max="100" step="1"#}
+                                                {#                                                       value="100" #}
+                                                {#                                                       onchange="javascript:change_transparency({{ foo.0.1 }},this.value)">#}
                                                 {# 滑动条 #}
                                                 <br>
                                             </ul>
                                         </li>
                                     {% endfor %}
-                                    <li><a href="#uikit"> <i class="fa fa-dollar icon"> <b class="bg-success"></b>
+                                    <li><a href="#uikit"
+                                           onclick="javascript:show_all()"> <i
+                                            class="fa fa-dollar icon"> <b class="bg-success"></b>
                                     </i>
                                         <span class="pull-right"> <i class="fa fa-angle-down text"></i> <i
                                                 class="fa fa-angle-up text-active"></i> </span>
@@ -142,10 +144,10 @@
                                         {% for foo in project.part_name %}
                                             <ul class="nav lt">
                                                 <input id="changer_{{ foo.0.1 }}" type="color"
-                                                       onchange="javascript:change_color('{{ foo }}')">
+                                                       onchange="javascript:change_color('{{ foo.0.1 }}',this.value)">
                                                 <input id="r_{{ foo.0.1 }}" type="range" min="0" max="100" step="1"
                                                        value="100"
-                                                       onchange="javascript:void('{{ foo }}')"><br>
+                                                       onchange="javascript:change_transparency('{{ foo.0.1 }}',this.value)"><br>
                                             </ul>
                                         {% endfor %}
                                     </li>
@@ -166,7 +168,7 @@
                             color_id = 'changer' + id;
                             document.getElementById(color_id).value = color[id];
 
-                            for (var i = 0; i <= 8; i++) {
+                            for (var i = 1; i <= color_board.length; i++) {
                                 var selectedObject = scene.getObjectByName('actor' + i);
                                 if (selectedObject) {
                                     scene.remove(selectedObject);
@@ -175,6 +177,22 @@
                             show_single_stl(part_name, id);
                             animate();
                         }
+                        function show_all() {
+                            for (var i = 0; i < color_board.length; i++) {
+                                var selectedObject = scene.getObjectByName('actor' + (i + 1));
+                                if (selectedObject) {
+                                    scene.remove(selectedObject);
+                                }
+                            }
+                            controls.reset();
+
+                            var urls = {{ urls|safe }};
+                            for (var x in urls) {
+                                show_all_stl(urls[x], x, 1.0);
+                                color_id = 'changer_' + (parseInt(x) + 1);
+                                document.getElementById(color_id).value = color_board[x];
+                            }
+                        }
                         function change_color(id, value) {
                             var selectedObject = scene.getObjectByName('actor' + id);
                             if (selectedObject) {
@@ -182,6 +200,7 @@
                                     selectedObject.material.color = new THREE.Color(value);
                                 document.getElementById("changer" + id).value = value;
                                 document.getElementById("changer_" + id).value = value;
+                                color_board[parseInt(id) - 1] = value;
                             } else {
                                 alert("没有找到目标" + 'actor' + id);
                             }

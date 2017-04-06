@@ -185,7 +185,7 @@ function show_single_stl(path, id) {
 }
 
 
-function show_all_stl(path, c, id, opa) {
+function show_all_stl(path, id, opa) {
     var loader = new THREE.STLLoader();
     var mesh;
 
@@ -208,7 +208,7 @@ function show_all_stl(path, c, id, opa) {
 
 
         var material = new THREE.MeshPhongMaterial({
-            color: color[c],
+            color: color_board[parseInt(id)],
             specular: 0x001111,
             shininess: 80,
             wireframe: false,
@@ -217,12 +217,7 @@ function show_all_stl(path, c, id, opa) {
             opacity: opa,
         });
 
-        if (labels[id - 1] == 1) {
-            material.color = new THREE.Color(COLORS[id - 1]);
-        } else {
-            material.color = new THREE.Color(color[c]);
-        }
-
+        material.color = new THREE.Color(color_board[parseInt(id)]);
         mesh = new THREE.Mesh(geo, material);
 
         //alert(mesh.position.x + " " + mesh.position.y + " " + mesh.position.z);
@@ -232,13 +227,12 @@ function show_all_stl(path, c, id, opa) {
 
         mesh.castShadow = true;
         mesh.receiveShadow = true;
-        mesh.name = 'actor' + id;
-        //alert(mesh.name);
+        mesh.name = 'actor' + (parseInt(id) + 1);
         scene.add(mesh);
         // for (var i = 1; i <= 8; i++) {
         //     document.getElementById('a' + i).removeAttribute('disabled');
         // }
-        count--;
+        // count--;
 
         //if (count == 0)
         //    layer.close(index);
