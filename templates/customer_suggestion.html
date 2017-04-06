@@ -1,0 +1,36 @@
+{% extends 'customer_side.html' %}
+{% block title %}意见反馈{% endblock %}
+{% block content %}
+    {% load static %}
+    <link rel="stylesheet" type="text/css" href="{% static 'simditor/styles/simditor.css' %}"/>
+    <link rel="stylesheet" type="text/css" href="{% static 'css/normalize.css' %}"/>
+    <link rel="stylesheet" type="text/css" href="{% static 'fonts/font-awesome-4.2.0/css/font-awesome.min.css' %}"/>
+    <link rel="stylesheet" type="text/css" href="{% static 'css/demo.css' %}"/>
+    <link rel="stylesheet" type="text/css" href="{% static 'css/component.css' %}"/>
+
+    <script type="text/javascript" src="{% static 'simditor/scripts/jquery.min.js' %}"></script>
+    <script type="text/javascript" src="{% static 'simditor/scripts/module.js' %}"></script>
+    <script type="text/javascript" src="{% static 'simditor/scripts/hotkeys.js' %}"></script>
+    <script type="text/javascript" src="{% static 'simditor/scripts/uploader.js' %}"></script>
+    <script type="text/javascript" src="{% static 'simditor/scripts/simditor.js' %}"></script>
+    <script src="{% static 'js/classie.js' %}"></script>
+
+    <section id="content">
+        <section class="vbox">
+            <section class="scrollable padder">
+                <ul class="breadcrumb no-border no-radius b-b b-light pull-in">
+                    <li><a href="/"><i class="fa fa-home"></i> 主页</a></li>
+                    <li class="active">意见反馈</li>
+                </ul>
+                <section class="panel panel-default">
+
+                </section>
+
+            </section>
+        </section>
+    </section>
+
+
+    <a href="#" class="hide nav-off-screen-block" data-toggle="class:nav-off-screen" data-target="#nav"></a>
+
+{% endblock %}

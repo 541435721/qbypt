@@ -152,4 +152,6 @@ urlpatterns = [
 
     url(r'^customer_message_read', views.customer_message_info, name='customer_message_read'),
 
+    url(r'^customer_suggestion', views.customer_suggestion, name='consumer_suggestion'),
+
 ]

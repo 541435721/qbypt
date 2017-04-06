@@ -6,12 +6,12 @@
             <section class="scrollable padder">
                 <ul class="breadcrumb no-border no-radius b-b b-light pull-in">
                     <li><a href="/"><i class="fa fa-home"></i> 主页</a></li>
-                    <li class="active">用户订单</li>
+                    <li class="active">用户发票</li>
                 </ul>
                 <section class="panel panel-default">
                     <div style="border:0px solid; width:auto; height: auto; overflow:auto;">
                         <table data-toggle="table"
-                                {#               data-url="/gh/get/response.json/wenzhixin/bootstrap-table/tree/master/docs/data/data1/"#}
+{#                               data-url="/gh/get/response.json/wenzhixin/bootstrap-table/tree/master/docs/data/data1/"#}
                                data-search="true"
                                data-sort-name="stargazers_count"
                                data-sort-order="desc"
@@ -37,21 +37,104 @@
                                 </th>
                             </tr>
                             </thead>
-{#                            {% for foo in orders %}#}
-{#                                <tr>#}
-{#                                    <td>{{ foo.username }}</td>#}
-{#                                    #}
-{#                                </tr>#}
-{#                            {% endfor %}#}
+                            {% for foo in invoices %}
+                                <tr>
+                                    <td>{{ foo.order.order }}</td>
+                                    <td>{{ foo.order.project.project_name }}</td>
+                                    <td>{{ foo.amount }}</td>
+                                    <td>{{ foo.order.pay_date }}</td>
+                                    <td>查看</td>
+                                </tr>
+                            {% endfor %}
+
+                        </table>
+                        <table data-toggle="table"
+{#                               data-url="/gh/get/response.json/wenzhixin/bootstrap-table/tree/master/docs/data/data1/"#}
+                               data-search="true"
+                               data-sort-name="stargazers_count"
+                               data-sort-order="desc"
+                               data-show-refresh="true"
+                               data-show-toggle="true"
+                               data-show-columns="true">
+                            <thead>
+                            <tr>
+                                <th data-field="username" data-sortable="true">
+                                    <div style="font-weight: 900;font-size: medium">账号</div>
+                                </th>
+                                <th data-field="ID" data-sortable="true">
+                                    <div style="font-weight: 900;font-size: medium">订单编号</div>
+                                </th>
+                                <th data-field="name" data-sortable="true">
+                                    <div style="font-weight: 900;font-size: medium">订单类型</div>
+                                </th>
+                                <th data-field="class" data-sortable="true">
+                                    <div style="font-weight: 900;font-size: medium">订单状态</div>
+                                </th>
+                                <th data-field="create_time" data-sortable="true">
+                                    <div style="font-weight: 900;font-size: medium">订单价格</div>
+                                </th>
+                                <th data-field="status" data-sortable="true">
+                                    <div style="font-weight: 900;font-size: medium">支付状态</div>
+                                </th>
+                                <th data-field="handle">
+                                    <div style="font-weight: 900;font-size: medium">操作</div>
+                                </th>
+                            </tr>
+                            </thead>
+                            {% for foo in orders %}
+                                <tr>
+                                    <td>{{ foo.user.username }}</td>
+                                    <td>{{ foo.order }}</td>
+                                    <td>{{ foo.project.classify.classify_name }}</td>
+                                    <td>{% if foo.is_complete %}
+                                        已完成
+                                    {% else %}
+                                        未完成
+                                    {% endif %}</td>
+                                    <td>{{ foo.order_price }}</td>
+                                    <td>{% if foo.is_pay %}
+                                        已支付
+                                    {% else %}
+                                        未支付
+                                    {% endif %}</td>
+
+                                    <td>
+                                        {% if foo.is_pay %}
+                                            {% if foo.is_complete == '1' %}
+                                                <a href="javascript:demand_invoice('{{ foo.order }}')">申请发票</a>
+                                            {% elif foo.is_complete == '2' %}
+                                                已申请发票
+                                            {% endif %}
+                                        {% else %}
+                                            <a href="{{ foo.url }}" target="_blank">支付</a>
+                                            <a href="/alipy_notify?is_success=T&trade_status=TRADE_SUCCESS&out_trade_no={{ foo.out_trade_no }}">完成支付</a>
+                                        {% endif %}
+                                    </td>
+                                </tr>
+                            {% endfor %}
 
                         </table>
                     </div>
+                    <footer class="panel-footer">
+                        <div class="row">
+                            <div class="col-sm-4 hidden-xs">
 
+                            </div>
+                            <div class="col-sm-4 text-center">
+                            </div>
+                            <div class="col-sm-4 text-right text-center-xs">
 
+                            </div>
+                        </div>
+                    </footer>
                 </section>
             </section>
         </section>
     </section>
     <a href="#" class="hide nav-off-screen-block" data-toggle="class:nav-off-screen" data-target="#nav"></a>
-
+    <script>
+        function demand_invoice(order_id) {
+            location.href = "/customer_invoice_demand/?order_id=" + order_id + "";
+        }
+    </script>
 {% endblock %}
