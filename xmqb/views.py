@@ -529,7 +529,8 @@ def customer_invoice_demand(request):  # 用户发票索取
             demand_type=form.cleaned_data['demand_type']
             invoice_type=form.cleaned_data['invoice_type']
             recipient_name=form.cleaned_data['recipient_name']
-            address=form.cleaned_data['address']
+            pro_cit=request.POST['pc']    # 获取表单中的省份和城市信息
+            address=pro_cit+form.cleaned_data['address']
             telephone=form.cleaned_data['telephone']
             deliver_id=form.cleaned_data['deliver_id']
             deliver_company=form.cleaned_data['deliver_company']
