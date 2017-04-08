@@ -72,8 +72,6 @@
                                         {% else %}
 
                                             <a href="{{ foo.url }}" target="_blank">支付</a>
-                                            <a href="/customer_order_info/?order_id={{ foo.out_trade_no }}"
-                                               target="_blank">查看详情</a>
                                             <a href="/alipy_notify?is_success=T&trade_status=TRADE_SUCCESS&out_trade_no={{ foo.out_trade_no }}">完成支付</a>
 
                                         {% endif %}

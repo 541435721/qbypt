@@ -1,0 +1,96 @@
+{% extends 'marketer_side.html' %}
+{% block title %}优惠券管理{% endblock %}
+{% block content %}
+    <section id="content">
+        <section class="vbox">
+            <section class="scrollable padder">
+                <ul class="breadcrumb no-border no-radius b-b b-light pull-in">
+                    <li><a href="/"><i class="fa fa-home"></i> 主页</a></li>
+                    <li class="active">优惠券列表</li>
+                </ul>
+                <section class="panel panel-default">
+                    <div style="border:0px solid; width:auto; height: auto; overflow:auto;">
+                        <table data-toggle="table"
+                                {#               data-url="/gh/get/response.json/wenzhixin/bootstrap-table/tree/master/docs/data/data1/"#}
+                               data-search="true"
+                               data-sort-name="stargazers_count"
+                               data-sort-order="desc"
+                               data-show-refresh="true"
+                               data-show-toggle="true"
+                               data-show-columns="true">
+                            <thead>
+                            <tr>
+                                <th data-field="ID" data-sortable="true">
+                                    <div style="font-weight: 900;font-size: medium">优惠券编号</div>
+                                </th>
+                                <th data-field="user" data-sortable="true">
+                                    <div style="font-weight: 900;font-size: medium">用户</div>
+                                </th>
+                                <th data-field="rest_amount" data-sortable="true">
+                                    <div style="font-weight: 900;font-size: medium">可用金额</div>
+                                </th>
+                                <th data-field="class" data-sortable="true">
+                                    <div style="font-weight: 900;font-size: medium">适用范围</div>
+                                </th>
+                                <th data-field="deadline_time" data-sortable="true">
+                                    <div style="font-weight: 900;font-size: medium">到期时间</div>
+                                </th>
+                                <th data-field="remark" data-sortable="true">
+                                    <div style="font-weight: 900;font-size: medium">备注</div>
+                                </th>
+                                <th data-field="handle">
+                                    <div style="font-weight: 900;font-size: medium">操作</div>
+                                </th>
+                            </tr>
+                            </thead>
+                            {% for coupon in coupons %}
+                                <tr>
+                                    <td>{{ coupon.coupon }}</td>
+                                    <td>{{ coupon.user }}</td>
+                                    <td>{{ coupon.rest_amount }}</td>
+                                    <td>{{ coupon.type.classify_name }}</td>
+                                    <td>{{ coupon.deadline_time|date:"Y-m-d H:i:s"  }}</td>
+                                    <td>{{ coupon.remark }}</td>
+
+                                    <td>
+                                        <a href="javascript:administrator_coupon_alter('{{ coupon.coupon }}')"
+                                           target="_blank">修改</a>
+                                        <a href="javascript:administrator_coupon_delete('{{ coupon.coupon }}')"
+                                           target="_blank">删除</a>
+                                    </td>
+                                </tr>
+                            {% endfor %}
+
+                        </table>
+                    </div>
+
+
+                </section>
+            </section>
+        </section>
+    </section>
+    <a href="#" class="hide nav-off-screen-block" data-toggle="class:nav-off-screen" data-target="#nav"></a>
+    <script>
+     try {
+            var index = parent.layer.getFrameIndex(window.name);
+            if (index) {
+                parent.location.reload();
+                parent.layer.close(index);
+            }
+        } catch (err) {
+
+        }
+    function administrator_coupon_alter(coupon) {
+            var index = layer.open({
+                type: 2,
+                area: ['700px', '530px'],
+                fix: false, //不固定
+                maxmin: true,
+                content: '/administrator_coupon_alter/?coupon=' + coupon
+            });
+        }
+    function administrator_coupon_delete(coupon) {
+            location.href = "/administrator_coupon_delete/?coupon=" + coupon + "";
+        }
+    </script>
+{% endblock %}

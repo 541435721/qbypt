@@ -1,8 +1,9 @@
 {% extends 'customer_side.html' %}
 {% load static %}
+    <script src="{% static 'js/jquery.js' %}"></script>
 {% block title %}查看项目{% endblock %}
 {% block content %}
-    <script src="{% static 'js/jquery.js' %}"></script>
+
 
     <section id="content">
         <section class="vbox">
@@ -12,7 +13,10 @@
                     <li class="active">项目管理</li>
                     <li class="active">项目清单</li>
                 </ul>
-            <div class="col-sm-12">
+                <div class="m-b-md">
+                    {#                            <h3 class="m-b-none">个人中心</h3>#}
+                    <small></small>
+                </div>
                 <section class="panel panel-default">
                     <div style="border:0px solid; width:auto; height: auto; overflow:auto;">
                         <table data-toggle="table"
@@ -101,7 +105,7 @@
                             </div>
                             <div class="col-sm-4 text-center">
                                 <a type="submit" class="btn btn-large btn-primary"
-                                   href="/customer_project_new/" target="_blank">
+                                   href="/customer_project_new/">
                                     <font color="#00008b" size="3"><B>新建项目</B></font>
                                 </a>
                             </div>
@@ -111,7 +115,7 @@
                         </div>
                     </footer>
                 </section>
-
+                </div>
             </section>
         </section>
         <a href="#" class="hide nav-off-screen-block" data-toggle="class:nav-off-screen" data-target="#nav"></a>

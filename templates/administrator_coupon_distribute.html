@@ -1,0 +1,100 @@
+{% extends 'marketer_side.html' %}
+{% load static %}
+{% block title %}优惠券发放{% endblock %}
+{% block content %}
+    <section id="content">
+        <section class="vbox">
+            <section class="scrollable padder">
+                <ul class="breadcrumb no-border no-radius b-b b-light pull-in">
+                    <li><a href="/"><i class="fa fa-home"></i> 主页</a></li>
+                    <li class="active">优惠券分配</li>
+                </ul>
+                <section class="panel panel-default">
+                    <div style="border:0px solid; width:auto; height: auto; overflow:auto;">
+                        <form method="post">
+                            {% csrf_token %}
+                        <fieldset>
+                    {% for field in form.visible_fields %}  <!--对于每一个field-->
+                        <div class="form-group{% if field.errors %} has-error{% endif %}"> <!--对表单进行排版-->
+                            <label>{{ field.label }}</label>
+                            {{ field }} <!--显示输入框 -->
+                            {% if field.help_text %}
+                                <span class="help-block">{{ field.help_text|safe }}</span> <!--如果有帮助提示，则显示-->
+                            {% endif %}
+                            {% for error in field.errors %}
+                                <label class="control-label">{{ error }}</label> <!--显示每个错误提示-->
+                            {% endfor %}
+                        </div>
+                    {% endfor %}
+                </fieldset>
+                            <table data-toggle="table"
+                                   data-url="/gh/get/response.json/wenzhixin/bootstrap-table/tree/master/docs/data/data1/"
+                                   data-search="true"
+                                   data-sort-name="stargazers_count"
+                                   data-sort-order="desc"
+                                   data-show-refresh="true"
+                                   data-show-toggle="true"
+                                   data-show-columns="true">
+                                <thead>
+                                <tr>
+                                    <th data-field="operate">
+                                        <div style="font-weight: 900;font-size: medium">选择</div>
+                                    </th>
+                                    <th data-field="username" data-sortable="true">
+                                        <div style="font-weight: 900;font-size: medium">账号</div>
+                                    </th>
+                                    <th data-field="name" data-sortable="true">
+                                        <div style="font-weight: 900;font-size: medium">名字</div>
+                                    </th>
+                                    <th data-field="performance" data-sortable="true">
+                                        <div style="font-weight: 900;font-size: medium">身份</div>
+                                    </th>
+                                    <th data-field="number" data-sortable="true">
+                                        <div style="font-weight: 900;font-size: medium">注册时间</div>
+                                    </th>
+                                    <th data-field="time">
+                                        <div style="font-weight: 900;font-size: medium">最近登陆时间</div>
+                                    </th>
+
+                                </tr>
+                                </thead>
+                                {% for user in users %}
+                                    <tr>
+                                        <td>
+                                            <input type="checkbox" name="users" value={{ user.user.username }}>
+                                        </td>
+                                        <td>{{ user.user.username }}</td>
+                                        <td>{{ user.user_name }}</td>
+                                        <td>{{ user.position }}</td>
+                                        <td>{{ user.user.date_joined|date:"Y-m-d H:i:s"  }}</td>
+                                        <td>{{ user.user.last_login|date:"Y-m-d H:i:s" }}</td>
+                                    </tr>
+                                {% endfor %}
+
+                            </table>
+                            <div class="">
+                                <button type="submit" class="btn btn-large btn-primary">分发</button>
+                            </div>
+                        </form>
+
+                    </div>
+
+                    <footer class="panel-footer">
+                        <div class="row">
+                            <div class="col-sm-4 hidden-xs">
+
+                            </div>
+                            <div class="col-sm-4 text-center">
+                            </div>
+                            <div class="col-sm-4 text-right text-center-xs">
+
+                            </div>
+                        </div>
+                    </footer>
+                </section>
+            </section>
+        </section>
+    </section>
+    <a href="#" class="hide nav-off-screen-block" data-toggle="class:nav-off-screen" data-target="#nav"></a>
+    <script src="{% static 'laydate/laydate.js'%}"></script>
+{% endblock %}
