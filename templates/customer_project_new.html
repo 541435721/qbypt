@@ -65,23 +65,25 @@
                     }
                     document.getElementById('id_part_' + String(i - 1)).parentNode.parentNode.style.display = "none";       // 隐藏该部位
                 }
+                document.getElementById('id_part_' + String(i - 1)).parentNode.parentNode.style.display = "none";       // 隐藏该部位
             }
             choose_coupon()
         }
+    }
 
-        var partRelation = new Array()
-        var partRelation = new Array(); //先声明一维
+    var partRelation = new Array()
+    var partRelation = new Array(); //先声明一维
 
-        for (var i = 0; i < 50; i++) {  //一维长度为2
-            partRelation[i] = new Array(); //再声明二维
-            for (var j = 0; j < 50; j++) {  //二维长度为3
-                partRelation[i][j] = 0;  // 赋值，每个数组元素的值为i+j
-            }
+    for (var i = 0; i < 50; i++) {  //一维长度为2
+        partRelation[i] = new Array(); //再声明二维
+        for (var j = 0; j < 50; j++) {  //二维长度为3
+            partRelation[i][j] = 0;  // 赋值，每个数组元素的值为i+j
         }
+    }
 
-        function checkbox_relation(part_son, part_father) {
-            partRelation[part_son][part_father] = 1;
-        }
+    function checkbox_relation(part_son, part_father) {
+        partRelation[part_son][part_father] = 1;
+    }
 
         function get_relation_checkbox(part) {
             var changed_checkbox = document.getElementById('id_part_' + String(parseInt(part) - 1))
@@ -117,11 +119,12 @@
                             change_coupon()
                         }
 
-
                     }
                 }
             }
         }
+    }
+
 
 
     </script>

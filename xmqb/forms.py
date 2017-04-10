@@ -211,11 +211,11 @@ class InvoiceDemandForm(forms.ModelForm):
                                 error_messages={'required': u'请填写收件人电话'})
 
     deliver_id = forms.CharField(widget=forms.TextInput(attrs={'class': 'form-control'}),  # 物流编号
-                                 max_length=30,required=True,label=u'物流编号',
+                                 max_length=30,required=False,label=u'物流编号',
                                  error_messages={'required': u'请填写物流编号'})
 
     deliver_company = forms.CharField(widget=forms.TextInput(attrs={'class': 'form-control'}),  # 物流公司
-                                      max_length=30,required=True,label=u'物流公司',
+                                      max_length=30,required=False,label=u'物流公司',
                                       error_messages={'required': u'请填写物流公司'})
 
     remark=forms.CharField(widget=forms.TextInput(attrs={'class': 'form-control'}),

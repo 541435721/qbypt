@@ -1,4 +1,4 @@
-{% extends 'customer_side.html' %}
+{% extends 'administrator_side.html' %}
 {% block title %}发票管理{% endblock %}
 {% block content %}
     <section id="content">
@@ -26,29 +26,82 @@
                                 <th data-field="ID" data-sortable="true">
                                     <div style="font-weight: 900;font-size: medium">项目名</div>
                                 </th>
-                                <th data-field="name" data-sortable="true">
+                                <th data-field="amount" data-sortable="true">
                                     <div style="font-weight: 900;font-size: medium">实付金额</div>
                                 </th>
-                                <th data-field="class" data-sortable="true">
+                                <th data-field="pay_date" data-sortable="true">
                                     <div style="font-weight: 900;font-size: medium">支付时间</div>
+                                </th>
+                                <th data-field="is_deliver" data-sortable="true">
+                                    <div style="font-weight: 900;font-size: medium">是否寄送</div>
                                 </th>
                                 <th data-field="handle">
                                     <div style="font-weight: 900;font-size: medium">操作</div>
                                 </th>
                             </tr>
                             </thead>
-                            {% for foo in invoices %}
+                            {% for foo in delivered %}
                                 <tr>
                                     <td>{{ foo.order.order }}</td>
                                     <td>{{ foo.order.project.project_name }}</td>
                                     <td>{{ foo.amount }}</td>
                                     <td>{{ foo.order.pay_date }}</td>
-                                    <td><a href="/customer_invoice_info?order_id={{ foo.order.order }}" target="_blank">查看</a>
+                                    <td>已寄送</td>
+                                    <td><a href="/administrator_invoice_info?order_id={{ foo.order.order }}"
+                                           target="_blank">查看</a>
                                     </td>
                                 </tr>
                             {% endfor %}
 
                         </table>
+                    </div>
+                    <div style="border:0px solid; width:auto; height: auto; overflow:auto;">
+                        <table data-toggle="table"
+                                {#                               data-url="/gh/get/response.json/wenzhixin/bootstrap-table/tree/master/docs/data/data1/"#}
+                               data-search="true"
+                               data-sort-name="stargazers_count"
+                               data-sort-order="desc"
+                               data-show-refresh="true"
+                               data-show-toggle="true"
+                               data-show-columns="true">
+                            <thead>
+                            <tr>
+                                <th data-field="username" data-sortable="true">
+                                    <div style="font-weight: 900;font-size: medium">订单编号</div>
+                                </th>
+                                <th data-field="ID" data-sortable="true">
+                                    <div style="font-weight: 900;font-size: medium">项目名</div>
+                                </th>
+                                <th data-field="amount" data-sortable="true">
+                                    <div style="font-weight: 900;font-size: medium">实付金额</div>
+                                </th>
+                                <th data-field="pay_date" data-sortable="true">
+                                    <div style="font-weight: 900;font-size: medium">支付时间</div>
+                                </th>
+                                <th data-field="is_deliver" data-sortable="true">
+                                    <div style="font-weight: 900;font-size: medium">是否寄送</div>
+                                </th>
+                                <th data-field="handle">
+                                    <div style="font-weight: 900;font-size: medium">操作</div>
+                                </th>
+                            </tr>
+                            </thead>
+                            {% for foo in undelivered %}
+                                <tr>
+                                    <td>{{ foo.order.order }}</td>
+                                    <td>{{ foo.order.project.project_name }}</td>
+                                    <td>{{ foo.amount }}</td>
+                                    <td>{{ foo.order.pay_date }}</td>
+                                    <td>未寄送</td>
+                                    <td><a href="/administrator_invoice_handle?order_id={{ foo.order.order }}"
+                                           target="_blank">处理</a>
+                                    </td>
+                                </tr>
+                            {% endfor %}
+
+                        </table>
+                    </div>
+                    <div style="border:0px solid; width:auto; height: auto; overflow:auto;">
                         <table data-toggle="table"
                                 {#                               data-url="/gh/get/response.json/wenzhixin/bootstrap-table/tree/master/docs/data/data1/"#}
                                data-search="true"
@@ -102,12 +155,11 @@
                                     <td>
                                         {% if foo.is_pay %}
                                             {% if foo.is_complete == '1' %}
-                                                <a href="javascript:demand_invoice('{{ foo.order }}')">申请发票</a>
+                                                <a href="/administrator_invoice_create?order_id={{ foo.order }}">生成发票</a>
                                             {% elif foo.is_complete == '2' %}
                                                 已申请发票
                                             {% endif %}
                                         {% else %}
-                                            <a href="{{ foo.url }}" target="_blank">支付</a>
                                             <a href="/alipy_notify?is_success=T&trade_status=TRADE_SUCCESS&out_trade_no={{ foo.out_trade_no }}">完成支付</a>
                                         {% endif %}
                                     </td>
