@@ -1,5 +1,6 @@
 {% extends 'customer_side.html' %}
 {% load static %}
+
 <script src="{% static 'js/jquery.js' %}"></script>
 {% block title %}查看项目{% endblock %}
 {% block content %}
@@ -12,18 +13,44 @@
                     <li class="active">项目管理</li>
                     <li class="active">项目清单</li>
                 </ul>
-                <div class="col-sm-12">
-                    <section class="panel panel-default">
-                        <div style="border:0px solid; width:auto; height: auto; overflow:auto;">
-                            <table data-toggle="table"
-                                    {#               data-url="/gh/get/response.json/wenzhixin/bootstrap-table/tree/master/docs/data/data1/"#}
-                                   data-search="true"
-                                   data-sort-name="stargazers_count"
-                                   data-sort-order="desc"
-                                   data-show-refresh="true"
-                                   data-show-toggle="true"
-                                   data-show-columns="true">
-                                <thead>
+
+                <div class="m-b-md">
+                    {#                            <h3 class="m-b-none">个人中心</h3>#}
+                    <small></small>
+                </div>
+                <section class="panel panel-default">
+                    <div style="border:0px solid; width:auto; height: auto; overflow:auto;">
+                        <table data-toggle="table"
+                                {#               data-url="/gh/get/response.json/wenzhixin/bootstrap-table/tree/master/docs/data/data1/"#}
+                               data-search="true"
+                               data-sort-name="stargazers_count"
+                               data-sort-order="desc"
+                               data-show-refresh="true"
+                               data-show-toggle="true"
+                               data-show-columns="true">
+                            <thead>
+                            <tr>
+                                <th data-field="ID" data-sortable="true">
+                                    <div style="font-weight: 900;font-size: medium">项目编号</div>
+                                </th>
+                                <th data-field="name" data-sortable="true">
+                                    <div style="font-weight: 900;font-size: medium">项目名</div>
+                                </th>
+                                <th data-field="class" data-sortable="true">
+                                    <div style="font-weight: 900;font-size: medium">项目类别</div>
+                                </th>
+                                <th data-field="create_time" data-sortable="true">
+                                    <div style="font-weight: 900;font-size: medium">创建时间</div>
+                                </th>
+                                <th data-field="status" data-sortable="true">
+                                    <div style="font-weight: 900;font-size: medium">项目状态</div>
+                                </th>
+                                <th data-field="handle">
+                                    <div style="font-weight: 900;font-size: medium">操作</div>
+                                </th>
+                            </tr>
+                            </thead>
+                            {% for foo in project %}
                                 <tr>
                                     <th data-field="ID" data-sortable="true">
                                         <div style="font-weight: 900;font-size: medium">项目编号</div>
@@ -98,19 +125,21 @@
                             <div class="row">
                                 <div class="col-sm-4 hidden-xs">
 
-                                </div>
-                                <div class="col-sm-4 text-center">
-                                    <a type="submit" class="btn btn-large btn-primary"
-                                       href="/customer_project_new/" target="_blank">
-                                        <font color="#00008b" size="3"><B>新建项目</B></font>
-                                    </a>
-                                </div>
-                                <div class="col-sm-4 text-right text-center-xs">
+
+                            </div>
+                            <div class="col-sm-4 text-center">
+                                <a type="submit" class="btn btn-large btn-primary"
+                                   href="/customer_project_new/">
+                                    <font color="#00008b" size="3"><B>新建项目</B></font>
+                                </a>
+                            </div>
+                            <div class="col-sm-4 text-right text-center-xs">
 
                                 </div>
                             </div>
-                        </footer>
-                    </section>
+                        </div>
+                    </footer>
+                </section>
                 </div>
             </section>
         </section>

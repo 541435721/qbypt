@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    {% load static %}
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+    <link rel="stylesheet" href="{% static 'css/app.v2.css' %}" type="text/css"/>
+    <link rel="stylesheet" href="{% static 'css/combo.select.css' %}" type="text/css"/>
+    <link rel="stylesheet" href="{% static 'js/calendar/bootstrap_calendar.css' %}" type="text/css" cache="false"/>
+    <!--[if lt IE 9]>
+    <script src="{% static 'js/ie/html5shiv.js'%}" cache="false"></script>
+    <script src="{% static 'js/ie/respond.min.js'%}" cache="false"></script>
+    <script src="{% static 'js/ie/excanvas.js'%}" cache="false"></script>
+<script src="{% static 'js/app.v2.js' %}"></script> <!-- Bootstrap --> <!-- App -->
+    {# 可用于表格排序筛选的样式 #}
+    <script src="{% static 'js/layer.js' %}"></script>
+    <link href="{% static 'css/bootstrap-table.css' %}" rel="stylesheet">
+    <script src="{% static 'js/bootstrap-table.js' %}"></script>
+    <script src="{% static 'laydate/laydate.js' %}"></script>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <section class="vbox">
+        <section class="scrollable padder">
+            <form method="post">
+
+                {% csrf_token %}
+                <fieldset>
+                    <label>优惠券编号：</label>{{ coupon.coupon }}
+                    {% for field in form.visible_fields %}  <!--对于每一个field-->
+                        <div class="form-group{% if field.errors %} has-error{% endif %}"> <!--对表单进行排版-->
+                            <label>{{ field.label }}</label>
+                            {{ field }} <!--显示输入框 -->
+                            {% if field.help_text %}
+                                <span class="help-block">{{ field.help_text|safe }}</span> <!--如果有帮助提示，则显示-->
+                            {% endif %}
+                            {% for error in field.errors %}
+                                <label class="control-label">{{ error }}</label> <!--显示每个错误提示-->
+                            {% endfor %}
+                        </div>
+                    {% endfor %}
+                    <div class="">
+                        <button type="submit" class="btn btn-large btn-primary">修改</button>
+                    </div>
+                </fieldset>
+
+            </form>
+        </section>
+    </section>
+</head>
+<body>
+
+</body>
+</html>

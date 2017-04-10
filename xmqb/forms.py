@@ -294,10 +294,12 @@ class HandleInvoiceForm(forms.ModelForm):
         super(HandleInvoiceForm, self).__init__(*args, **kwargs)
 
 
-class CouponForm(forms.ModelForm):
-    classify_choice = ((u'', u''))
+class CouponForm(forms.Form):
+    classify_choice = []
+    for obj in models.Classify.objects.all():
+        classify_choice.append((obj.classify, obj.classify_name))
 
-    deadline_time = forms.DateTimeField(widget=forms.TextInput(attrs={'class': 'form-control'}),
+    deadline_time = forms.DateTimeField(widget=forms.TextInput(attrs={'onClick': 'laydate()', 'class': 'form-control'}),
                                         required=True, label=u'过期时间',
                                         error_messages={'required': u'过期时间不能为空'})
 
@@ -312,8 +314,6 @@ class CouponForm(forms.ModelForm):
 
     def __init__(self, *args, **kwargs):  # 初始化的方法
         super(CouponForm, self).__init__(*args, **kwargs)
-        for obj in models.Classify.objects.all():
-            classify_choice = classify_choice + ((obj.classify, obj.classify_name))
 
 
 class PriceForm(forms.Form):

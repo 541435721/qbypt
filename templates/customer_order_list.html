@@ -48,7 +48,7 @@
                                     <td>{{ foo.username }}</td>
                                     <td>{{ foo.out_trade_no }}</td>
                                     <td>{{ foo.classify_name }}</td>
-                                    <td>{% if foo.is_complete %}
+                                    <td>{% if foo.is_complete == '1' %}
                                         已完成
                                     {% else %}
                                         未完成
