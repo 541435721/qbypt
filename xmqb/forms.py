@@ -416,7 +416,8 @@ class Suggestion(forms.Form):
                          'BORDER-BOTTOM: 2px solid; '
                          'BORDER-LEFT: 2px solid; '
                          'BORDER-RIGHT: 2px solid; '
-                         'BORDER-TOP: 2px solid',
+                         'BORDER-TOP: 2px solid;'
+                         'border-color:#65bd77',
                 'placeholder': '请输入您对我们的意见或建议',
                 'resize': 'none'}),
         label='意见反馈')
