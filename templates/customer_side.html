@@ -4,14 +4,18 @@
 <head>
     <meta charset="utf-8"/>
     <title>Notebook | Web Application</title>
+    <link href="{% static 'css/style.css' %}" rel="stylesheet" type="text/css">
+    <script src="{% static 'js/jquery.min.js' %}" type="text/javascript"></script>
     <meta name="description"
           content="app, web app, responsive, admin dashboard, admin, flat, flat ui, ui kit, off screen nav"/>
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
     <link rel="stylesheet" href="{% static 'css/app.v2.css' %}" type="text/css"/>
+
     <link rel="stylesheet" href="{% static 'css/combo.select.css' %}" type="text/css"/>
     <link rel="stylesheet" href="{% static 'js/calendar/bootstrap_calendar.css' %}" type="text/css" cache="false"/>
     <script src="{% static 'js/jquery.js' %}"></script>
     <script src="{% static 'js/choose_checkbox.js' %}"></script>
+
     <!--[if lt IE 9]>
     <script src="{% static 'js/ie/html5shiv.js'%}" cache="false"></script>
     <script src="{% static 'js/ie/respond.min.js'%}" cache="false"></script>
@@ -19,14 +23,44 @@
     <![endif]-->
 </head>
 <body style="font-family: 微软雅黑">
+
+<div class="izl-rmenu">
+    <a class="consult" target="_blank">
+        <div class="phone" style="display:none;">0592-5760668</div>
+    </a>
+    <a class="cart">
+        <div class="pic"></div>
+    </a>
+</div>
+<!--qq聊天代码部分begin-->
+{#<a target="_blank" href="http://wpa.qq.com/msgrd?v=3&uin=123456&site=qq&menu=yes"#}
+{#   id="udesk-feedback-tab" class="udesk-feedback-tab-left"#}
+{#   style="display: block; background-color: black;"></a>#}
+<!--qq聊天代码部分end-->
+<script>
+    $(function () {
+        $(".btn_top").hide();
+        $(".btn_top").on("click", function () {
+            $('html, body').animate({scrollTop: 0}, 300);
+            return false;
+        })
+        $(window).bind('scroll resize', function () {
+            if ($(window).scrollTop() <= 300) {
+                $(".btn_top").hide();
+            } else {
+                $(".btn_top").show();
+            }
+        })
+    })
+</script>
 <section class="vbox">
     <header class="bg-dark dk header navbar navbar-fixed-top-xs">
         <div class="navbar-header aside-md"><a class="btn btn-link visible-xs" data-toggle="class:nav-off-screen"
                                                data-target="#nav"> <i class="fa fa-bars"></i> </a> <a href="/"
                                                                                                       class="navbar-brand"><img
-                src="../../../static/images/qblogo.png" class="m-r-sm">强本宇康</a> <a class="btn btn-link visible-xs"
-                                                                                   data-toggle="dropdown"
-                                                                                   data-target=".nav-user"> <i
+                src="{% static 'images/qblogo.png' %}" class="m-r-sm">强本宇康</a> <a class="btn btn-link visible-xs"
+                                                                                  data-toggle="dropdown"
+                                                                                  data-target=".nav-user"> <i
                 class="fa fa-cog"></i> </a></div>
         <ul class="nav navbar-nav hidden-xs">
             <li>
@@ -36,24 +70,22 @@
         </ul>
         <ul class="nav navbar-nav navbar-right hidden-xs nav-user">
             <li class="hidden-xs"><a href="#" class="dropdown-toggle dk" data-toggle="dropdown"> <i
-                    class="fa fa-bell"></i> <span class="badge badge-sm up bg-danger m-l-n-sm count">2</span> </a>
+                    class="fa fa-bell"></i> <span
+                    class="badge badge-sm up bg-danger m-l-n-sm">{{ request.session.not_read }}</span> </a>
                 <section class="dropdown-menu aside-xl">
                     <section class="panel bg-white">
-                        <header class="panel-heading b-light bg-light"><strong>You have <span class="count">2</span>
-                            notifications</strong></header>
-                        <div class="list-group list-group-alt animated fadeInRight"><a href="#"
-                                                                                       class="media list-group-item">
-                            <span class="pull-left thumb-sm"> <img src="../../../static/images/avatar.jpg"
-                                                                   alt="John said" class="img-circle"> </span> <span
-                                class="media-body block m-b-none"> Use awesome animate.css<br>
-              <small class="text-muted">10 minutes ago</small> </span> </a> <a href="#"
-                                                                               class="media list-group-item"> <span
-                                class="media-body block m-b-none"> 1.0 initial released<br>
-              <small class="text-muted">1 hour ago</small> </span> </a></div>
-                        <footer class="panel-footer text-sm"><a href="#" class="pull-right"><i
-                                class="fa fa-cog"></i></a> <a href="#notes"
-                                                              data-toggle="class:show animated fadeInRight">See all the
-                            notifications</a></footer>
+                        <header class="panel-heading b-light bg-light"><strong>您有 <span
+                                class="">{{ request.session.not_read }}</span>
+                            条未读信息</strong></header>
+                        <div class="list-group-alt animated fadeInRight">
+                            <a href="#" class="media list-group-item">
+                                                    <span class="media-body block m-b-none"> 意见反馈------1<br>
+                                      <small class="text-muted">1 hour ago</small> </span>
+                            </a>
+                        </div>
+                        <footer class="panel-footer text-sm">
+                            <a href="/customer_message_receive/">查看全部消息</a>
+                        </footer>
                     </section>
                 </section>
             </li>
@@ -80,8 +112,12 @@
                     <span class="arrow top"></span>
                     <li><a href="/customer_user_info/">个人中心</a></li>
                     <li><a href="/customer_project_list/">项目管理</a></li>
-                    <li><a href="#"> <span class="badge bg-danger pull-right">3</span> 我的消息 </a></li>
-                    <li><a href="#">帮助</a></li>
+
+                    <li><a href="/customer_message_list/"> <span
+                            class="badge bg-danger pull-right">{{ request.session.not_read }}</span> 我的消息 </a>
+                    </li>
+                    {#                    <li><a href="docs.html">帮助</a></li>#}
+
                     <li class="divider"></li>
                     <li><a href="/logout/">退出</a></li>
                 </ul>
@@ -147,17 +183,19 @@
                                         <span class="pull-right"> <i class="fa fa-angle-down text"></i> <i
                                                 class="fa fa-angle-up text-active"></i> </span> <span>财务中心</span> </a>
                                         <ul class="nav lt">
-                                            <li><a href="/customer_order_list"> <i class="fa fa-angle-right"></i>
+                                            <li><a href="/customer_order_list/"> <i class="fa fa-angle-right"></i>
                                                 <span>我的订单</span> </a></li>
-                                            <li><a href="/customer_invoice_list"> <b
+                                            <li><a href="/customer_invoice_list/"> <b
                                                     class="badge bg-info pull-right"></b> <i
                                                     class="fa fa-angle-right"></i> <span>发票管理</span> </a></li>
                                         </ul>
                                     </li>
 
                                     <li><a href="/customer_message_receive/"> <b
-                                            class="badge bg-danger pull-right">{{ message }}</b> <i
-                                            class="fa fa-envelope-o icon"> <b class="bg-primary dker"></b> </i> <span>消息中心</span>
+                                            class="badge bg-danger pull-right">{{ request.session.not_read }}</b>
+                                        <i
+                                                class="fa fa-envelope-o icon"> <b class="bg-primary dker"></b> </i>
+                                        <span>消息中心</span>
                                     </a></li>
                                     <li><a href="/customer_suggestion/"> <i class="fa fa-pencil icon"> <b
                                             class="bg-info"></b>

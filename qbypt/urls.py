@@ -29,6 +29,8 @@ urlpatterns = [
 
     url(r'^register/$', views.register, name='register'),
 
+    url(r'^check_code/$', views.check_code, name='check_code'),
+
     url(r'^checkcode/$', views.CheckCode, name='CheckCode'),  # 图片验证码生成方法
 
     url(r'^customer_user_info/$', views.customer_user_info, name='customer_user_info'),
@@ -122,7 +124,7 @@ urlpatterns = [
 
     url(r'^administrator_invoice_info/$', views.administrator_invoice_info, name='administrator_invoice_info'),
 
-    url(r'^administrator_invoice_create/$',views.administrator_invoice_create,name='administrator_invoice_create'),
+    url(r'^administrator_invoice_create/$', views.administrator_invoice_create, name='administrator_invoice_create'),
 
     url(r'^administrator_coupon_distribute/$', views.administrator_coupon_distribute,
         name='administrator_coupon_distribute'),
@@ -148,13 +150,15 @@ urlpatterns = [
 
     url(r'^administrator_message_read/$', views.administrator_message_read, name='administrator_message_read'),
 
-    url(r'^alipy_notify', views.alipy_notify, name='alipy_notify'),  # 支付完成后所做的跳转，用以修改支付状态
+    url(r'^alipy_notify/$', views.alipy_notify, name='alipy_notify'),  # 支付完成后所做的跳转，用以修改支付状态
 
-    url(r'^customer_message_receive', views.customer_message_list, name='customer_message_list'),
+    url(r'^customer_message_receive/$', views.customer_message_list, name='customer_message_list'),
 
-    url(r'^customer_message_read', views.customer_message_info, name='customer_message_read'),
+    url(r'^customer_message_read/$', views.customer_message_info, name='customer_message_read'),
 
-    url(r'^customer_suggestion', views.customer_suggestion, name='consumer_suggestion'),
+    url(r'^customer_suggestion/$', views.customer_suggestion, name='consumer_suggestion'),
+
+    url(r'^contact_us/$', views.contact_us, name='contact_us'),
 
     url(r'^user_agreement', views.user_agreement, name='user_agreement'),
 ]
