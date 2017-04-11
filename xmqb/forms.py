@@ -199,8 +199,8 @@ class InvoiceDemandForm(forms.ModelForm):
                                      label=u'发票类型', required=True, choices=invoice_choice)  # 发票类型
 
     recipient_name = forms.CharField(widget=forms.TextInput(attrs={'class': 'form-control'}),  # 收件人姓名
-                                      max_length=10, required=True, label=u'收件人',
-                                      error_messages={'required': u'请填写发票收件人姓名'})
+                                     max_length=10, required=True, label=u'收件人',
+                                     error_messages={'required': u'请填写发票收件人姓名'})
 
     address = forms.CharField(widget=forms.TextInput(attrs={'class': 'form-control'}),  # 收件人地址
                               max_length=30, required=True, label=u'地址',
@@ -211,20 +211,21 @@ class InvoiceDemandForm(forms.ModelForm):
                                 error_messages={'required': u'请填写收件人电话'})
 
     deliver_id = forms.CharField(widget=forms.TextInput(attrs={'class': 'form-control'}),  # 物流编号
-                                 max_length=30,required=True,label=u'物流编号',
+                                 max_length=30, required=True, label=u'物流编号',
                                  error_messages={'required': u'请填写物流编号'})
 
     deliver_company = forms.CharField(widget=forms.TextInput(attrs={'class': 'form-control'}),  # 物流公司
-                                      max_length=30,required=True,label=u'物流公司',
+                                      max_length=30, required=True, label=u'物流公司',
                                       error_messages={'required': u'请填写物流公司'})
 
-    remark=forms.CharField(widget=forms.TextInput(attrs={'class': 'form-control'}),
-                           max_length=100,required=False,label=u'备注',)
+    remark = forms.CharField(widget=forms.TextInput(attrs={'class': 'form-control'}),
+                             max_length=100, required=False, label=u'备注', )
 
     class Meta:  # 和数据模型关联类ModelForm必要的子类
         model = models.Invoice
-        fields = ['title','demand_type','invoice_type','recipient_name','address','telephone','deliver_id','deliver_company','remark']
-        exclude = ['order','amount','demand_time','deliver_time','status','user',]  # 剔除不要的表项
+        fields = ['title', 'demand_type', 'invoice_type', 'recipient_name', 'address', 'telephone', 'deliver_id',
+                  'deliver_company', 'remark']
+        exclude = ['order', 'amount', 'demand_time', 'deliver_time', 'status', 'user', ]  # 剔除不要的表项
 
     def __init__(self, *args, **kwargs):  # 初始化的方法
         super(InvoiceDemandForm, self).__init__(*args, **kwargs)
@@ -404,3 +405,22 @@ class Order_Detial(forms.Form):
     def __init__(self, *args, **kwargs):
         """Constructor for Order_Detial"""
         super(Order_Detial, self).__init__(*args, **kwargs)
+
+
+class Suggestion(forms.Form):
+    context = forms.CharField(
+        widget=forms.Textarea(
+            attrs={
+                'style': 'font-size:18px;width: 500px; height: 300px;'
+                         'borderColor:true;'
+                         'BORDER-BOTTOM: 2px solid; '
+                         'BORDER-LEFT: 2px solid; '
+                         'BORDER-RIGHT: 2px solid; '
+                         'BORDER-TOP: 2px solid',
+                'placeholder': '请输入您对我们的意见或建议',
+                'resize': 'none'}),
+        label='意见反馈')
+
+    def __init__(self, *args, **kwargs):
+        """Constructor for Order_Detial"""
+        super(Suggestion, self).__init__(*args, **kwargs)

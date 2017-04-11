@@ -22,8 +22,23 @@
                     <li><a href="/"><i class="fa fa-home"></i> 主页</a></li>
                     <li class="active">意见反馈</li>
                 </ul>
+                <script>
+                    if (parseInt({{ state }}) == 1) {
+                        alert('感谢您的反馈！');
+                    }
+                    else if (parseInt({{ state }}) == 2) {
+                        alert('发送失败，请重新发送');
+                    }
+                </script>
                 <section class="panel panel-default">
-
+                    <div style="text-align: center;font-size: 36px">{{ suggestion.context.label }}</div>
+                    <br><br><br>
+                    <form method="post" role="form" action="/customer_suggestion/" style="text-align: center">
+                        {% csrf_token %}
+                        {{ suggestion.context }}
+                        <br><br><br>
+                        <button type="submit" class="btn btn-large btn-primary">发送</button>
+                    </form>
                 </section>
 
             </section>
