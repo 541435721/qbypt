@@ -50,6 +50,9 @@ def login(request):  # 登陆
             password = form.cleaned_data.get('password')
             user = auth.authenticate(username=username, password=password)
             auth.login(request, user)
+            not_read = len(xmqb_model.Message.objects.filter(user_id=request.user.id, is_read=0))
+            request.session['not_read'] = not_read
+            print not_read
             if request.user.is_superuser == 1:  # 管理员登录
                 return redirect('/administrator_project_list')
 
@@ -90,7 +93,6 @@ def register(request):  # 注册
             auth.login(request, user)  # 用户登录
             classifys = xmqb_model.Classify.objects.all()
             for item in classifys:
-                print item.classify_name
                 # timefield需要的格式 YYYY-MM-DD HH:MM 暂定优惠券有效时间为60天
                 coupon = xmqb_model.Coupon(coupon=str(user.id) + str(uuid.uuid1())[0:20], user=user, amount=500,
                                            rest_amount=500, type=item,
@@ -385,7 +387,6 @@ def customer_project_alert(request):  # 用户修改项目
 
     else:
         form = xmqb_form.ProjectForm(request.POST)
-        print form.is_valid()
         if form.is_valid():
             project = xmqb_model.Project.objects.get(project=project_id)
             project.project_name = form.cleaned_data['project_name']
@@ -407,7 +408,7 @@ def customer_project_alert(request):  # 用户修改项目
                     price += part.part_price
                     project_part.save()
 
-            if project.status == '3' or project.status == '2':          # 用户已付款的情况下修改订单
+            if project.status == '3' or project.status == '2':  # 用户已付款的情况下修改订单
                 if not price == 0:
                     order = xmqb_model.Order.objects.create(
                         order=time.strftime('%y%m%d%H%M%S') + str((project.user.id) % 10000).zfill(4) + str(
@@ -417,14 +418,15 @@ def customer_project_alert(request):  # 用户修改项目
                     order.save()
                     project.status = 1
                     project.save()
-            else:                                                       # 用户该项还没有付款情况下 修改订单
+
+            else:  # 用户该项还没有付款情况下 修改订单
                 if not price == 0:
                     project = xmqb_model.Project.objects.get(project=project_id)
                     try:
-                        order = xmqb_model.Order.objects.get(project=project,is_pay=0)
+                        order = xmqb_model.Order.objects.get(project=project, is_pay=0)
                         order.order_price += price
                         order.save()
-                    except Exception,e:
+                    except Exception, e:
                         return HttpResponse('支付异常')
 
         else:
@@ -617,8 +619,8 @@ def customer_message_list(request):  # 用户消息列表
     if not request.user.is_authenticated():
         return redirect('/login')
     record = xmqb_model.Message.objects.filter(user_id=request.user.id)
-    print request.user.id
     not_read = len(xmqb_model.Message.objects.filter(user_id=request.user.id, is_read=0))
+    request.session['not_read'] = not_read
     return render(request, 'customer_message_receive.html', {'messages': record, 'message': not_read})
 
 def customer_message_info(request):  # 用户消息详情
@@ -635,13 +637,40 @@ def customer_message_info(request):  # 用户消息详情
         record.is_read = 1
         record.read_time = timezone.localtime(timezone.now()).strftime("%Y-%m-%d %H:%M:%S")
         record.save()
-
+        not_read = len(xmqb_model.Message.objects.filter(user_id=request.user.id, is_read=0))
+        request.session['not_read'] = not_read
         return render(request, 'customer_message_read.html', {'form': forms})
     else:
         return redirect('/customer_message_receive')
 
+
 def customer_suggestion(request):
-    return render(request, 'customer_suggestion.html')
+    if not request.user.is_authenticated():
+        redirect('/login')
+    else:
+        if request.method == 'POST':
+            context = xmqb_form.Suggestion(request.POST)
+            if context.is_valid():
+                message = context.cleaned_data['context']
+                workers = xmqb_model.Worker.objects.all().values('worker_id')
+                for x in workers:
+                    i = x.values()[0]
+                    record = xmqb_model.Message.objects.create(title='意见反馈------' + str(request.user.id),
+                                                               message_content=message,
+                                                               is_read=0,
+                                                               send_worker_id=request.user.id,
+                                                               user_id=i)
+                    record.save()
+                    context = xmqb_form.Suggestion()
+                    not_read = len(xmqb_model.Message.objects.filter(user_id=request.user.id, is_read=0))
+                    request.session['not_read'] = not_read
+                    return render(request, 'customer_suggestion.html', {'suggestion': context, 'state': 1})
+                else:
+                    context = xmqb_form.Suggestion()
+                    return render(request, 'customer_suggestion.html', {'suggestion': context, 'state': 2})
+    context = xmqb_form.Suggestion()
+    return render(request, 'customer_suggestion.html', {'suggestion': context, 'state': 0})
+
 
 @csrf_exempt
 def uploadify_script(request):  # 前端 uploadify在后台的处理函数，用于上传文件的处理
@@ -994,7 +1023,7 @@ def administrator_file_upload(request):
 
 def administrator_work_order_assess_list(request):  # 工单审核列表
     assessor = xmqb_model.Worker.objects.get(worker=request.user)
-    workOrders = xmqb_model.WorkOrder.objects.filter(Q(status=2) | Q(status=3) | Q(status=4),assessor=assessor)
+    workOrders = xmqb_model.WorkOrder.objects.filter(Q(status=2) | Q(status=3) | Q(status=4), assessor=assessor)
     return render(request, 'administrator_work_order_assess_list.html', {'workOrders': workOrders})
 
 
@@ -1393,6 +1422,7 @@ def administrator_message_read(request):  # 阅读信息
         return render(request, 'administrator_message_read.html', {'form': forms})
     else:
         return redirect('/administrator_message_receive')
+
 
 def alipy_notify(request):
     if request.method == 'POST':
