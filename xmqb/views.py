@@ -39,6 +39,10 @@ def index(request):  # 首页
     return render(request, 'index.html')
 
 
+def user_agreement(request):  # 用户协议
+    return render(request, 'user_agreement.html')
+
+
 def login(request):  # 登陆
     if request.user.is_authenticated():
         return redirect('/')
@@ -65,7 +69,7 @@ def login(request):  # 登陆
                 return redirect('/administrator_coupon_distribute')
 
             elif request.user.is_superuser == 0:
-                return redirect('/customer_project_new')
+                return redirect('/customer_account_info')
         else:
             return render(request, 'login.html', {'form': form})
     else:
@@ -256,12 +260,11 @@ def customer_project_new(request):  # 用户新建项目
                     coupon.rest_amount = 0
                     coupon.save()
                 else:
+                    coupon.rest_amount = coupon.rest_amount - price
                     price = 0
-                    coupon.rest_amount -= price
                     coupon.save()
             except Exception, e:
                 print e
-
             order = xmqb_model.Order.objects.create(
                 order=str(time.strftime('%y%m%d%H%M%S') + str((request.user.id) % 10000).zfill(4) + str(
                     (random.randint(0, 100) % 100)).zfill(2)),
@@ -290,7 +293,7 @@ def customer_file_upload(request):
         project_ID = request.POST['project_ID']
         classify = request.POST['id_classify']
         upload_name = request.POST['id_upload_name']
-        upload_name = str(upload_name).replace("\"", "")
+        print upload_name
         if len(upload_name) > 0:
             project = xmqb_model.Project.objects.get(project=project_ID)
             project.upload_name = upload_name
@@ -590,6 +593,7 @@ def customer_message_list(request):  # 用户消息列表
     print request.user.id
     not_read = len(xmqb_model.Message.objects.filter(user_id=request.user.id, is_read=0))
     return render(request, 'customer_message_receive.html', {'messages': record, 'message': not_read})
+
 
 def customer_message_info(request):  # 用户消息详情
     if not request.user.is_authenticated():
@@ -954,7 +958,7 @@ def administrator_file_upload(request):
         project = xmqb_model.Project.objects.get(project=project_ID)
         part = xmqb_model.ProjectPart.objects.get(project=project, part=part_id)
         upload_name = request.POST['id_upload_name']
-        upload_name = str(upload_name).replace("\"", "")
+        print upload_name
         if len(upload_name) > 0:
             part.directory = upload_name
             part.save()
@@ -1051,6 +1055,7 @@ def administrator_invoice_list(request):  # 管理员发票列表
         else:
             undelivered.append(inv)
     return render(request, 'administrator_invoice_list.html',{'orders':orders,'delivered':delivered,'undelivered':undelivered},)
+
 
 def administrator_invoice_create(request):    # 管理员开发票
     if not request.user.is_superuser:
@@ -1364,6 +1369,7 @@ def administrator_message_read(request):  # 阅读信息
         return render(request, 'administrator_message_read.html', {'form': forms})
     else:
         return redirect('/administrator_message_receive')
+
 
 def alipy_notify(request):
     if request.method == 'POST':

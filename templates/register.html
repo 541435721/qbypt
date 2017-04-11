@@ -9,6 +9,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
     <link rel="stylesheet" href="{% static  'css/app.v2.css' %}" type="text/css"/>
     <link rel="stylesheet" href="{% static 'css/font.css' %}" type="text/css" cache="false"/>
+    <script src="{% static 'js/jquery.js' %}"></script>
+    <script src="{% static 'js/app.v2.js' %}"></script>
+    <script src="{% static 'js/layer.js' %}"></script>
     <!--[if lt IE 9]>
     <script src="{% static 'js/ie/html5shiv.js'%}" cache="false"></script>
     <script src="{% static 'js/ie/respond.min.js'%}" cache="false"></script>
@@ -52,7 +55,7 @@
                 <div class="checkbox">
                     <label>
                         <input type="checkbox">
-                        同意 <a href="#">用户注册协议</a> </label>
+                        同意 <a href="javascript:user_agreement()">用户注册协议</a> </label>
                 </div>
                 <button type="submit" class="btn btn-primary">注册</button>
                 <div class="line line-dashed"></div>
@@ -72,5 +75,26 @@
     </div>
 </footer>
 <!-- / footer -->
+
 </body>
+<script>
+    try {
+            var index = parent.layer.getFrameIndex(window.name);
+            if (index) {
+                parent.location.reload();
+                parent.layer.close(index);
+            }
+        } catch (err) {
+
+        }
+function user_agreement() {
+            var index = layer.open({
+                type: 2,
+                area: ['700px', '530px'],
+                fix: false, //不固定
+                maxmin: true,
+                content: '/user_agreement'
+            });
+        }
+</script>
 </html>
