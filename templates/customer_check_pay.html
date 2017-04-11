@@ -1,0 +1,48 @@
+{% extends 'customer_side.html' %}
+{% block title %}订单管理{% endblock %}
+{% block content %}
+    <section id="content">
+        <section class="vbox">
+            <section class="scrollable padder">
+                <ul class="breadcrumb no-border no-radius b-b b-light pull-in">
+                    <li><a href="/"><i class="fa fa-home"></i> 主页</a></li>
+                    <li class="active">订单详情：{{ order.order }}</li>
+                </ul>
+                <div class="col-sm-3 pull-left">
+                </div>
+                <div class="col-sm-5">
+                    <form data-validate="parsley" class="ProjectFrom"
+                          method="post"
+                          role="form">
+                        {% csrf_token %}
+                        <fieldset>
+                            <div id="myfield" class="form-group{% if field.errors %} has-error{% endif %}">
+                                <label>订单号：</label><input class="form-control input-lg" readonly="readonly"
+                                                          value="{{ order.order }}"><br>
+                                <label>项目号：</label><input class="form-control input-lg" readonly="readonly"
+                                                          value="{{ order.project.project }}"><br>
+                                <label>金额：</label><input class="form-control input-lg" readonly="readonly"
+                                                         value="{{ order.order_price }}"><br>
+                            </div>
+                            <div class="form-group-left">
+                                <a href="{{ url }}" class="btn btn-large btn-primary">确认支付</a>
+                            </div>
+                            <script>
+                                var d = document.getElementById("myfield");
+                                for (var i = 0; i < d.childNodes.length; i++) {
+                                    if (d.childNodes[i].disabled != null) {
+                                        d.childNodes[i].disabled = "disabled";
+                                    }
+                                }
+                            </script>
+                        </fieldset>
+                    </form>
+                </div>
+            </section>
+        </section>
+    </section>
+    <a href="#" class="hide nav-off-screen-block" data-toggle="class:nav-off-screen" data-target="#nav"></a>
+
+{% endblock %}
+
+<a href="{{ url }}">确认支付</a>
