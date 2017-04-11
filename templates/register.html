@@ -9,10 +9,12 @@
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
     <link rel="stylesheet" href="{% static  'css/app.v2.css' %}" type="text/css"/>
     <link rel="stylesheet" href="{% static 'css/font.css' %}" type="text/css" cache="false"/>
+    <script src="{% static 'js/jquery.min.js' %}" cache="false"></script>
     <!--[if lt IE 9]>
     <script src="{% static 'js/ie/html5shiv.js'%}" cache="false"></script>
     <script src="{% static 'js/ie/respond.min.js'%}" cache="false"></script>
     <script src="{% static 'js/ie/excanvas.js'%}" cache="false"></script>
+    <script src="{% static 'js/jquery.min.js'%}" cache="false"></script>
     <![endif]-->
 </head>
 <body style="font-family: 微软雅黑">
@@ -20,25 +22,18 @@
     <div class="container aside-xxl"><a class="navbar-brand block" href="index.html"></a>
         <section class="panel panel-default m-t-lg bg-white">
             <header class="panel-heading text-center"><strong>注册</strong></header>
-            <form action="{% url 'register' %}" method="post" class="panel-body wrapper-lg">
-                {#        <div class="form-group">#}
-                {#          <label class="control-label">Name</label>#}
-                {#          <input type="text" placeholder="eg. Your name or company" class="form-control input-lg">#}
-                {#        </div>#}
-                {#        <div class="form-group">#}
-                {#          <label class="control-label">Email</label>#}
-                {#          <input type="email" placeholder="test@example.com" class="form-control input-lg">#}
-                {#        </div>#}
-                {#        <div class="form-group">#}
-                {#          <label class="control-label">Password</label>#}
-                {#          <input type="password" id="inputPassword" placeholder="Type a password" class="form-control input-lg">#}
-                {#        </div>#}
+            <form action="{% url 'register' %}" method="post" id="register_form" class="panel-body wrapper-lg">
                 {% csrf_token %}
                 <fieldset>
                     {% for field in form.visible_fields %}  <!--对于每一个field-->
                         <div class="form-group{% if field.errors %} has-error{% endif %}"> <!--对表单进行排版-->
                             <label>{{ field.label }}</label>
                             {{ field }} <!--显示输入框 -->
+                            {% if field.label == '手机验证码' %}
+                                <button type="button" id="check" class="btn btn-group-lg">获取验证码</button>
+                                <span id='result'></span>
+                                <span id='code' style="display: none"></span>
+                            {% endif %}
                             {% if field.help_text %}
                                 <span class="help-block">{{ field.help_text|safe }}</span> <!--如果有帮助提示，则显示-->
                             {% endif %}
@@ -54,7 +49,7 @@
                         <input type="checkbox">
                         同意 <a href="#">用户注册协议</a> </label>
                 </div>
-                <button type="submit" class="btn btn-primary">注册</button>
+                <button id="register" class="btn btn-primary">注册</button>
                 <div class="line line-dashed"></div>
                 <p class="text-muted text-center">
                     <small>已经有账号?</small>
@@ -64,6 +59,27 @@
         </section>
     </div>
 </section>
+<script>
+    $(document).ready(function () {
+        $("#check").click(function () {
+            var phone_number = $("#id_cellphone").val();
+            $.getJSON("/check_code/", {'phone_number': phone_number}, function (ret) {
+                $("#result").html(ret['status']);
+                $("#code").html(ret['code']);
+            })
+        });
+        $("#register").click(function () {
+            if ($("#id_identifying_code").val().localeCompare($("#code").html()) != 0) {
+                alert("验证码错误");
+                $("#id_identifying_code").val("");
+                return false;  {# 不加这一句还是会提交表单 #}
+            }
+            else {
+                return true;
+            }
+        })
+    });
+</script>
 <!-- footer -->
 <footer id="footer">
     <div class="text-center padder clearfix">

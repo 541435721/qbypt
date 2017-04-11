@@ -22,7 +22,8 @@ from xmqb.Helper import Checkcode
 from alipay_API import Alipay
 from qbypt.settings import DOWNLOAD_DIR
 import json
-
+import top.api
+import unicodedata
 # Create your views here.
 
 # 创建支付对象，用以生成支付链接
@@ -102,6 +103,36 @@ def register(request):  # 注册
             return render(request, 'register.html', {'form': form})
     return render(request, 'register.html', {'form': xmqb_form.RegisterForm()})
 
+def check_code(request):  # 用户接收短信验证码
+    phone_number=request.GET['phone_number']
+    users=xmqb_model.UserInfo.objects.filter(user_telephone=phone_number)
+    if len(users)>0:
+        return HttpResponse("此号码已存在")
+    req = top.api.AlibabaAliqinFcSmsNumSendRequest()
+    req.set_app_info(top.appinfo("23744157", "5e0763455c8f5b66c295f13c6184928e"))
+    phone_number=unicodedata.normalize('NFKD',phone_number).encode('ascii','ignore') # 将手机号码转换成ascii编码
+    req.extend = ""
+    req.sms_type = "normal"
+    req.sms_free_sign_name = "王弘轩"
+    # 生成随机验证码
+    codes=[0,1,2,3,4,5,6,7,8,9]
+    random.shuffle(codes)
+    code=''
+    for i in range(4):
+        temp_index=int(random.uniform(0,9))
+        code=code+str(codes[temp_index])
+    req.sms_param = "{code:'"+code+"'}"
+    req.rec_num = phone_number
+    req.sms_template_code = "SMS_57820069"
+    try:
+        resp = req.getResponse()
+        print (resp)
+        ajax_list={'status':"验证码已发送",'code':code}
+        return JsonResponse(ajax_list)
+    except Exception, e:
+        print (e)
+        ajax_list = {'status': "error"}
+        return HttpResponse(ajax_list)
 
 def customer_user_info(request):  # 用户个人信息
     if not request.user.is_authenticated:
@@ -290,7 +321,6 @@ def customer_file_upload(request):
         project_ID = request.POST['project_ID']
         classify = request.POST['id_classify']
         upload_name = request.POST['id_upload_name']
-        upload_name = str(upload_name).replace("\"", "")
         if len(upload_name) > 0:
             project = xmqb_model.Project.objects.get(project=project_ID)
             project.upload_name = upload_name
@@ -954,7 +984,6 @@ def administrator_file_upload(request):
         project = xmqb_model.Project.objects.get(project=project_ID)
         part = xmqb_model.ProjectPart.objects.get(project=project, part=part_id)
         upload_name = request.POST['id_upload_name']
-        upload_name = str(upload_name).replace("\"", "")
         if len(upload_name) > 0:
             part.directory = upload_name
             part.save()
