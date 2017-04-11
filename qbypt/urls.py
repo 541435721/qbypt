@@ -59,6 +59,8 @@ urlpatterns = [
 
     url(r'^customer_order_list/$', views.customer_order_list, name='customer_order_list'),
 
+    url(r'^customer_check_pay/$', views.customer_check_pay, name='customer_check_pay'),  # 用户确认支付
+
     url(r'^customer_order_info/$', views.customer_order_info, name='customer_order_info'),
 
     url(r'^customer_order_pay/$', views.customer_order_pay, name='customer_order_pay'),
