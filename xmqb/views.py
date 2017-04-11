@@ -41,6 +41,10 @@ def index(request):  # 首页
     return render(request, 'index.html')
 
 
+def user_agreement(request):  # 用户协议
+    return render(request, 'user_agreement.html')
+
+
 def login(request):  # 登陆
     if request.user.is_authenticated():
         return redirect('/')
@@ -70,7 +74,7 @@ def login(request):  # 登陆
                 return redirect('/administrator_coupon_distribute')
 
             elif request.user.is_superuser == 0:
-                return redirect('/customer_project_new')
+                return redirect('/customer_account_info')
         else:
             return render(request, 'login.html', {'form': form})
     else:
@@ -292,12 +296,11 @@ def customer_project_new(request):  # 用户新建项目
                     coupon.rest_amount = 0
                     coupon.save()
                 else:
+                    coupon.rest_amount = coupon.rest_amount - price
                     price = 0
-                    coupon.rest_amount -= price
                     coupon.save()
             except Exception, e:
                 print e
-
             order = xmqb_model.Order.objects.create(
                 order=str(time.strftime('%y%m%d%H%M%S') + str((request.user.id) % 10000).zfill(4) + str(
                     (random.randint(0, 100) % 100)).zfill(2)),
@@ -1120,6 +1123,7 @@ def administrator_invoice_list(request):  # 管理员发票列表
             undelivered.append(inv)
     return render(request, 'administrator_invoice_list.html',
                   {'orders': orders, 'delivered': delivered, 'undelivered': undelivered}, )
+
 
 
 def administrator_invoice_create(request):  # 管理员开发票

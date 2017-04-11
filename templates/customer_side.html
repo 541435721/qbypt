@@ -11,6 +11,11 @@
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
     <link rel="stylesheet" href="{% static 'css/app.v2.css' %}" type="text/css"/>
 
+    <link rel="stylesheet" href="{% static 'css/combo.select.css' %}" type="text/css"/>
+    <link rel="stylesheet" href="{% static 'js/calendar/bootstrap_calendar.css' %}" type="text/css" cache="false"/>
+    <script src="{% static 'js/jquery.js' %}"></script>
+    <script src="{% static 'js/choose_checkbox.js' %}"></script>
+
     <!--[if lt IE 9]>
     <script src="{% static 'js/ie/html5shiv.js'%}" cache="false"></script>
     <script src="{% static 'js/ie/respond.min.js'%}" cache="false"></script>
@@ -107,10 +112,12 @@
                     <span class="arrow top"></span>
                     <li><a href="/customer_user_info/">个人中心</a></li>
                     <li><a href="/customer_project_list/">项目管理</a></li>
+
                     <li><a href="/customer_message_list/"> <span
                             class="badge bg-danger pull-right">{{ request.session.not_read }}</span> 我的消息 </a>
                     </li>
                     {#                    <li><a href="docs.html">帮助</a></li>#}
+
                     <li class="divider"></li>
                     <li><a href="/logout/">退出</a></li>
                 </ul>
@@ -249,6 +256,5 @@
 <script src="{% static 'js/layer.js' %}"></script>
 <link href="{% static 'css/bootstrap-table.css' %}" rel="stylesheet">
 <script src="{% static 'js/bootstrap-table.js' %}"></script>
-
 </body>
 </html>

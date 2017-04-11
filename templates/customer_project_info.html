@@ -6,6 +6,7 @@
 function chooseParts(parts) {
     document.getElementById('id_part_' + String(parseInt(parts) - 1)).checked = true
     document.getElementById('id_part_' + String(parseInt(parts) - 1)).disabled = 'disabled'
+
 }
 function displayParts() {
     var id = document.getElementsByName('part');
@@ -80,9 +81,9 @@ function disable()
 
                         <script>disable()</script>
 
-                            <label>所需费用为：</label>
-                            <span id="price">0</span>
-                            <label>元</label>
+{#                            <label>所需费用为：</label>#}
+{#                            <span id="price">{{ project.price }}</span>#}
+{#                            <label>元</label>#}
                             <div class="form-group-left">
                                 <button type="submit" class="btn btn-large btn-primary">确定</button>
 
