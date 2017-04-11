@@ -29,6 +29,8 @@ urlpatterns = [
 
     url(r'^register/$', views.register, name='register'),
 
+    url(r'^check_code/$',views.check_code,name='check_code'),
+
     url(r'^checkcode/$', views.CheckCode, name='CheckCode'),  # 图片验证码生成方法
 
     url(r'^customer_user_info/$', views.customer_user_info, name='customer_user_info'),
@@ -121,6 +123,8 @@ urlpatterns = [
     url(r'^administrator_invoice_handle/$', views.administrator_invoice_handle, name='administrator_invoice_handle'),
 
     url(r'^administrator_invoice_info/$', views.administrator_invoice_info, name='administrator_invoice_info'),
+
+    url(r'^administrator_invoice_create/$',views.administrator_invoice_create,name='administrator_invoice_create'),
 
     url(r'^administrator_coupon_distribute/$', views.administrator_coupon_distribute,
         name='administrator_coupon_distribute'),

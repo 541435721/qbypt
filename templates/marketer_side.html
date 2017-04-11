@@ -1,16 +1,19 @@
 <!DOCTYPE html>
-{% load static %}
 <html lang="en" class="app">
+{% load static %}
 <head>
     <meta charset="utf-8"/>
-    <title>强本宇康 | 医学影像云平台</title>
+    <title>Notebook | Web Application</title>
     <meta name="description"
           content="app, web app, responsive, admin dashboard, admin, flat, flat ui, ui kit, off screen nav"/>
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
     <link rel="stylesheet" href="{% static 'css/app.v2.css' %}" type="text/css"/>
     <link rel="stylesheet" href="{% static 'css/combo.select.css' %}" type="text/css"/>
     <link rel="stylesheet" href="{% static 'js/calendar/bootstrap_calendar.css' %}" type="text/css" cache="false"/>
-    <!--[if lt IE 9]> <script src="js/ie/html5shiv.js" cache="false"></script> <script src="js/ie/respond.min.js" cache="false"></script> <script src="js/ie/excanvas.js" cache="false"></script>
+    <!--[if lt IE 9]>
+    <script src="{% static 'js/ie/html5shiv.js'%}" cache="false"></script>
+    <script src="{% static 'js/ie/respond.min.js'%}" cache="false"></script>
+    <script src="{% static 'js/ie/excanvas.js'%}" cache="false"></script>
     <![endif]-->
 </head>
 <body style="font-family: 微软雅黑">
@@ -19,38 +22,19 @@
         <div class="navbar-header aside-md"><a class="btn btn-link visible-xs" data-toggle="class:nav-off-screen"
                                                data-target="#nav"> <i class="fa fa-bars"></i> </a> <a href="/"
                                                                                                       class="navbar-brand"><img
-                src="../static/images/qblogo.png" class="m-r-sm">强本宇康</a> <a class="btn btn-link visible-xs"
-                                                                             data-toggle="dropdown"
-                                                                             data-target=".nav-user"> <i
+                src="../../../static/images/qblogo.png" class="m-r-sm">强本宇康</a> <a class="btn btn-link visible-xs"
+                                                                                   data-toggle="dropdown"
+                                                                                   data-target=".nav-user"> <i
                 class="fa fa-cog"></i> </a></div>
         <ul class="nav navbar-nav hidden-xs">
-            {#      <li class="dropdown"> <a href="#" class="dropdown-toggle dker" data-toggle="dropdown"> <i class="fa fa-building-o"></i> <span class="font-bold">Activity</span> </a>#}
-            {#        <section class="dropdown-menu aside-xl on animated fadeInLeft no-borders lt">#}
-            {#          <div class="wrapper lter m-t-n-xs"> <a href="#" class="thumb pull-left m-r"> <img src="../../../static/images/avatar.jpg" class="img-circle"> </a>#}
-            {#            <div class="clear"> <a href="#"><span class="text-white font-bold">@Mike Mcalidek</a></span> <small class="block">Art Director</small> <a href="#" class="btn btn-xs btn-success m-t-xs">Upgrade</a> </div>#}
-            {#          </div>#}
-            {#          <div class="row m-l-none m-r-none m-b-n-xs text-center">#}
-            {#            <div class="col-xs-4">#}
-            {#              <div class="padder-v"> <span class="m-b-xs h4 block text-white">245</span> <small class="text-muted">Followers</small> </div>#}
-            {#            </div>#}
-            {#            <div class="col-xs-4 dk">#}
-            {#              <div class="padder-v"> <span class="m-b-xs h4 block text-white">55</span> <small class="text-muted">Likes</small> </div>#}
-            {#            </div>#}
-            {#            <div class="col-xs-4">#}
-            {#              <div class="padder-v"> <span class="m-b-xs h4 block text-white">2,035</span> <small class="text-muted">Photos</small> </div>#}
-            {#            </div>#}
-            {#          </div>#}
-            {#        </section>#}
-            {#      </li>#}
             <li>
-                <div class="m-t m-l"><a href="javascript:history.go(-1)" class="dropdown-toggle btn btn-xs btn-primary"
+                <div class="m-t m-l"><a href="price.html" class="dropdown-toggle btn btn-xs btn-primary"
                                         title="Upgrade"><i class="fa fa-long-arrow-up"></i></a></div>
             </li>
         </ul>
         <ul class="nav navbar-nav navbar-right hidden-xs nav-user">
             <li class="hidden-xs"><a href="#" class="dropdown-toggle dk" data-toggle="dropdown"> <i
-                    class="fa fa-bell"></i> <span
-                    class="badge badge-sm up bg-danger m-l-n-sm count">{{ message }}</span> </a>
+                    class="fa fa-bell"></i> <span class="badge badge-sm up bg-danger m-l-n-sm count">2</span> </a>
                 <section class="dropdown-menu aside-xl">
                     <section class="panel bg-white">
                         <header class="panel-heading b-light bg-light"><strong>You have <span class="count">2</span>
@@ -92,8 +76,7 @@
                     src="../../../static/images/avatar.jpg"> </span> {{ request.user }}<b class="caret"></b> </a>
                 <ul class="dropdown-menu animated fadeInRight">
                     <span class="arrow top"></span>
-                    <li><a href="/user_center/">个人中心</a></li>
-                    <li><a href="/administrator_project_list/">项目管理</a></li>
+                    <li><a href="/administrator_work_order_handle_list/">优惠券管理</a></li>
                     <li><a href="#"> <span class="badge bg-danger pull-right">3</span> 我的消息 </a></li>
                     <li><a href="docs.html">帮助</a></li>
                     <li class="divider"></li>
@@ -127,60 +110,22 @@
                              data-size="5px" data-color="#333333"> <!-- nav -->
                             <nav class="nav-primary hidden-xs">
                                 <ul class="nav">
-                                    <li><a href="/" class="active"> <i class="fa fa-user icon"> <b
-                                            class="bg-danger"></b> </i> <span class="pull-right"> <i
-                                            class="fa fa-angle-up text"></i> <i
-                                            class="fa fa-angle-down text-active"></i> </span> <span>用户管理</span> </a>
-                                        <ul class="nav lt">
-                                            <li><a href="/administrator_user_info_list/"> <i
-                                                    class="fa fa-angle-right"></i>
-                                                <span>用户基本信息管理</span> </a></li>
-                                            <li><a href="/administrator_account_list/"> <i
-                                                    class="fa fa-angle-right"></i>
-                                                <span>用户安全信息管理</span> </a></li>
-                                        </ul>
-                                    </li>
                                     <li><a href="#layout"> <i class="fa fa-columns icon"> <b class="bg-warning"></b>
                                     </i> <span class="pull-right"> <i class="fa fa-angle-down text"></i> <i
-                                            class="fa fa-angle-up text-active"></i> </span> <span>项目管理</span> </a>
+                                            class="fa fa-angle-up text-active"></i> </span> <span>优惠券管理</span> </a>
                                         <ul class="nav lt">
-                                            <li><a href="/administrator_project_list/"> <i
-                                                    class="fa fa-angle-right"></i>
-                                                <span>项目清单</span> </a></li>
+                                            <li><a href="/administrator_coupon_distribute/"> <i class="fa fa-angle-right"></i>
+                                                <span>优惠券分发</span> </a></li>
+                                        </ul>
+                                        <ul class="nav lt">
+                                            <li><a href="/administrator_coupon_list/"> <i class="fa fa-angle-right"></i>
+                                                <span>优惠券列表</span> </a></li>
+                                        </ul>
+                                    </li>
 
-                                            <li><a href="/administrator_work_order_distribute/" target="_blank"> <i
-                                                    class="fa fa-angle-right"></i>
-                                                <span>项目分配</span> </a></li>
-                                        </ul>
-                                    </li>
-                                    <li><a href="/administrator_price_list/"> <i class="fa fa-envelope-o icon">
-                                        <b class="bg-primary dker"></b> </i> <span>单价管理</span>
-                                    </a></li>
-                                    <li><a href="/administrator_order_list/"> <i class="fa fa-envelope-o icon">
-                                        <b class="bg-primary dker"></b> </i> <span>订单管理</span>
-                                    </a></li>
-                                    <li><a href="#layout"> <i class="fa fa-columns icon"> <b class="bg-warning"></b>
-                                    </i> <span class="pull-right"> <i class="fa fa-angle-down text"></i> <i
-                                            class="fa fa-angle-up text-active"></i> </span> <span>发票管理</span> </a>
-                                        <ul class="nav lt">
-                                            <li><a href="/administrator_invoice_list/"> <i
-                                                    class="fa fa-angle-right"></i>
-                                                <span>发票列表</span> </a></li>
-                                        </ul>
-                                    </li>
-                                    <li><a href="#"> <b class="badge bg-danger pull-right">{{ message }}</b> <i
+                                    <li><a href="mail.html"> <b class="badge bg-danger pull-right">3</b> <i
                                             class="fa fa-envelope-o icon"> <b class="bg-primary dker"></b> </i> <span>消息中心</span>
-                                    </a>
-                                        <ul class="nav lt">
-                                            <li><a href="/administrator_message_send/"> <i
-                                                    class="fa fa-angle-right"></i>
-                                                <span>发件箱</span> </a></li>
-
-                                            <li><a href="/administrator_message_receive/"> <i
-                                                    class="fa fa-angle-right"></i>
-                                                <span>收件箱</span> </a></li>
-                                        </ul>
-                                    </li>
+                                    </a></li>
                                 </ul>
                             </nav>
                             <!-- / nav --> </div>
@@ -232,8 +177,8 @@
         </section>
     </section>
 </section>
-{# 可用于表格排序筛选的样式 #}
 <script src="{% static 'js/app.v2.js' %}"></script> <!-- Bootstrap --> <!-- App -->
+{# 可用于表格排序筛选的样式 #}
 <script src="{% static 'js/layer.js' %}"></script>
 <link href="{% static 'css/bootstrap-table.css' %}" rel="stylesheet">
 <script src="{% static 'js/bootstrap-table.js' %}"></script>

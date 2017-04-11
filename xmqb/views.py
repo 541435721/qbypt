@@ -22,7 +22,8 @@ from xmqb.Helper import Checkcode
 from alipay_API import Alipay
 from qbypt.settings import DOWNLOAD_DIR
 import json
-
+import top.api
+import unicodedata
 # Create your views here.
 
 # 创建支付对象，用以生成支付链接
@@ -104,6 +105,36 @@ def register(request):  # 注册
             return render(request, 'register.html', {'form': form})
     return render(request, 'register.html', {'form': xmqb_form.RegisterForm()})
 
+def check_code(request):  # 用户接收短信验证码
+    phone_number=request.GET['phone_number']
+    users=xmqb_model.UserInfo.objects.filter(user_telephone=phone_number)
+    if len(users)>0:
+        return HttpResponse("此号码已存在")
+    req = top.api.AlibabaAliqinFcSmsNumSendRequest()
+    req.set_app_info(top.appinfo("23744157", "5e0763455c8f5b66c295f13c6184928e"))
+    phone_number=unicodedata.normalize('NFKD',phone_number).encode('ascii','ignore') # 将手机号码转换成ascii编码
+    req.extend = ""
+    req.sms_type = "normal"
+    req.sms_free_sign_name = "王弘轩"
+    # 生成随机验证码
+    codes=[0,1,2,3,4,5,6,7,8,9]
+    random.shuffle(codes)
+    code=''
+    for i in range(4):
+        temp_index=int(random.uniform(0,9))
+        code=code+str(codes[temp_index])
+    req.sms_param = "{code:'"+code+"'}"
+    req.rec_num = phone_number
+    req.sms_template_code = "SMS_57820069"
+    try:
+        resp = req.getResponse()
+        print (resp)
+        ajax_list={'status':"验证码已发送",'code':code}
+        return JsonResponse(ajax_list)
+    except Exception, e:
+        print (e)
+        ajax_list = {'status': "error"}
+        return HttpResponse(ajax_list)
 
 def customer_user_info(request):  # 用户个人信息
     if not request.user.is_authenticated:
@@ -222,7 +253,6 @@ def customer_project_new(request):  # 用户新建项目
         if form.is_valid():
             classify = xmqb_model.Classify.objects.get(classify=form.cleaned_data['classify'])
             project = xmqb_model.Project.objects.create(user=request.user, classify=classify,
-
                                                         project=time.strftime('%y%m%d%H%M%S') + str(
                                                             (request.user.id) % 100000).zfill(4))
 
@@ -241,16 +271,29 @@ def customer_project_new(request):  # 用户新建项目
             # else:
             #     project.status = '0'
             project.save()
-
             partlist = form.cleaned_data['part']
+            coupon_id = request.POST.get('coupon')
+
             price = 0
 
             for everypart in partlist:
                 part = xmqb_model.Price.objects.get(part=everypart)
                 project_part = xmqb_model.ProjectPart.objects.create(project=project, part=part)
                 project_part.save()
-
                 price += part.part_price
+
+            try:
+                coupon = xmqb_model.Coupon.objects.get(coupon=coupon_id)
+                if price >= coupon.rest_amount:
+                    price -= coupon.rest_amount
+                    coupon.rest_amount = 0
+                    coupon.save()
+                else:
+                    price = 0
+                    coupon.rest_amount -= price
+                    coupon.save()
+            except Exception, e:
+                print e
 
             order = xmqb_model.Order.objects.create(
                 order=str(time.strftime('%y%m%d%H%M%S') + str((request.user.id) % 10000).zfill(4) + str(
@@ -269,8 +312,9 @@ def customer_project_new(request):  # 用户新建项目
         form = xmqb_form.ProjectForm()
         part = xmqb_model.Price.objects.all()
         part_relation = xmqb_model.PartRelation.objects.all()
+        coupons = xmqb_model.Coupon.objects.filter(user=request.user,rest_amount__gt = 0, deadline_time__gte=timezone.now())
         return render(request, 'customer_project_new.html',
-                      {'form': form, 'part': part, 'part_relation': part_relation})
+                      {'form': form, 'part': part, 'part_relation': part_relation, 'coupons': coupons})
 
 
 @csrf_exempt
@@ -279,7 +323,6 @@ def customer_file_upload(request):
         project_ID = request.POST['project_ID']
         classify = request.POST['id_classify']
         upload_name = request.POST['id_upload_name']
-        upload_name = str(upload_name).replace("\"", "")
         if len(upload_name) > 0:
             project = xmqb_model.Project.objects.get(project=project_ID)
             project.upload_name = upload_name
@@ -375,6 +418,7 @@ def customer_project_alert(request):  # 用户修改项目
                     order.save()
                     project.status = 1
                     project.save()
+
             else:  # 用户该项还没有付款情况下 修改订单
                 if not price == 0:
                     project = xmqb_model.Project.objects.get(project=project_id)
@@ -436,7 +480,7 @@ def customer_stl_show(request):  # 用户查看3D模型
             print e
             pass
 
-    record = xmqb_model.Project.objects.filter(user_id=request.user, status__gte=3)
+    record = xmqb_model.Project.objects.filter(user_id=request.user, order__is_complete='1')
     return render(request, 'customer_stl_show.html', {'project': record})
 
 
@@ -503,17 +547,68 @@ def customer_order_pay(request):  # 用户订单付款
 def customer_invoice_list(request):  # 用户发票列表
     if not request.user.is_authenticated():
         return redirect('/login')
-
-    return render(request, 'customer_invoice_list.html')
+    orders=xmqb_model.Order.objects.filter(user=request.user,is_complete='1')
+    invoices=xmqb_model.Invoice.objects.filter(user=request.user)
+    return render(request, 'customer_invoice_list.html',{'orders':orders,'invoices':invoices})
 
 
 def customer_invoice_demand(request):  # 用户发票索取
-
-    return render(request, 'customer_invoice_demand.html')
+    if not request.user.is_authenticated():
+        return redirect('/login/')
+    if request.method=='GET':
+        order_id=request.GET['order_id']
+        form = xmqb_form.InvoiceDemandForm()
+        try:
+            order=xmqb_model.Order.objects.get(order=order_id)
+        except:
+            return render(request, 'customer_invoice_demand.html', {'order_id': order_id, 'form': form})
+        return render(request,'customer_invoice_demand.html',{'order_id':order_id,'form':form,'order':order})
+    if (request.method == 'POST'):
+        form = xmqb_form.InvoiceDemandForm(request.POST)
+        if form.is_valid():
+            order_id=request.POST['order']
+            amount=request.POST['amount']
+            order=xmqb_model.Order.objects.get(order=order_id) # 查找发票对应的订单
+            title=form.cleaned_data['title']
+            demand_type=form.cleaned_data['demand_type']
+            invoice_type=form.cleaned_data['invoice_type']
+            recipient_name=form.cleaned_data['recipient_name']
+            pro_cit=request.POST['pc']    # 获取表单中的省份和城市信息
+            address=pro_cit+form.cleaned_data['address']
+            telephone=form.cleaned_data['telephone']
+            deliver_id=form.cleaned_data['deliver_id']
+            deliver_company=form.cleaned_data['deliver_company']
+            remark=form.cleaned_data['remark']
+            invoice=xmqb_model.Invoice.objects.create(title=title,demand_type=demand_type,order=order,user=order.user,
+                                                      invoice_type=invoice_type,recipient_name=recipient_name,
+                                                      address=address,telephone=telephone,deliver_id=deliver_id,
+                                                      deliver_company=deliver_company,remark=remark,amount=amount
+                                                      )
+            invoice.save()
+            order.is_complete='2'  # 申请发票成功后，修改订单状态
+            order.save()
+            return redirect('/customer_invoice_list/')
+        else:
+            return render(request, 'customer_invoice_demand.html',{'form':form})
+    else:
+        form=xmqb_form.InvoiceDemandForm()
+        return render(request, 'customer_invoice_demand.html',{'form':form})
 
 
 def customer_invoice_info(request):  # 用户发票信息
-    return render(request, 'customer_invoice_info.html')
+    order_id=request.GET['order_id']
+    order=xmqb_model.Order.objects.get(order=order_id)
+    invoice=xmqb_model.Invoice.objects.get(order=order)
+    form=xmqb_form.InvoiceDemandForm(initial={
+                                    'title':invoice.title,'demand_type':invoice.demand_type,
+                                    'invoice_type':invoice.invoice_type,
+                                    'recipient_name':invoice.recipient_name,
+                                    'address':invoice.address,
+                                    'telephone':invoice.telephone,
+                                    'deliver_id':invoice.deliver_id,
+                                    'deliver_company':invoice.deliver_company,
+                                    'remark':invoice.remark})
+    return render(request, 'customer_invoice_info.html',{'invlice':invoice,'form':form})
 
 
 def customer_coupon_list(request):  # 用户优惠券列表
@@ -527,7 +622,6 @@ def customer_message_list(request):  # 用户消息列表
     not_read = len(xmqb_model.Message.objects.filter(user_id=request.user.id, is_read=0))
     request.session['not_read'] = not_read
     return render(request, 'customer_message_receive.html', {'messages': record, 'message': not_read})
-
 
 def customer_message_info(request):  # 用户消息详情
     if not request.user.is_authenticated():
@@ -691,8 +785,7 @@ def administrator_user_info_alter(request):  # 管理员用户个人信息修改
             user_info.save()
         else:
             return render(request, 'administrator_user_info_alter.html', {'form': form})
-        Users = xmqb_model.UserInfo.objects.all()
-        return render(request, 'administrator_user_info_list.html', {'Users': Users})
+        return redirect('/administrator_user_info_list/')
 
 
 def administrator_account_list(request):  # 管理员账号管理
@@ -822,8 +915,7 @@ def administrator_project_alter(request):  # 管理员项目信息修改
                 project.status = 1
         else:
             return render(request, 'administrator_project_alter.html', {'form': form})
-    projects = xmqb_model.Project.objects.all()
-    return render(request, 'administrator_project_list.html', {'project': projects})
+    return redirect('/administrator_project_list/')
 
 
 def administrator_project_delete(request):  # 管理员项目删除
@@ -838,8 +930,7 @@ def administrator_project_delete(request):  # 管理员项目删除
     except:
         return HttpResponse("此项目不存在")
     pass
-    projects = xmqb_model.Project.objects.all()
-    return render(request, 'administrator_project_list.html', {'project': projects})
+    return redirect('/administrator_project_list/')
 
 
 def administrator_work_order_distribute(request):  # 管理工单分配
@@ -906,8 +997,7 @@ def administrator_work_order_handle(request):  # 工单处理
     else:
         workorder.status = 2
         workorder.save()
-        workOrders = xmqb_model.WorkOrder.objects.filter(processor=request.user)
-        return render(request, 'administrator_work_order_handle_list.html', {'workOrders': workOrders})
+        return redirect('/administrator_work_order_handle_list/')
 
 
 def administrator_file_upload(request):
@@ -923,7 +1013,6 @@ def administrator_file_upload(request):
         project = xmqb_model.Project.objects.get(project=project_ID)
         part = xmqb_model.ProjectPart.objects.get(project=project, part=part_id)
         upload_name = request.POST['id_upload_name']
-        upload_name = str(upload_name).replace("\"", "")
         if len(upload_name) > 0:
             part.directory = upload_name
             part.save()
@@ -977,15 +1066,13 @@ def administrator_work_order_assess_handle(request):  # 工单审核
             workorder.status = 3
             workorder.remark = remark
         workorder.save()
-        assessor = xmqb_model.Worker.objects.get(worker=request.user)
-        workOrders = xmqb_model.WorkOrder.objects.filter(Q(status=2) | Q(status=3) | Q(status=4), assessor=assessor)
-        return render(request, 'administrator_work_order_assess_list.html', {'workOrders': workOrders})
+        return redirect('/administrator_work_order_assess_list/')
 
 
 def administrator_order_list(request):  # 管理员订单列表查看
     if not request.user.is_authenticated():
         return redirect('/login')
-    if not request.user.is_superuser == 1:
+    if not request.user.is_superuser == 4:
         return redirect('/login')
     orders = xmqb_model.Order.objects.all()
     return render(request, 'administrator_order_list.html', {'orders': orders})
@@ -1010,31 +1097,168 @@ def administrator_order_info(request):  # 管理员订单信息查看
 
 
 def administrator_invoice_list(request):  # 管理员发票列表
-    render(request, 'administrator_order_list.html')
+    if not request.user.is_superuser:
+        return redirect('/login')
+    orders=xmqb_model.Order.objects.filter(is_complete='1')
+    invoices=xmqb_model.Invoice.objects.all()
+    delivered=[]
+    undelivered=[]
+    for inv in invoices:
+        if len(inv.deliver_id)>0:
+            delivered.append(inv)
+        else:
+            undelivered.append(inv)
+    return render(request, 'administrator_invoice_list.html',{'orders':orders,'delivered':delivered,'undelivered':undelivered},)
 
+def administrator_invoice_create(request):    # 管理员开发票
+    if not request.user.is_superuser:
+        return redirect('/login')
+    if request.method == 'GET':
+        order_id = request.GET['order_id']
+        form = xmqb_form.InvoiceDemandForm()
+        try:
+            order = xmqb_model.Order.objects.get(order=order_id)
+        except:
+            return render(request, 'administrator_invoice_create.html', {'order_id': order_id, 'form': form})
+        return render(request, 'administrator_invoice_create.html', {'order_id': order_id, 'form': form, 'order': order})
+    if (request.method == 'POST'):
+        form = xmqb_form.InvoiceDemandForm(request.POST)
+        if form.is_valid():
+            order_id = request.POST['order']
+            amount = request.POST['amount']
+            order = xmqb_model.Order.objects.get(order=order_id)  # 查找发票对应的订单
+            title = form.cleaned_data['title']
+            demand_type = form.cleaned_data['demand_type']
+            invoice_type = form.cleaned_data['invoice_type']
+            recipient_name = form.cleaned_data['recipient_name']
+            address = form.cleaned_data['address']
+            telephone = form.cleaned_data['telephone']
+            deliver_id = form.cleaned_data['deliver_id']
+            deliver_company = form.cleaned_data['deliver_company']
+            remark = form.cleaned_data['remark']
+            invoice = xmqb_model.Invoice.objects.create(title=title, demand_type=demand_type, order=order,
+                                                        user=order.user,
+                                                        invoice_type=invoice_type, recipient_name=recipient_name,
+                                                        address=address, telephone=telephone, deliver_id=deliver_id,
+                                                        deliver_company=deliver_company, remark=remark, amount=amount
+                                                        )
+            invoice.save()
+            order.is_complete = '2'  # 申请发票成功后，修改订单状态
+            order.save()
+            return redirect('/administrator_invoice_list')
+        else:
+            return render(request, 'administrator_invoice_create.html', {'form': form})
+    else:
+        form = xmqb_form.InvoiceDemandForm()
+        return render(request, 'administrator_invoice_create.html', {'form': form})
 
 def administrator_invoice_handle(request):  # 管理员发票处理
-    render(request, 'administrator_invoice_handle.html')
+    if not request.user.is_superuser:
+        return redirect('/login')
+    if request.method == 'GET':
+        order_id = request.GET['order_id']
+        invoice=xmqb_model.Invoice.objects.get(order=order_id) # 找到与订单对应的发票
+        form = xmqb_form.InvoiceDemandForm(initial={'remark':invoice.remark})
+        try:
+            order = xmqb_model.Order.objects.get(order=order_id)
+        except:
+            return render(request, 'administrator_invoice_handle.html', {'order_id': order_id, 'form': form})
+        return render(request, 'administrator_invoice_handle.html',
+                      {'order_id': order_id, 'form': form, 'order': order})
+    if request.method=='POST':
+            order_id = request.POST['order']
+            invoice=xmqb_model.Invoice.objects.get(order=order_id) # 找到与订单对应的发票
+            invoice.deliver_id = request.POST['deliver_id']
+            invoice.deliver_company = request.POST['deliver_company']
+            invoice.remark = request.POST['remark']
+            invoice.save()
+            return redirect('/administrator_invoice_list')
+    else:
+        form = xmqb_form.InvoiceDemandForm()
+        return render(request, 'administrator_invoice_handle.html',{'form':form})
 
 
 def administrator_invoice_info(request):  # 管理员发票信息查看
-    render(request, 'administrator_invoice_info.html')
+    order_id = request.GET['order_id']
+    order = xmqb_model.Order.objects.get(order=order_id)
+    invoice = xmqb_model.Invoice.objects.get(order=order)
+    form = xmqb_form.InvoiceDemandForm(initial={
+        'title': invoice.title, 'demand_type': invoice.demand_type,
+        'invoice_type': invoice.invoice_type,
+        'recipient_name': invoice.recipient_name,
+        'address': invoice.address,
+        'telephone': invoice.telephone,
+        'deliver_id': invoice.deliver_id,
+        'deliver_company': invoice.deliver_company,
+        'remark': invoice.remark})
+    return render(request, 'administrator_invoice_info.html',{'form':form})
 
 
 def administrator_coupon_distribute(request):  # 管理员优惠券发放
-    render(request, 'administrator_coupon_distribute.html')
+    if not request.user.is_authenticated():
+        return redirect('/login')
+    if not request.user.is_superuser == 5:
+        return redirect('/login')
+    if request.method == 'GET':
+        form = xmqb_form.CouponForm()
+        users = xmqb_model.UserInfo.objects.all()
+        return render(request, 'administrator_coupon_distribute.html', {"form": form, "users": users})
+    else:
+        form = xmqb_form.CouponForm(request.POST)
+        if form.is_valid():
+            deadline_time = form.cleaned_data['deadline_time']
+            amount = form.cleaned_data['amount']
+            remark = form.cleaned_data['remark']
+            type = form.cleaned_data['type']
+            classify = xmqb_model.Classify.objects.get(classify=type)
+            checkusers = request.POST.getlist('users')
+            for everyUser in checkusers:
+                user = xmqb_model.User.objects.get(username=everyUser)
+                coupon = xmqb_model.Coupon.objects.create(coupon=str(user.id) + str(uuid.uuid1())[0:20], user=user, deadline_time=deadline_time, amount=amount,
+                                                          remark=remark, type=classify, rest_amount=amount)
+                coupon.save()
+            return redirect('/administrator_coupon_list/')
+        else:
+            users = xmqb_model.UserInfo.objects.all()
+            return render(request, 'administrator_coupon_distribute.html', {"form": form, "users": users})
 
 
 def administrator_coupon_list(request):  # 管理员优惠券列表
-    render(request, 'administrator_coupon_list.html')
+    coupons = xmqb_model.Coupon.objects.all()
+    return render(request, 'administrator_coupon_list.html', {'coupons': coupons})
 
 
 def administrator_coupon_delete(request):  # 管理员优惠券删除
-    render(request, 'administrator_coupon_delete.html')
+    coupon_id = request.GET['coupon']
+    coupon = xmqb_model.Coupon.objects.get(coupon=coupon_id)
+    coupon.delete()
+    return redirect('/administrator_coupon_list/')
 
 
 def administrator_coupon_alter(request):  # 管理员优惠券修改
-    render(request, 'administrator_coupon_alter.html')
+    coupon_id = request.GET['coupon']
+    coupon = xmqb_model.Coupon.objects.get(coupon=coupon_id)
+    if request.method == 'GET':
+        form = xmqb_form.CouponForm(initial={
+            'deadline_time': coupon.deadline_time,
+            'amount': coupon.rest_amount,
+            'type': coupon.type,
+            'remark': coupon.remark,
+        })
+        return render(request, 'administrator_coupon_alter.html', {"form": form, "coupon": coupon})
+    else:
+        form = xmqb_form.CouponForm(request.POST)
+        if form.is_valid():
+            coupon.deadline_time = form.cleaned_data['deadline_time']
+            coupon.rest_amount = form.cleaned_data['amount']
+            classify = xmqb_model.Classify.objects.get(classify=form.cleaned_data['type'])
+            coupon.type = classify
+            coupon.remark = form.cleaned_data['remark']
+            coupon.save()
+            return redirect('/administrator_coupon_list/')
+        else:
+            return render(request, 'administrator_coupon_alter.html', {"form": form, "coupon": coupon})
+        return redirect('/administrator_coupon_list/')
 
 
 def administrator_price_list(request):  # 管理员服务价格列表
@@ -1091,12 +1315,12 @@ def administrator_part_price_alter(request):  # 管理员服务价格修改
             order = xmqb_model.Price.objects.get(part=order_id)
             order.part_price = set_price
             order.save()
-            return redirect('/administrator_price_list')
+            return redirect('/administrator_price_list/')
         else:
             print 'invalid'
     else:
         print 'invalid'
-    return redirect('/administrator_price_list')
+    return redirect('/administrator_price_list/')
 
 
 def administrator_price_alter(request):  # 管理员订单价格修改

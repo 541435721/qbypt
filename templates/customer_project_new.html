@@ -1,11 +1,8 @@
 {% extends 'customer_side.html' %}
 {% load static %}
-<script src="{% static 'js/jquery.js' %}"></script>
 {% block title %}项目管理{% endblock %}
 {% block content %}
-
-
-
+    <script src="{% static 'js/jquery.js' %}"></script>
     <script>
         var partClass = new Array()               //用来记录类型和部位选项的关系 是1对多的关系
         var partPrice = new Array()
@@ -14,6 +11,31 @@
             partPrice[part] = price;           //初始化部位。初始化partClass的数据
         }
 
+        function choose_coupon() {          //初始化优惠券
+            var sel = document.getElementById('id_classify');
+            var selected_val = sel.options[sel.selectedIndex].value;
+
+            for (var i = 1; i < document.getElementById('coupons').options.length; i++) {
+                if (document.getElementById('coupons').options[i].getAttribute('mytype') == selected_val) {
+                    document.getElementById('coupons').options[i].style.display = ''
+                }
+                else {
+                    document.getElementById('coupons').options[i].style.display = 'none'
+                }
+            }
+        }
+
+        function change_coupon() {
+            var price = document.getElementById('price')
+            var sel = document.getElementById('coupons');
+            if (parseInt(sel.options[sel.selectedIndex].getAttribute('rest_amount')) > parseInt(price.getAttribute('label'))) {
+                price.innerHTML = '0'
+            }
+            else {
+                price.innerHTML = parseInt(price.getAttribute('label')) - parseInt(sel.options[sel.selectedIndex].getAttribute('rest_amount'))
+            }
+
+        }
         function choose_checkbox(part, classify) {          //初始化部位。初始化partClass的数据 part 是
             partClass[part] = classify;           //初始化部位。初始化partClass的数据
             var sel = document.getElementById('id_classify');           //获取类型框对象
@@ -24,23 +46,28 @@
                 document.getElementById('id_part_' + String(parseInt(part) - 1)).parentNode.parentNode.style.display = "";     //如果是 显示
         }
 
+
         function change_checkbox() {                 //重新选择类的时候 调整新的选择部位
             var sel = document.getElementById('id_classify');
             var selected_val = sel.options[sel.selectedIndex].value;
             var price = document.getElementById('price')
-            for (var i = 1; i <= partClass.length; i++)      // 遍历所有的部位
+            for (var i = 1; i < partClass.length; i++)      // 遍历所有的部位
             {
                 if (partClass[i] == selected_val)          // 如果该部位对应的类型是选择的类型
                     document.getElementById('id_part_' + String(i - 1)).parentNode.parentNode.style.display = ""; //显示出来 'id_part_'+String(i-1) 是获取到对应的li
                 else {
                     if (document.getElementById('id_part_' + String(i - 1)).checked) {           // 如果不是该类型的话 看该部位之前是不是被选中
                         document.getElementById('id_part_' + String(i - 1)).checked = false;    // 变成未选中
-                        price.innerHTML = parseInt(price.innerHTML) - partPrice[i]              //减掉价格
+                        price.innerHTML = parseInt(price.innerHTML) - partPrice[i]  //减掉价格
+                        price.setAttribute('label', parseInt(price.getAttribute('label')) - partPrice[i])
                     }
                     document.getElementById('id_part_' + String(i - 1)).parentNode.parentNode.style.display = "none";       // 隐藏该部位
                 }
+                document.getElementById('id_part_' + String(i - 1)).parentNode.parentNode.style.display = "none";       // 隐藏该部位
             }
+            choose_coupon()
         }
+
 
         var partRelation = new Array()
         var partRelation = new Array(); //先声明一维
@@ -62,35 +89,42 @@
             var price = document.getElementById('price')
             if (changed_checkbox.checked) {
                 price.innerHTML = parseInt(price.innerHTML) + partPrice[part]
+                price.setAttribute('label', parseInt(price.getAttribute('label')) + partPrice[part])
+                change_coupon()
                 for (var i = 1; i <= partClass.length; i++) {
                     if (partRelation[i][part] == 1) {
                         son_checkbox = document.getElementById('id_part_' + String(i - 1))
                         if (!son_checkbox.checked) {
                             son_checkbox.checked = true
                             price.innerHTML = parseInt(price.innerHTML) + partPrice[i]
+                            price.setAttribute('label', parseInt(price.getAttribute('label')) + partPrice[i])
+                            change_coupon()
                         }
                     }
                 }
             }
             else {
                 price.innerHTML = parseInt(price.innerHTML) - partPrice[part]
+                price.setAttribute('label', parseInt(price.getAttribute('label')) - partPrice[part])
+                change_coupon()
                 for (var i = 1; i <= partClass.length; i++) {
                     if (partRelation[part][i] == 1) {
                         son_checkbox = document.getElementById('id_part_' + String(i - 1))
                         if (son_checkbox.checked) {
                             son_checkbox.checked = false
                             price.innerHTML = parseInt(price.innerHTML) - partPrice[i]
+                            price.setAttribute('label', parseInt(price.getAttribute('label')) - partPrice[i])
+                            change_coupon()
                         }
-
 
                     }
                 }
             }
+
         }
 
 
     </script>
-
     <section id="content">
         <section class="vbox">
             <section class="scrollable padder">
@@ -101,63 +135,75 @@
                 <div class="col-sm-3 pull-left">
                 </div>
                 <div class="col-sm-5">
-                    <form data-validate="parsley" id="projectform" class="ProjectFrom" action="/customer_project_new/"
+                    <form data-validate="parsley" class="ProjectFrom" action="/customer_project_new/"
                           method="post"
                           role="form">
-                        {% csrf_token %}
-                        <fieldset>
-                            {% for field in form.visible_fields %}
-                                <div class="form-group{% if field.errors %} has-error{% endif %}">
-                                    <label for="{{ field.label }}">{{ field.label }}</label>
-                                    {% if field.name == 'upload_name' %}
-                                        <div style="display: none;">{{ field }}</div>
-                                    {% else %}
-                                        {{ field }}
-                                    {% endif %}
-                                    {% if field.help_text %}
-                                        <span class="help-block">{{ field.help_text|safe }}</span>
-                                    {% endif %}
-                                    {% for error in field.errors %}
-                                        <label class="control-label">{{ error }}</label>
-                                    {% endfor %}
-                                </div>
-                            {% endfor %}
-                            {% for field in form.visible_fields %}
-                                {% for error in field.errors %}
-                                    <script>
-                                        $("#id_upload_name").val("");
-                                        //这里的for循环就需要很注意，form表单展示出来的时候就是for循环，所以在for循环没循环到指定位置的时候，
-                                        //对这个指定位置所做的操作是无效的，比如这里，想要触发清空dir字段的操作，必须要在上面的for循环结束之后
-                                        //再做，因为就算是在for循环里dir字段之前的字段发生错误触发这个清空操作，dir字段的id是找不到的，因为它还没有
-                                        //被展示在网页里，所以只有在所有的filed展示出来，即以代码的形式通过for循环展示到网页中之后，定位dir字段id的
-                                        //的操作才会绝对有效
-                                    </script>
-                                {% endfor %}
-                            {% endfor %}
-                            {% for everypart in part %}
-                                <script>choose_checkbox({{ everypart.part }}, {{ everypart.classify }})</script>
-                                <script>part_price({{ everypart.part }}, {{ everypart.part_price }})</script>
-                            {% endfor %}
-                            {% for relation in part_relation %}
-                                <script> checkbox_relation({{ relation.part_son }}, {{ relation.part_father_id }})</script>
-                            {% endfor %}
-                            <label>所需费用为：</label>
-                            <span id="price">0</span>
-                            <label>元</label>
-                            <div class="form-group-left">
-                                <button type="submit" class="btn btn-large btn-primary">提交资料</button>
+                        <section class="panel panel-default">
+                            <header class="panel-heading"><span class="h4" style="font-family: 微软雅黑">新建项目</span>
+                            </header>
+                            <div class="panel-body">
+                                {% csrf_token %}
+                                <fieldset>
+                                    <div class="panel-body">
+                                        <div class="form-group pull-in clearfix">
+                                            {% for field in form.visible_fields %}
+                                                <div class="form-group{% if field.errors %} has-error{% endif %}">
+                                                    <label for="{{ field.label }}">{{ field.label }}</label>
+                                                    {% if field.name == 'upload_name' %}
+                                                        <div style="display: none;">{{ field }}</div>
+                                                    {% else %}
+                                                        {{ field }}
+                                                    {% endif %}
+                                                    {% if field.help_text %}
+                                                        <span class="help-block">{{ field.help_text|safe }}</span>
+                                                    {% endif %}
+                                                    {% for error in field.errors %}
+                                                        <label class="control-label">{{ error }}</label>
+                                                    {% endfor %}
+                                                </div>
+                                            {% endfor %}
+                                            {% for field in form.visible_fields %}
+                                                {% for error in field.errors %}
+                                                {% endfor %}
+                                            {% endfor %}
+                                            {% for everypart in part %}
+                                                <script>choose_checkbox({{ everypart.part }}, {{ everypart.classify }})</script>
+                                                <script>part_price({{ everypart.part }}, {{ everypart.part_price }})</script>
+                                            {% endfor %}
+                                            {% for relation in part_relation %}
+                                                <script> checkbox_relation({{ relation.part_son }}, {{ relation.part_father_id }})</script>
+                                            {% endfor %}
+
+                                            <select name="coupon" id="coupons" onchange="javascript:change_coupon()">
+                                                <option value="0" rest_amount="0">不使用优惠券</option>
+                                                {% for coupon in coupons %}
+                                                    <option mytype="{{ coupon.type.classify }}"
+                                                            rest_amount="{{ coupon.rest_amount }}"
+                                                            value="{{ coupon.coupon }}">
+                                                        余额：{{ coupon.rest_amount }}</option>
+                                                {% endfor %}
+
+                                                <script>
+                                                    choose_coupon({{ coupon.type }})
+                                                </script>
+                                            </select>
+
+                                            <label>所需费用为：</label>
+                                            <span id="price" label="0">0</span>
+                                            <label>元</label>
+
+                                        </div>
+                                    </div>
+                                </fieldset>
+                                <footer class="panel-footer text-right bg-light lter">
+                                    <button type="submit" class="btn btn-success btn-s-xs">提交资料</button>
+                                </footer>
                             </div>
-                        </fieldset>
+                        </section>
                     </form>
                 </div>
             </section>
         </section>
     </section>
-    {##}
-    {#    <script>#}
-    {#        var test1 = document.getElementById('id_part_1');#}
-    {#        test1.checked=true;#}
-    {#        test1.onclick=function(){return false;};#}
-    {#    </script>#}
 
 {% endblock %}
