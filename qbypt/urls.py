@@ -29,7 +29,7 @@ urlpatterns = [
 
     url(r'^register/$', views.register, name='register'),
 
-    url(r'^check_code/$',views.check_code,name='check_code'),
+    url(r'^check_code/$', views.check_code, name='check_code'),
 
     url(r'^checkcode/$', views.CheckCode, name='CheckCode'),  # 图片验证码生成方法
 
@@ -58,6 +58,8 @@ urlpatterns = [
     url(r'^customer_stl_show/$', views.customer_stl_show, name='customer_stl_show'),
 
     url(r'^customer_order_list/$', views.customer_order_list, name='customer_order_list'),
+
+    url(r'^customer_check_pay/$', views.customer_check_pay, name='customer_check_pay'),  # 用户确认支付
 
     url(r'^customer_order_info/$', views.customer_order_info, name='customer_order_info'),
 
@@ -124,7 +126,7 @@ urlpatterns = [
 
     url(r'^administrator_invoice_info/$', views.administrator_invoice_info, name='administrator_invoice_info'),
 
-    url(r'^administrator_invoice_create/$',views.administrator_invoice_create,name='administrator_invoice_create'),
+    url(r'^administrator_invoice_create/$', views.administrator_invoice_create, name='administrator_invoice_create'),
 
     url(r'^administrator_coupon_distribute/$', views.administrator_coupon_distribute,
         name='administrator_coupon_distribute'),

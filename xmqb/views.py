@@ -488,7 +488,7 @@ def customer_order_list(request):  # 用户订单列表
     orders = xmqb_model.Order.objects.filter(user=request.user)
     pays = []
     for foo in orders:
-        if not foo.is_pay:
+        if not foo.is_pay and not foo.order_price==0:
             temp_url = {'is_complete': foo.is_complete,
                         'username': foo.user.username,
                         'is_pay': foo.is_pay,
@@ -498,10 +498,17 @@ def customer_order_list(request):  # 用户订单列表
                         'start_date': foo.start_date,
                         'order_price': foo.order_price,
                         'out_trade_no': foo.order,
-                        'url': alipay.create_direct_pay_by_user_url(out_trade_no=foo.order,
-                                                                    subject=u'测试', total_fee=foo.order_price,
-                                                                    return_url='http://127.0.0.1:8000/customer_project_list',
-                                                                    notify_url='http://www.tencent.com/')
+                        }
+        if not foo.is_pay and foo.order_price==0:
+            temp_url = {'is_complete': foo.is_complete,
+                        'username': foo.user.username,
+                        'is_pay': foo.is_pay,
+                        'project': foo.project,
+                        'project_name': foo.project.project_name,
+                        'classify_name': foo.project.classify.classify_name,
+                        'start_date': foo.start_date,
+                        'order_price': foo.order_price,
+                        'out_trade_no': foo.order,
                         }
         else:
             temp_url = {'is_complete': foo.is_complete,
@@ -518,6 +525,22 @@ def customer_order_list(request):  # 用户订单列表
         pays.append(temp_url)
     return render(request, 'customer_order_list.html', {'orders': pays})
 
+def customer_check_pay(request):      # 用户确认支付
+    if not request.user.is_authenticated():
+        return redirect('/login')
+    if request.method=="GET":
+        out_trade_no=request.GET['out_trade_no']
+        total_fee=request.GET['total_fee']
+        order=xmqb_model.Order.objects.get(order=out_trade_no)
+        project=xmqb_model.Project.objects.get(project=order.project.project)
+        if not order.order_price == 0:
+            url=alipay.create_direct_pay_by_user_url(out_trade_no=out_trade_no,
+                                                    subject=u'测试', total_fee=total_fee,
+                                                    return_url='http://127.0.0.1:8000/customer_project_list',
+                                                    notify_url='http://www.tencent.com/')
+        else:
+            url="/alipy_notify?is_success=T&trade_status=TRADE_SUCCESS&out_trade_no=" + order.order
+        return render(request,'customer_check_pay.html',{'url':url,'order':order,'project':project})
 
 def customer_order_info(request):  # 用户订单信息
     if not request.user.is_authenticated():
