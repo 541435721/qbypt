@@ -160,4 +160,7 @@ urlpatterns = [
 
     url(r'^customer_suggestion/$', views.customer_suggestion, name='consumer_suggestion'),
 
+    url(r'^contact_us/$', views.contact_us, name='contact_us'),
+
+    url(r'^user_agreement', views.user_agreement, name='user_agreement'),
 ]

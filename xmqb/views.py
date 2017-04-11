@@ -24,6 +24,7 @@ from qbypt.settings import DOWNLOAD_DIR
 import json
 import top.api
 import unicodedata
+
 # Create your views here.
 
 # 创建支付对象，用以生成支付链接
@@ -38,6 +39,10 @@ alipay = Alipay(pid='2088421836722555', key='x5b1vxvggtye0br2o0bgl3lp4lz1d2iq',
 
 def index(request):  # 首页
     return render(request, 'index.html')
+
+
+def user_agreement(request):  # 用户协议
+    return render(request, 'user_agreement.html')
 
 
 def login(request):  # 登陆
@@ -69,7 +74,7 @@ def login(request):  # 登陆
                 return redirect('/administrator_coupon_distribute')
 
             elif request.user.is_superuser == 0:
-                return redirect('/customer_project_new')
+                return redirect('/customer_account_info')
         else:
             return render(request, 'login.html', {'form': form})
     else:
@@ -105,36 +110,38 @@ def register(request):  # 注册
             return render(request, 'register.html', {'form': form})
     return render(request, 'register.html', {'form': xmqb_form.RegisterForm()})
 
+
 def check_code(request):  # 用户接收短信验证码
-    phone_number=request.GET['phone_number']
-    users=xmqb_model.UserInfo.objects.filter(user_telephone=phone_number)
-    if len(users)>0:
+    phone_number = request.GET['phone_number']
+    users = xmqb_model.UserInfo.objects.filter(user_telephone=phone_number)
+    if len(users) > 0:
         return HttpResponse("此号码已存在")
     req = top.api.AlibabaAliqinFcSmsNumSendRequest()
     req.set_app_info(top.appinfo("23744157", "5e0763455c8f5b66c295f13c6184928e"))
-    phone_number=unicodedata.normalize('NFKD',phone_number).encode('ascii','ignore') # 将手机号码转换成ascii编码
+    phone_number = unicodedata.normalize('NFKD', phone_number).encode('ascii', 'ignore')  # 将手机号码转换成ascii编码
     req.extend = ""
     req.sms_type = "normal"
     req.sms_free_sign_name = "王弘轩"
     # 生成随机验证码
-    codes=[0,1,2,3,4,5,6,7,8,9]
+    codes = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
     random.shuffle(codes)
-    code=''
+    code = ''
     for i in range(4):
-        temp_index=int(random.uniform(0,9))
-        code=code+str(codes[temp_index])
-    req.sms_param = "{code:'"+code+"'}"
+        temp_index = int(random.uniform(0, 9))
+        code = code + str(codes[temp_index])
+    req.sms_param = "{code:'" + code + "'}"
     req.rec_num = phone_number
     req.sms_template_code = "SMS_57820069"
     try:
         resp = req.getResponse()
         print (resp)
-        ajax_list={'status':"验证码已发送",'code':code}
+        ajax_list = {'status': "验证码已发送", 'code': code}
         return JsonResponse(ajax_list)
     except Exception, e:
         print (e)
         ajax_list = {'status': "error"}
         return HttpResponse(ajax_list)
+
 
 def customer_user_info(request):  # 用户个人信息
     if not request.user.is_authenticated:
@@ -289,12 +296,11 @@ def customer_project_new(request):  # 用户新建项目
                     coupon.rest_amount = 0
                     coupon.save()
                 else:
+                    coupon.rest_amount = coupon.rest_amount - price
                     price = 0
-                    coupon.rest_amount -= price
                     coupon.save()
             except Exception, e:
                 print e
-
             order = xmqb_model.Order.objects.create(
                 order=str(time.strftime('%y%m%d%H%M%S') + str((request.user.id) % 10000).zfill(4) + str(
                     (random.randint(0, 100) % 100)).zfill(2)),
@@ -312,7 +318,8 @@ def customer_project_new(request):  # 用户新建项目
         form = xmqb_form.ProjectForm()
         part = xmqb_model.Price.objects.all()
         part_relation = xmqb_model.PartRelation.objects.all()
-        coupons = xmqb_model.Coupon.objects.filter(user=request.user,rest_amount__gt = 0, deadline_time__gte=timezone.now())
+        coupons = xmqb_model.Coupon.objects.filter(user=request.user, rest_amount__gt=0,
+                                                   deadline_time__gte=timezone.now())
         return render(request, 'customer_project_new.html',
                       {'form': form, 'part': part, 'part_relation': part_relation, 'coupons': coupons})
 
@@ -332,9 +339,13 @@ def customer_file_upload(request):
         else:
             return render(request, 'customer_project_list.html', {'method': '0'})
     else:
-        project_ID = request.GET['project_ID']
-        project = xmqb_model.Project.objects.get(project=project_ID)
-        return render(request, 'customer_upload.html', {'project': project})
+        try:
+            project_ID = request.GET['project_ID']
+            project = xmqb_model.Project.objects.get(project=project_ID)
+            return render(request, 'customer_upload.html', {'project': project})
+        except Exception, e:
+            print e
+            return render(request, 'customer_upload.html')
 
 
 def customer_project_info(request):  # 用户查看项目
@@ -570,68 +581,69 @@ def customer_order_pay(request):  # 用户订单付款
 def customer_invoice_list(request):  # 用户发票列表
     if not request.user.is_authenticated():
         return redirect('/login')
-    orders=xmqb_model.Order.objects.filter(user=request.user,is_complete='1')
-    invoices=xmqb_model.Invoice.objects.filter(user=request.user)
-    return render(request, 'customer_invoice_list.html',{'orders':orders,'invoices':invoices})
+    orders = xmqb_model.Order.objects.filter(user=request.user, is_complete='1')
+    invoices = xmqb_model.Invoice.objects.filter(user=request.user)
+    return render(request, 'customer_invoice_list.html', {'orders': orders, 'invoices': invoices})
 
 
 def customer_invoice_demand(request):  # 用户发票索取
     if not request.user.is_authenticated():
         return redirect('/login/')
-    if request.method=='GET':
-        order_id=request.GET['order_id']
+    if request.method == 'GET':
+        order_id = request.GET['order_id']
         form = xmqb_form.InvoiceDemandForm()
         try:
-            order=xmqb_model.Order.objects.get(order=order_id)
+            order = xmqb_model.Order.objects.get(order=order_id)
         except:
             return render(request, 'customer_invoice_demand.html', {'order_id': order_id, 'form': form})
-        return render(request,'customer_invoice_demand.html',{'order_id':order_id,'form':form,'order':order})
+        return render(request, 'customer_invoice_demand.html', {'order_id': order_id, 'form': form, 'order': order})
     if (request.method == 'POST'):
         form = xmqb_form.InvoiceDemandForm(request.POST)
         if form.is_valid():
-            order_id=request.POST['order']
-            amount=request.POST['amount']
-            order=xmqb_model.Order.objects.get(order=order_id) # 查找发票对应的订单
-            title=form.cleaned_data['title']
-            demand_type=form.cleaned_data['demand_type']
-            invoice_type=form.cleaned_data['invoice_type']
-            recipient_name=form.cleaned_data['recipient_name']
-            pro_cit=request.POST['pc']    # 获取表单中的省份和城市信息
-            address=pro_cit+form.cleaned_data['address']
-            telephone=form.cleaned_data['telephone']
-            deliver_id=form.cleaned_data['deliver_id']
-            deliver_company=form.cleaned_data['deliver_company']
-            remark=form.cleaned_data['remark']
-            invoice=xmqb_model.Invoice.objects.create(title=title,demand_type=demand_type,order=order,user=order.user,
-                                                      invoice_type=invoice_type,recipient_name=recipient_name,
-                                                      address=address,telephone=telephone,deliver_id=deliver_id,
-                                                      deliver_company=deliver_company,remark=remark,amount=amount
-                                                      )
+            order_id = request.POST['order']
+            amount = request.POST['amount']
+            order = xmqb_model.Order.objects.get(order=order_id)  # 查找发票对应的订单
+            title = form.cleaned_data['title']
+            demand_type = form.cleaned_data['demand_type']
+            invoice_type = form.cleaned_data['invoice_type']
+            recipient_name = form.cleaned_data['recipient_name']
+            pro_cit = request.POST['pc']  # 获取表单中的省份和城市信息
+            address = pro_cit + form.cleaned_data['address']
+            telephone = form.cleaned_data['telephone']
+            deliver_id = form.cleaned_data['deliver_id']
+            deliver_company = form.cleaned_data['deliver_company']
+            remark = form.cleaned_data['remark']
+            invoice = xmqb_model.Invoice.objects.create(title=title, demand_type=demand_type, order=order,
+                                                        user=order.user,
+                                                        invoice_type=invoice_type, recipient_name=recipient_name,
+                                                        address=address, telephone=telephone, deliver_id=deliver_id,
+                                                        deliver_company=deliver_company, remark=remark, amount=amount
+                                                        )
             invoice.save()
-            order.is_complete='2'  # 申请发票成功后，修改订单状态
+            order.is_complete = '2'  # 申请发票成功后，修改订单状态
             order.save()
             return redirect('/customer_invoice_list/')
         else:
-            return render(request, 'customer_invoice_demand.html',{'form':form})
+            return render(request, 'customer_invoice_demand.html', {'form': form})
     else:
-        form=xmqb_form.InvoiceDemandForm()
-        return render(request, 'customer_invoice_demand.html',{'form':form})
+        form = xmqb_form.InvoiceDemandForm()
+        return render(request, 'customer_invoice_demand.html', {'form': form})
 
 
 def customer_invoice_info(request):  # 用户发票信息
-    order_id=request.GET['order_id']
-    order=xmqb_model.Order.objects.get(order=order_id)
-    invoice=xmqb_model.Invoice.objects.get(order=order)
-    form=xmqb_form.InvoiceDemandForm(initial={
-                                    'title':invoice.title,'demand_type':invoice.demand_type,
-                                    'invoice_type':invoice.invoice_type,
-                                    'recipient_name':invoice.recipient_name,
-                                    'address':invoice.address,
-                                    'telephone':invoice.telephone,
-                                    'deliver_id':invoice.deliver_id,
-                                    'deliver_company':invoice.deliver_company,
-                                    'remark':invoice.remark})
-    return render(request, 'customer_invoice_info.html',{'invlice':invoice,'form':form})
+    order_id = request.GET['order_id']
+    order = xmqb_model.Order.objects.get(order=order_id)
+    invoice = xmqb_model.Invoice.objects.get(order=order)
+    form = xmqb_form.InvoiceDemandForm(initial={
+        'title': invoice.title, 'demand_type': invoice.demand_type,
+        'invoice_type': invoice.invoice_type,
+        'recipient_name': invoice.recipient_name,
+        'address': invoice.address,
+        'telephone': invoice.telephone,
+        'deliver_id': invoice.deliver_id,
+        'deliver_company': invoice.deliver_company,
+        'remark': invoice.remark})
+    return render(request, 'customer_invoice_info.html', {'invlice': invoice, 'form': form})
 
 
 def customer_coupon_list(request):  # 用户优惠券列表
@@ -645,6 +657,7 @@ def customer_message_list(request):  # 用户消息列表
     not_read = len(xmqb_model.Message.objects.filter(user_id=request.user.id, is_read=0))
     request.session['not_read'] = not_read
     return render(request, 'customer_message_receive.html', {'messages': record, 'message': not_read})
+
 
 def customer_message_info(request):  # 用户消息详情
     if not request.user.is_authenticated():
@@ -1122,18 +1135,21 @@ def administrator_order_info(request):  # 管理员订单信息查看
 def administrator_invoice_list(request):  # 管理员发票列表
     if not request.user.is_superuser:
         return redirect('/login')
-    orders=xmqb_model.Order.objects.filter(is_complete='1')
-    invoices=xmqb_model.Invoice.objects.all()
-    delivered=[]
-    undelivered=[]
+    orders = xmqb_model.Order.objects.filter(is_complete='1')
+    invoices = xmqb_model.Invoice.objects.all()
+    delivered = []
+    undelivered = []
     for inv in invoices:
-        if len(inv.deliver_id)>0:
+        if len(inv.deliver_id) > 0:
             delivered.append(inv)
         else:
             undelivered.append(inv)
-    return render(request, 'administrator_invoice_list.html',{'orders':orders,'delivered':delivered,'undelivered':undelivered},)
+    return render(request, 'administrator_invoice_list.html',
+                  {'orders': orders, 'delivered': delivered, 'undelivered': undelivered}, )
 
-def administrator_invoice_create(request):    # 管理员开发票
+
+
+def administrator_invoice_create(request):  # 管理员开发票
     if not request.user.is_superuser:
         return redirect('/login')
     if request.method == 'GET':
@@ -1143,7 +1159,8 @@ def administrator_invoice_create(request):    # 管理员开发票
             order = xmqb_model.Order.objects.get(order=order_id)
         except:
             return render(request, 'administrator_invoice_create.html', {'order_id': order_id, 'form': form})
-        return render(request, 'administrator_invoice_create.html', {'order_id': order_id, 'form': form, 'order': order})
+        return render(request, 'administrator_invoice_create.html',
+                      {'order_id': order_id, 'form': form, 'order': order})
     if (request.method == 'POST'):
         form = xmqb_form.InvoiceDemandForm(request.POST)
         if form.is_valid():
@@ -1175,30 +1192,31 @@ def administrator_invoice_create(request):    # 管理员开发票
         form = xmqb_form.InvoiceDemandForm()
         return render(request, 'administrator_invoice_create.html', {'form': form})
 
+
 def administrator_invoice_handle(request):  # 管理员发票处理
     if not request.user.is_superuser:
         return redirect('/login')
     if request.method == 'GET':
         order_id = request.GET['order_id']
-        invoice=xmqb_model.Invoice.objects.get(order=order_id) # 找到与订单对应的发票
-        form = xmqb_form.InvoiceDemandForm(initial={'remark':invoice.remark})
+        invoice = xmqb_model.Invoice.objects.get(order=order_id)  # 找到与订单对应的发票
+        form = xmqb_form.InvoiceDemandForm(initial={'remark': invoice.remark})
         try:
             order = xmqb_model.Order.objects.get(order=order_id)
         except:
             return render(request, 'administrator_invoice_handle.html', {'order_id': order_id, 'form': form})
         return render(request, 'administrator_invoice_handle.html',
                       {'order_id': order_id, 'form': form, 'order': order})
-    if request.method=='POST':
-            order_id = request.POST['order']
-            invoice=xmqb_model.Invoice.objects.get(order=order_id) # 找到与订单对应的发票
-            invoice.deliver_id = request.POST['deliver_id']
-            invoice.deliver_company = request.POST['deliver_company']
-            invoice.remark = request.POST['remark']
-            invoice.save()
-            return redirect('/administrator_invoice_list')
+    if request.method == 'POST':
+        order_id = request.POST['order']
+        invoice = xmqb_model.Invoice.objects.get(order=order_id)  # 找到与订单对应的发票
+        invoice.deliver_id = request.POST['deliver_id']
+        invoice.deliver_company = request.POST['deliver_company']
+        invoice.remark = request.POST['remark']
+        invoice.save()
+        return redirect('/administrator_invoice_list')
     else:
         form = xmqb_form.InvoiceDemandForm()
-        return render(request, 'administrator_invoice_handle.html',{'form':form})
+        return render(request, 'administrator_invoice_handle.html', {'form': form})
 
 
 def administrator_invoice_info(request):  # 管理员发票信息查看
@@ -1214,7 +1232,7 @@ def administrator_invoice_info(request):  # 管理员发票信息查看
         'deliver_id': invoice.deliver_id,
         'deliver_company': invoice.deliver_company,
         'remark': invoice.remark})
-    return render(request, 'administrator_invoice_info.html',{'form':form})
+    return render(request, 'administrator_invoice_info.html', {'form': form})
 
 
 def administrator_coupon_distribute(request):  # 管理员优惠券发放
@@ -1237,7 +1255,8 @@ def administrator_coupon_distribute(request):  # 管理员优惠券发放
             checkusers = request.POST.getlist('users')
             for everyUser in checkusers:
                 user = xmqb_model.User.objects.get(username=everyUser)
-                coupon = xmqb_model.Coupon.objects.create(coupon=str(user.id) + str(uuid.uuid1())[0:20], user=user, deadline_time=deadline_time, amount=amount,
+                coupon = xmqb_model.Coupon.objects.create(coupon=str(user.id) + str(uuid.uuid1())[0:20], user=user,
+                                                          deadline_time=deadline_time, amount=amount,
                                                           remark=remark, type=classify, rest_amount=amount)
                 coupon.save()
             return redirect('/administrator_coupon_list/')
@@ -1474,3 +1493,7 @@ def alipy_notify(request):
             return redirect('/customer_order_list')
         else:
             return render(request, 'index.html', {'dic': 'failed'})
+
+
+def contact_us(request):
+    return render(request, 'contactus.html')
