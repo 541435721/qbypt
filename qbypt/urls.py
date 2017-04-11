@@ -146,12 +146,12 @@ urlpatterns = [
 
     url(r'^administrator_message_read/$', views.administrator_message_read, name='administrator_message_read'),
 
-    url(r'^alipy_notify', views.alipy_notify, name='alipy_notify'),  # 支付完成后所做的跳转，用以修改支付状态
+    url(r'^alipy_notify/$', views.alipy_notify, name='alipy_notify'),  # 支付完成后所做的跳转，用以修改支付状态
 
-    url(r'^customer_message_receive', views.customer_message_list, name='customer_message_list'),
+    url(r'^customer_message_receive/$', views.customer_message_list, name='customer_message_list'),
 
-    url(r'^customer_message_read', views.customer_message_info, name='customer_message_read'),
+    url(r'^customer_message_read/$', views.customer_message_info, name='customer_message_read'),
 
-    url(r'^customer_suggestion', views.customer_suggestion, name='consumer_suggestion'),
+    url(r'^customer_suggestion/$', views.customer_suggestion, name='consumer_suggestion'),
 
 ]
