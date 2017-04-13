@@ -1525,6 +1525,7 @@ def alipy_notify(request):
             thisorder = xmqb_model.Order.objects.get(order=request.GET['out_trade_no'])
             thisorder.is_pay = True  # 将当前已支付的订单设置为已支付
             thisproject = thisorder.project  # 将当前订单对应的项目设置为已支付状态
+            thisorder.pay_date=time.strftime('%Y-%m-%d %H:%M',time.localtime(time.time()))
             thisproject.status = '2'
             # 支付完成生成工单,默认1号为审核员
             processor = auth.models.User.objects.get(username=1)
