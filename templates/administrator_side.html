@@ -466,7 +466,12 @@
                                                     class="fa fa-angle-right"></i>
                                                 <span>发件箱</span> </a></li>
 
-                                            <li><a href="/administrator_message_receive/"> <i
+                                            <li><a href="/administrator_message_receive/">
+                                                {% if  request.session.not_read %}
+                                                    <b class="badge bg-danger pull-right">
+                                                        {{ request.session.not_read }}
+                                                    </b>
+                                                {% endif %} <i
                                                     class="fa fa-angle-right"></i>
                                                 <span>收件箱</span> </a></li>
                                         </ul>
