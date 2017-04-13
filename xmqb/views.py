@@ -735,7 +735,7 @@ def customer_suggestion(request):
                 message = context.cleaned_data['context']
                 workers = xmqb_model.Worker.objects.all().values('worker_id')
                 for x in workers:
-                    i = x.values()[0]
+                    i = x['worker_id']
                     record = xmqb_model.Message.objects.create(title='意见反馈------' + str(request.user.id),
                                                                message_content=message,
                                                                is_read=0,
@@ -745,10 +745,10 @@ def customer_suggestion(request):
                     context = xmqb_form.Suggestion()
                     not_read = len(xmqb_model.Message.objects.filter(user_id=request.user.id, is_read=0))
                     request.session['not_read'] = not_read
-                    return render(request, 'customer_suggestion.html', {'suggestion': context, 'state': 1})
-                else:
-                    context = xmqb_form.Suggestion()
-                    return render(request, 'customer_suggestion.html', {'suggestion': context, 'state': 2})
+            else:
+                context = xmqb_form.Suggestion()
+                return render(request, 'customer_suggestion.html', {'suggestion': context, 'state': 2})
+            return render(request, 'customer_suggestion.html', {'suggestion': context, 'state': 1})
     context = xmqb_form.Suggestion()
     return render(request, 'customer_suggestion.html', {'suggestion': context, 'state': 0})
 
