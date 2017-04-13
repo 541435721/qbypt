@@ -163,4 +163,6 @@ urlpatterns = [
     url(r'^contact_us/$', views.contact_us, name='contact_us'),
 
     url(r'^user_agreement', views.user_agreement, name='user_agreement'),
+
+    url(r'^project_show/$', views.project_show, name='project_show'),
 ]

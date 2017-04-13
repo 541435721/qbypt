@@ -495,11 +495,54 @@ def customer_stl_show(request):  # 用户查看3D模型
     return render(request, 'customer_stl_show.html', {'project': record})
 
 
+def project_show(request):  # 项目展示
+    if request.method == "GET":
+        try:
+            project_id = request.GET['project_id']
+            if project_id:
+                record = xmqb_model.Project.objects.get(project=project_id)
+                url = u'' + DOWNLOAD_DIR + '/' + str(record.user.username) + '/' + str(record.classify_id) + '/' + str(
+                    record.project) + '/STL/'
+                url = url.replace('\\', '/')
+                sub_url = u'' + '/download' + '/' + str(record.user.username) + '/' + str(
+                    record.classify_id) + '/' + str(record.project) + '/STL/'
+                sub_url = sub_url.replace('\\', '/')
+                part_url = os.listdir(url)
+                part_name = copy.copy(part_url)
+                index = []
+                for x in xrange(len(part_name)):
+                    part_name[x] = part_name[x][0:-4]
+                    index.append(x + 1)
+                for i in xrange(len(part_url)):
+                    part_url[i] = sub_url + part_url[i]
+                part_name = zip(zip(part_name, index), part_url)
+                project = {'name': record.project_name,
+                           'part_name': part_name,
+                           'stl_url': part_url,
+                           'num': len(part_name)}
+                project_list = {'1704121210290008': u'肝癌',
+                                '1704121211000008': u'肺癌',
+                                '1704121213250008': u'腹部',
+                                '1704121214020008': u'盆腔',
+                                '1704121214340008': u'心脏',
+                                '1704121214560008': u'肾脏',
+                                '1704121215220008': u'血管',
+                                '1704121215480008': u'腹部大肿瘤'}
+                return render(request, 'stl_show.html',
+                              {'project': project,
+                               'urls': json.dumps(part_url),
+                               'show_list': project_list.items()})
+        except Exception, e:
+            print e
+            pass
+    return HttpResponse('404')
+
+
 def customer_order_list(request):  # 用户订单列表
     orders = xmqb_model.Order.objects.filter(user=request.user)
     pays = []
     for foo in orders:
-        if not foo.is_pay and not foo.order_price==0:
+        if not foo.is_pay and not foo.order_price == 0:
             temp_url = {'is_complete': foo.is_complete,
                         'username': foo.user.username,
                         'is_pay': foo.is_pay,
@@ -510,7 +553,7 @@ def customer_order_list(request):  # 用户订单列表
                         'order_price': foo.order_price,
                         'out_trade_no': foo.order,
                         }
-        if not foo.is_pay and foo.order_price==0:
+        if not foo.is_pay and foo.order_price == 0:
             temp_url = {'is_complete': foo.is_complete,
                         'username': foo.user.username,
                         'is_pay': foo.is_pay,
@@ -536,22 +579,24 @@ def customer_order_list(request):  # 用户订单列表
         pays.append(temp_url)
     return render(request, 'customer_order_list.html', {'orders': pays})
 
-def customer_check_pay(request):      # 用户确认支付
+
+def customer_check_pay(request):  # 用户确认支付
     if not request.user.is_authenticated():
         return redirect('/login')
-    if request.method=="GET":
-        out_trade_no=request.GET['out_trade_no']
-        total_fee=request.GET['total_fee']
-        order=xmqb_model.Order.objects.get(order=out_trade_no)
-        project=xmqb_model.Project.objects.get(project=order.project.project)
+    if request.method == "GET":
+        out_trade_no = request.GET['out_trade_no']
+        total_fee = request.GET['total_fee']
+        order = xmqb_model.Order.objects.get(order=out_trade_no)
+        project = xmqb_model.Project.objects.get(project=order.project.project)
         if not order.order_price == 0:
-            url=alipay.create_direct_pay_by_user_url(out_trade_no=out_trade_no,
-                                                    subject=u'测试', total_fee=total_fee,
-                                                    return_url='http://127.0.0.1:8000/customer_project_list',
-                                                    notify_url='http://www.tencent.com/')
+            url = alipay.create_direct_pay_by_user_url(out_trade_no=out_trade_no,
+                                                       subject=u'测试', total_fee=total_fee,
+                                                       return_url='http://127.0.0.1:8000/customer_project_list',
+                                                       notify_url='http://www.tencent.com/')
         else:
-            url="/alipy_notify?is_success=T&trade_status=TRADE_SUCCESS&out_trade_no=" + order.order
-        return render(request,'customer_check_pay.html',{'url':url,'order':order,'project':project})
+            url = "/alipy_notify?is_success=T&trade_status=TRADE_SUCCESS&out_trade_no=" + order.order
+        return render(request, 'customer_check_pay.html', {'url': url, 'order': order, 'project': project})
+
 
 def customer_order_info(request):  # 用户订单信息
     if not request.user.is_authenticated():
@@ -694,7 +739,7 @@ def customer_suggestion(request):
                     record = xmqb_model.Message.objects.create(title='意见反馈------' + str(request.user.id),
                                                                message_content=message,
                                                                is_read=0,
-                                                               send_worker_id=request.user.id,
+                                                               send_worker_id=i,
                                                                user_id=i)
                     record.save()
                     context = xmqb_form.Suggestion()
@@ -1148,7 +1193,6 @@ def administrator_invoice_list(request):  # 管理员发票列表
                   {'orders': orders, 'delivered': delivered, 'undelivered': undelivered}, )
 
 
-
 def administrator_invoice_create(request):  # 管理员开发票
     if not request.user.is_superuser:
         return redirect('/login')
@@ -1315,7 +1359,7 @@ def administrator_price_list(request):  # 管理员服务价格列表
 def administrator_price_new(request):  # 管理员新增服务
     if not request.user.is_authenticated():
         return redirect('/login')
-    if not request.user.is_superuser == 1:
+    if not request.user.is_superuser >= 1:
         return redirect('/login')
     if request.method == "POST":
         form = xmqb_form.Add_Price(request.POST)
@@ -1336,7 +1380,7 @@ def administrator_price_new(request):  # 管理员新增服务
 def administrator_part_price_alter(request):  # 管理员服务价格修改
     if not request.user.is_authenticated():
         return redirect('/login')
-    if not request.user.is_superuser == 1:
+    if not request.user.is_superuser >= 1:
         return redirect('/login')
     if request.method == 'GET':
         part_id = request.GET['part_ID']
@@ -1368,7 +1412,7 @@ def administrator_part_price_alter(request):  # 管理员服务价格修改
 def administrator_price_alter(request):  # 管理员订单价格修改
     if not request.user.is_authenticated():
         return redirect('/login')
-    if not request.user.is_superuser == 1:
+    if not request.user.is_superuser >= 1:
         return redirect('/login')
     if request.method == 'GET':
         if request.GET['state']:
@@ -1400,7 +1444,7 @@ def administrator_price_alter(request):  # 管理员订单价格修改
 def administrator_message_send(request):  # 管理员消息发送
     if not request.user.is_authenticated():
         return redirect('/login')
-    if not request.user.is_superuser == 1:
+    if not request.user.is_superuser >= 1:
         return redirect('/login')
     if request.method == "GET":
         forms = xmqb_form.Send_Message()
@@ -1423,6 +1467,8 @@ def administrator_message_send(request):  # 管理员消息发送
                                                                    is_read=Is_read,
                                                                    send_worker_id=receiver, user_id=User_id)
                 message_record.save()
+                not_read = len(xmqb_model.Message.objects.filter(user_id=request.user.id, is_read=0))
+                request.session['not_read'] = not_read
                 forms = xmqb_form.Send_Message()
                 return render(request, 'administrator_message_send.html', {'form': forms, 'type': 1})
             except Exception, e:
@@ -1437,17 +1483,18 @@ def administrator_message_send(request):  # 管理员消息发送
 def administrator_message_receive(request):  # 管理员消息接受
     if not request.user.is_authenticated():
         return redirect('/login')
-    if not request.user.is_superuser == 1:
+    if not request.user.is_superuser >= 1:
         return redirect('/login')
     record = xmqb_model.Message.objects.filter(user_id=request.user.id)
     not_read = len(xmqb_model.Message.objects.filter(user_id=request.user.id, is_read=0))
+    request.session['not_read'] = not_read
     return render(request, 'administrator_message_receive.html', {'messages': record, 'message': not_read})
 
 
 def administrator_message_read(request):  # 阅读信息
     if not request.user.is_authenticated():
         return redirect('/login')
-    if not request.user.is_superuser == 1:
+    if not request.user.is_superuser >= 1:
         return redirect('/login')
 
     if request.method == "GET":
@@ -1460,7 +1507,8 @@ def administrator_message_read(request):  # 阅读信息
         record.is_read = 1
         record.read_time = timezone.localtime(timezone.now()).strftime("%Y-%m-%d %H:%M:%S")
         record.save()
-
+        not_read = len(xmqb_model.Message.objects.filter(user_id=request.user.id, is_read=0))
+        request.session['not_read'] = not_read
         return render(request, 'administrator_message_read.html', {'form': forms})
     else:
         return redirect('/administrator_message_receive')

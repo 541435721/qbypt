@@ -49,25 +49,27 @@
         </ul>
         <ul class="nav navbar-nav navbar-right hidden-xs nav-user">
             <li class="hidden-xs"><a href="#" class="dropdown-toggle dk" data-toggle="dropdown"> <i
-                    class="fa fa-bell"></i> <span
-                    class="badge badge-sm up bg-danger m-l-n-sm count">{{ message }}</span> </a>
+                    class="fa fa-bell"></i>
+                {% if request.session.not_read %}
+                    <span class="badge badge-sm up bg-danger m-l-n-sm">
+                    {{ request.session.not_read }}
+                    </span>
+                {% endif %}
+            </a>
                 <section class="dropdown-menu aside-xl">
                     <section class="panel bg-white">
-                        <header class="panel-heading b-light bg-light"><strong>You have <span class="count">2</span>
-                            notifications</strong></header>
-                        <div class="list-group list-group-alt animated fadeInRight"><a href="#"
-                                                                                       class="media list-group-item">
-                            <span class="pull-left thumb-sm"> <img src="../../../static/images/avatar.jpg"
-                                                                   alt="John said" class="img-circle"> </span> <span
-                                class="media-body block m-b-none"> Use awesome animate.css<br>
-              <small class="text-muted">10 minutes ago</small> </span> </a> <a href="#"
-                                                                               class="media list-group-item"> <span
-                                class="media-body block m-b-none"> 1.0 initial released<br>
-              <small class="text-muted">1 hour ago</small> </span> </a></div>
-                        <footer class="panel-footer text-sm"><a href="#" class="pull-right"><i
-                                class="fa fa-cog"></i></a> <a href="#notes"
-                                                              data-toggle="class:show animated fadeInRight">See all the
-                            notifications</a></footer>
+                        <header class="panel-heading b-light bg-light"><strong>您有 <span
+                                class="">  {{ request.session.not_read }}  </span>
+                            条未读信息</strong></header>
+                        <div class="list-group-alt animated fadeInRight">
+                            <a href="#" class="media list-group-item">
+                                                    <span class="media-body block m-b-none"> 意见反馈------1<br>
+                                      <small class="text-muted">1 hour ago</small> </span>
+                            </a>
+                        </div>
+                        <footer class="panel-footer text-sm">
+                            <a href="/administrator_message_receive/">查看全部消息</a>
+                        </footer>
                     </section>
                 </section>
             </li>
@@ -94,8 +96,11 @@
                     <span class="arrow top"></span>
                     <li><a href="/user_center/">个人中心</a></li>
                     <li><a href="/administrator_project_list/">项目管理</a></li>
-                    <li><a href="#"> <span class="badge bg-danger pull-right">3</span> 我的消息 </a></li>
-                    <li><a href="docs.html">帮助</a></li>
+                    <li><a href="#"> {% if request.session.not_read %}
+                        <span class="badge bg-danger pull-right">{{ request.session.not_read }}</span>
+                    {% endif %}
+                        我的消息 </a>
+                    </li>
                     <li class="divider"></li>
                     <li><a href="/logout/">退出</a></li>
                 </ul>
@@ -122,11 +127,13 @@
                             </div>
                         </div>
                     </header>
+                {% if request.user.is_superuser == 1 %}
                     <section class="w-f scrollable">
                         <div class="slim-scroll" data-height="auto" data-disable-fade-out="true" data-distance="0"
                              data-size="5px" data-color="#333333"> <!-- nav -->
                             <nav class="nav-primary hidden-xs">
                                 <ul class="nav">
+
                                     <li><a href="/" class="active"> <i class="fa fa-user icon"> <b
                                             class="bg-danger"></b> </i> <span class="pull-right"> <i
                                             class="fa fa-angle-up text"></i> <i
@@ -151,6 +158,14 @@
                                             <li><a href="/administrator_work_order_distribute/" target="_blank"> <i
                                                     class="fa fa-angle-right"></i>
                                                 <span>项目分配</span> </a></li>
+
+                                            <li><a href="/administrator_work_order_handle_list/"> <i
+                                                    class="fa fa-angle-right"></i>
+                                                <span>项目处理</span> </a></li>
+
+                                            <li><a href="/administrator_work_order_assess_handle_list/"> <i
+                                                    class="fa fa-angle-right"></i>
+                                                <span>项目审核</span> </a></li>
                                         </ul>
                                     </li>
                                     <li><a href="/administrator_price_list/"> <i class="fa fa-envelope-o icon">
@@ -159,6 +174,21 @@
                                     <li><a href="/administrator_order_list/"> <i class="fa fa-envelope-o icon">
                                         <b class="bg-primary dker"></b> </i> <span>订单管理</span>
                                     </a></li>
+
+
+                                <li><a href="#layout"> <i class="fa fa-columns icon"> <b class="bg-warning"></b>
+                                    </i> <span class="pull-right"> <i class="fa fa-angle-down text"></i> <i
+                                            class="fa fa-angle-up text-active"></i> </span> <span>优惠券管理</span> </a>
+                                        <ul class="nav lt">
+                                            <li><a href="/administrator_coupon_distribute/"> <i class="fa fa-angle-right"></i>
+                                                <span>优惠券分发</span> </a></li>
+                                        </ul>
+                                        <ul class="nav lt">
+                                            <li><a href="/administrator_coupon_list/"> <i class="fa fa-angle-right"></i>
+                                                <span>优惠券列表</span> </a></li>
+                                        </ul>
+                                    </li>
+
                                     <li><a href="#layout"> <i class="fa fa-columns icon"> <b class="bg-warning"></b>
                                     </i> <span class="pull-right"> <i class="fa fa-angle-down text"></i> <i
                                             class="fa fa-angle-up text-active"></i> </span> <span>发票管理</span> </a>
@@ -168,8 +198,12 @@
                                                 <span>发票列表</span> </a></li>
                                         </ul>
                                     </li>
-                                    <li><a href="#"> <b class="badge bg-danger pull-right">{{ message }}</b> <i
-                                            class="fa fa-envelope-o icon"> <b class="bg-primary dker"></b> </i> <span>消息中心</span>
+                                    <li><a href="#"> {% if  request.session.not_read %}
+                                        <b class="badge bg-danger pull-right">
+                                            {{ request.session.not_read }}
+                                        </b>
+                                    {% endif %} <i class="fa fa-envelope-o icon"> <b class="bg-primary dker"></b> </i>
+                                        <span>消息中心</span>
                                     </a>
                                         <ul class="nav lt">
                                             <li><a href="/administrator_message_send/"> <i
@@ -185,6 +219,379 @@
                             </nav>
                             <!-- / nav --> </div>
                     </section>
+                {% endif %}
+                {% if request.user.is_superuser == 2 %}
+                    <section class="w-f scrollable">
+                        <div class="slim-scroll" data-height="auto" data-disable-fade-out="true" data-distance="0"
+                             data-size="5px" data-color="#333333"> <!-- nav -->
+                            <nav class="nav-primary hidden-xs">
+                                <ul class="nav">
+
+                                    <li><a href="/" class="active"> <i class="fa fa-user icon"> <b
+                                            class="bg-danger"></b> </i> <span class="pull-right"> <i
+                                            class="fa fa-angle-up text"></i> <i
+                                            class="fa fa-angle-down text-active"></i> </span> <span>用户管理</span> </a>
+                                        <ul class="nav lt">
+                                            <li><a href="/administrator_user_info_list/"> <i
+                                                    class="fa fa-angle-right"></i>
+                                                <span>用户基本信息管理</span> </a></li>
+                                            <li><a href="/administrator_account_list/"> <i
+                                                    class="fa fa-angle-right"></i>
+                                                <span>用户安全信息管理</span> </a></li>
+                                        </ul>
+                                    </li>
+                                    <li><a href="#layout"> <i class="fa fa-columns icon"> <b class="bg-warning"></b>
+                                    </i> <span class="pull-right"> <i class="fa fa-angle-down text"></i> <i
+                                            class="fa fa-angle-up text-active"></i> </span> <span>项目管理</span> </a>
+                                        <ul class="nav lt">
+                                            <li><a href="/administrator_project_list/"> <i
+                                                    class="fa fa-angle-right"></i>
+                                                <span>项目清单</span> </a></li>
+
+                                            <li><a href="/administrator_work_order_distribute/" target="_blank"> <i
+                                                    class="fa fa-angle-right"></i>
+                                                <span>项目分配</span> </a></li>
+
+                                            <li><a href="/administrator_work_order_handle_list/"> <i
+                                                    class="fa fa-angle-right"></i>
+                                                <span>项目处理</span> </a></li>
+
+                                            <li><a href="/administrator_work_order_assess_handle_list/"> <i
+                                                    class="fa fa-angle-right"></i>
+                                                <span>项目审核</span> </a></li>
+                                        </ul>
+                                    </li>
+                                    <li><a href="/administrator_price_list/"> <i class="fa fa-envelope-o icon">
+                                        <b class="bg-primary dker"></b> </i> <span>单价管理</span>
+                                    </a></li>
+                                    <li><a href="/administrator_order_list/"> <i class="fa fa-envelope-o icon">
+                                        <b class="bg-primary dker"></b> </i> <span>订单管理</span>
+                                    </a></li>
+
+
+                                <li><a href="#layout"> <i class="fa fa-columns icon"> <b class="bg-warning"></b>
+                                    </i> <span class="pull-right"> <i class="fa fa-angle-down text"></i> <i
+                                            class="fa fa-angle-up text-active"></i> </span> <span>优惠券管理</span> </a>
+                                        <ul class="nav lt">
+                                            <li><a href="/administrator_coupon_distribute/"> <i class="fa fa-angle-right"></i>
+                                                <span>优惠券分发</span> </a></li>
+                                        </ul>
+                                        <ul class="nav lt">
+                                            <li><a href="/administrator_coupon_list/"> <i class="fa fa-angle-right"></i>
+                                                <span>优惠券列表</span> </a></li>
+                                        </ul>
+                                    </li>
+
+                                    <li><a href="#layout"> <i class="fa fa-columns icon"> <b class="bg-warning"></b>
+                                    </i> <span class="pull-right"> <i class="fa fa-angle-down text"></i> <i
+                                            class="fa fa-angle-up text-active"></i> </span> <span>发票管理</span> </a>
+                                        <ul class="nav lt">
+                                            <li><a href="/administrator_invoice_list/"> <i
+                                                    class="fa fa-angle-right"></i>
+                                                <span>发票列表</span> </a></li>
+                                        </ul>
+                                    </li>
+                                    <li><a href="#"> {% if  request.session.not_read %}
+                                        <b class="badge bg-danger pull-right">
+                                            {{ request.session.not_read }}
+                                        </b>
+                                    {% endif %} <i class="fa fa-envelope-o icon"> <b class="bg-primary dker"></b> </i>
+                                        <span>消息中心</span>
+                                    </a>
+                                        <ul class="nav lt">
+                                            <li><a href="/administrator_message_send/"> <i
+                                                    class="fa fa-angle-right"></i>
+                                                <span>发件箱</span> </a></li>
+
+                                            <li><a href="/administrator_message_receive/"> <i
+                                                    class="fa fa-angle-right"></i>
+                                                <span>收件箱</span> </a></li>
+                                        </ul>
+                                    </li>
+                                </ul>
+                            </nav>
+                            <!-- / nav --> </div>
+                    </section>
+                {% endif %}
+                {% if request.user.is_superuser == 3 %}
+                    <section class="w-f scrollable">
+                        <div class="slim-scroll" data-height="auto" data-disable-fade-out="true" data-distance="0"
+                             data-size="5px" data-color="#333333"> <!-- nav -->
+                            <nav class="nav-primary hidden-xs">
+                                <ul class="nav">
+
+                                    <li><a href="/" class="active"> <i class="fa fa-user icon"> <b
+                                            class="bg-danger"></b> </i> <span class="pull-right"> <i
+                                            class="fa fa-angle-up text"></i> <i
+                                            class="fa fa-angle-down text-active"></i> </span> <span>用户管理</span> </a>
+                                        <ul class="nav lt">
+                                            <li><a href="/administrator_user_info_list/"> <i
+                                                    class="fa fa-angle-right"></i>
+                                                <span>用户基本信息管理</span> </a></li>
+                                            <li><a href="/administrator_account_list/"> <i
+                                                    class="fa fa-angle-right"></i>
+                                                <span>用户安全信息管理</span> </a></li>
+                                        </ul>
+                                    </li>
+                                    <li><a href="#layout"> <i class="fa fa-columns icon"> <b class="bg-warning"></b>
+                                    </i> <span class="pull-right"> <i class="fa fa-angle-down text"></i> <i
+                                            class="fa fa-angle-up text-active"></i> </span> <span>项目管理</span> </a>
+                                        <ul class="nav lt">
+                                            <li><a href="/administrator_project_list/"> <i
+                                                    class="fa fa-angle-right"></i>
+                                                <span>项目清单</span> </a></li>
+
+                                            <li><a href="/administrator_work_order_distribute/" target="_blank"> <i
+                                                    class="fa fa-angle-right"></i>
+                                                <span>项目分配</span> </a></li>
+
+                                            <li><a href="/administrator_work_order_handle_list/"> <i
+                                                    class="fa fa-angle-right"></i>
+                                                <span>项目处理</span> </a></li>
+
+                                            <li><a href="/administrator_work_order_assess_handle_list/"> <i
+                                                    class="fa fa-angle-right"></i>
+                                                <span>项目审核</span> </a></li>
+                                        </ul>
+                                    </li>
+                                    <li><a href="/administrator_price_list/"> <i class="fa fa-envelope-o icon">
+                                        <b class="bg-primary dker"></b> </i> <span>单价管理</span>
+                                    </a></li>
+                                    <li><a href="/administrator_order_list/"> <i class="fa fa-envelope-o icon">
+                                        <b class="bg-primary dker"></b> </i> <span>订单管理</span>
+                                    </a></li>
+
+
+                                <li><a href="#layout"> <i class="fa fa-columns icon"> <b class="bg-warning"></b>
+                                    </i> <span class="pull-right"> <i class="fa fa-angle-down text"></i> <i
+                                            class="fa fa-angle-up text-active"></i> </span> <span>优惠券管理</span> </a>
+                                        <ul class="nav lt">
+                                            <li><a href="/administrator_coupon_distribute/"> <i class="fa fa-angle-right"></i>
+                                                <span>优惠券分发</span> </a></li>
+                                        </ul>
+                                        <ul class="nav lt">
+                                            <li><a href="/administrator_coupon_list/"> <i class="fa fa-angle-right"></i>
+                                                <span>优惠券列表</span> </a></li>
+                                        </ul>
+                                    </li>
+
+                                    <li><a href="#layout"> <i class="fa fa-columns icon"> <b class="bg-warning"></b>
+                                    </i> <span class="pull-right"> <i class="fa fa-angle-down text"></i> <i
+                                            class="fa fa-angle-up text-active"></i> </span> <span>发票管理</span> </a>
+                                        <ul class="nav lt">
+                                            <li><a href="/administrator_invoice_list/"> <i
+                                                    class="fa fa-angle-right"></i>
+                                                <span>发票列表</span> </a></li>
+                                        </ul>
+                                    </li>
+                                    <li><a href="#"> {% if  request.session.not_read %}
+                                        <b class="badge bg-danger pull-right">
+                                            {{ request.session.not_read }}
+                                        </b>
+                                    {% endif %} <i class="fa fa-envelope-o icon"> <b class="bg-primary dker"></b> </i>
+                                        <span>消息中心</span>
+                                    </a>
+                                        <ul class="nav lt">
+                                            <li><a href="/administrator_message_send/"> <i
+                                                    class="fa fa-angle-right"></i>
+                                                <span>发件箱</span> </a></li>
+
+                                            <li><a href="/administrator_message_receive/"> <i
+                                                    class="fa fa-angle-right"></i>
+                                                <span>收件箱</span> </a></li>
+                                        </ul>
+                                    </li>
+                                </ul>
+                            </nav>
+                            <!-- / nav --> </div>
+                    </section>
+                {% endif %}
+                {% if request.user.is_superuser == 4 %}
+                    <section class="w-f scrollable">
+                        <div class="slim-scroll" data-height="auto" data-disable-fade-out="true" data-distance="0"
+                             data-size="5px" data-color="#333333"> <!-- nav -->
+                            <nav class="nav-primary hidden-xs">
+                                <ul class="nav">
+
+                                    <li><a href="/" class="active"> <i class="fa fa-user icon"> <b
+                                            class="bg-danger"></b> </i> <span class="pull-right"> <i
+                                            class="fa fa-angle-up text"></i> <i
+                                            class="fa fa-angle-down text-active"></i> </span> <span>用户管理</span> </a>
+                                        <ul class="nav lt">
+                                            <li><a href="/administrator_user_info_list/"> <i
+                                                    class="fa fa-angle-right"></i>
+                                                <span>用户基本信息管理</span> </a></li>
+                                            <li><a href="/administrator_account_list/"> <i
+                                                    class="fa fa-angle-right"></i>
+                                                <span>用户安全信息管理</span> </a></li>
+                                        </ul>
+                                    </li>
+                                    <li><a href="#layout"> <i class="fa fa-columns icon"> <b class="bg-warning"></b>
+                                    </i> <span class="pull-right"> <i class="fa fa-angle-down text"></i> <i
+                                            class="fa fa-angle-up text-active"></i> </span> <span>项目管理</span> </a>
+                                        <ul class="nav lt">
+                                            <li><a href="/administrator_project_list/"> <i
+                                                    class="fa fa-angle-right"></i>
+                                                <span>项目清单</span> </a></li>
+
+                                            <li><a href="/administrator_work_order_distribute/" target="_blank"> <i
+                                                    class="fa fa-angle-right"></i>
+                                                <span>项目分配</span> </a></li>
+
+                                            <li><a href="/administrator_work_order_handle_list/"> <i
+                                                    class="fa fa-angle-right"></i>
+                                                <span>项目处理</span> </a></li>
+
+                                            <li><a href="/administrator_work_order_assess_handle_list/"> <i
+                                                    class="fa fa-angle-right"></i>
+                                                <span>项目审核</span> </a></li>
+                                        </ul>
+                                    </li>
+                                    <li><a href="/administrator_price_list/"> <i class="fa fa-envelope-o icon">
+                                        <b class="bg-primary dker"></b> </i> <span>单价管理</span>
+                                    </a></li>
+                                    <li><a href="/administrator_order_list/"> <i class="fa fa-envelope-o icon">
+                                        <b class="bg-primary dker"></b> </i> <span>订单管理</span>
+                                    </a></li>
+
+
+                                <li><a href="#layout"> <i class="fa fa-columns icon"> <b class="bg-warning"></b>
+                                    </i> <span class="pull-right"> <i class="fa fa-angle-down text"></i> <i
+                                            class="fa fa-angle-up text-active"></i> </span> <span>优惠券管理</span> </a>
+                                        <ul class="nav lt">
+                                            <li><a href="/administrator_coupon_distribute/"> <i class="fa fa-angle-right"></i>
+                                                <span>优惠券分发</span> </a></li>
+                                        </ul>
+                                        <ul class="nav lt">
+                                            <li><a href="/administrator_coupon_list/"> <i class="fa fa-angle-right"></i>
+                                                <span>优惠券列表</span> </a></li>
+                                        </ul>
+                                    </li>
+
+                                    <li><a href="#layout"> <i class="fa fa-columns icon"> <b class="bg-warning"></b>
+                                    </i> <span class="pull-right"> <i class="fa fa-angle-down text"></i> <i
+                                            class="fa fa-angle-up text-active"></i> </span> <span>发票管理</span> </a>
+                                        <ul class="nav lt">
+                                            <li><a href="/administrator_invoice_list/"> <i
+                                                    class="fa fa-angle-right"></i>
+                                                <span>发票列表</span> </a></li>
+                                        </ul>
+                                    </li>
+                                    <li><a href="#"> {% if  request.session.not_read %}
+                                        <b class="badge bg-danger pull-right">
+                                            {{ request.session.not_read }}
+                                        </b>
+                                    {% endif %} <i class="fa fa-envelope-o icon"> <b class="bg-primary dker"></b> </i>
+                                        <span>消息中心</span>
+                                    </a>
+                                        <ul class="nav lt">
+                                            <li><a href="/administrator_message_send/"> <i
+                                                    class="fa fa-angle-right"></i>
+                                                <span>发件箱</span> </a></li>
+
+                                            <li><a href="/administrator_message_receive/"> <i
+                                                    class="fa fa-angle-right"></i>
+                                                <span>收件箱</span> </a></li>
+                                        </ul>
+                                    </li>
+                                </ul>
+                            </nav>
+                            <!-- / nav --> </div>
+                    </section>
+                {% endif %}
+                {% if request.user.is_superuser == 5 %}
+                    <section class="w-f scrollable">
+                        <div class="slim-scroll" data-height="auto" data-disable-fade-out="true" data-distance="0"
+                             data-size="5px" data-color="#333333"> <!-- nav -->
+                            <nav class="nav-primary hidden-xs">
+                                <ul class="nav">
+
+                                    <li><a href="/" class="active"> <i class="fa fa-user icon"> <b
+                                            class="bg-danger"></b> </i> <span class="pull-right"> <i
+                                            class="fa fa-angle-up text"></i> <i
+                                            class="fa fa-angle-down text-active"></i> </span> <span>用户管理</span> </a>
+                                        <ul class="nav lt">
+                                            <li><a href="/administrator_user_info_list/"> <i
+                                                    class="fa fa-angle-right"></i>
+                                                <span>用户基本信息管理</span> </a></li>
+                                            <li><a href="/administrator_account_list/"> <i
+                                                    class="fa fa-angle-right"></i>
+                                                <span>用户安全信息管理</span> </a></li>
+                                        </ul>
+                                    </li>
+                                    <li><a href="#layout"> <i class="fa fa-columns icon"> <b class="bg-warning"></b>
+                                    </i> <span class="pull-right"> <i class="fa fa-angle-down text"></i> <i
+                                            class="fa fa-angle-up text-active"></i> </span> <span>项目管理</span> </a>
+                                        <ul class="nav lt">
+                                            <li><a href="/administrator_project_list/"> <i
+                                                    class="fa fa-angle-right"></i>
+                                                <span>项目清单</span> </a></li>
+
+                                            <li><a href="/administrator_work_order_distribute/" target="_blank"> <i
+                                                    class="fa fa-angle-right"></i>
+                                                <span>项目分配</span> </a></li>
+
+                                            <li><a href="/administrator_work_order_handle_list/"> <i
+                                                    class="fa fa-angle-right"></i>
+                                                <span>项目处理</span> </a></li>
+
+                                            <li><a href="/administrator_work_order_assess_handle_list/"> <i
+                                                    class="fa fa-angle-right"></i>
+                                                <span>项目审核</span> </a></li>
+                                        </ul>
+                                    </li>
+                                    <li><a href="/administrator_price_list/"> <i class="fa fa-envelope-o icon">
+                                        <b class="bg-primary dker"></b> </i> <span>单价管理</span>
+                                    </a></li>
+                                    <li><a href="/administrator_order_list/"> <i class="fa fa-envelope-o icon">
+                                        <b class="bg-primary dker"></b> </i> <span>订单管理</span>
+                                    </a></li>
+
+
+                                <li><a href="#layout"> <i class="fa fa-columns icon"> <b class="bg-warning"></b>
+                                    </i> <span class="pull-right"> <i class="fa fa-angle-down text"></i> <i
+                                            class="fa fa-angle-up text-active"></i> </span> <span>优惠券管理</span> </a>
+                                        <ul class="nav lt">
+                                            <li><a href="/administrator_coupon_distribute/"> <i class="fa fa-angle-right"></i>
+                                                <span>优惠券分发</span> </a></li>
+                                        </ul>
+                                        <ul class="nav lt">
+                                            <li><a href="/administrator_coupon_list/"> <i class="fa fa-angle-right"></i>
+                                                <span>优惠券列表</span> </a></li>
+                                        </ul>
+                                    </li>
+
+                                    <li><a href="#layout"> <i class="fa fa-columns icon"> <b class="bg-warning"></b>
+                                    </i> <span class="pull-right"> <i class="fa fa-angle-down text"></i> <i
+                                            class="fa fa-angle-up text-active"></i> </span> <span>发票管理</span> </a>
+                                        <ul class="nav lt">
+                                            <li><a href="/administrator_invoice_list/"> <i
+                                                    class="fa fa-angle-right"></i>
+                                                <span>发票列表</span> </a></li>
+                                        </ul>
+                                    </li>
+                                    <li><a href="#"> {% if  request.session.not_read %}
+                                        <b class="badge bg-danger pull-right">
+                                            {{ request.session.not_read }}
+                                        </b>
+                                    {% endif %} <i class="fa fa-envelope-o icon"> <b class="bg-primary dker"></b> </i>
+                                        <span>消息中心</span>
+                                    </a>
+                                        <ul class="nav lt">
+                                            <li><a href="/administrator_message_send/"> <i
+                                                    class="fa fa-angle-right"></i>
+                                                <span>发件箱</span> </a></li>
+
+                                            <li><a href="/administrator_message_receive/"> <i
+                                                    class="fa fa-angle-right"></i>
+                                                <span>收件箱</span> </a></li>
+                                        </ul>
+                                    </li>
+                                </ul>
+                            </nav>
+                            <!-- / nav --> </div>
+                    </section>
+                {% endif %}
                     <footer class="footer lt hidden-xs b-t b-dark">
                         <div id="chat" class="dropup">
                             <section class="dropdown-menu on aside-md m-l-n">

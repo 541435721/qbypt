@@ -212,11 +212,11 @@ class InvoiceDemandForm(forms.ModelForm):
 
     deliver_id = forms.CharField(widget=forms.TextInput(attrs={'class': 'form-control'}),  # 物流编号
 
-                                 max_length=30, required=True, label=u'物流编号',
+                                 max_length=30, required=False, label=u'物流编号',
                                  error_messages={'required': u'请填写物流编号'})
 
     deliver_company = forms.CharField(widget=forms.TextInput(attrs={'class': 'form-control'}),  # 物流公司
-                                      max_length=30, required=True, label=u'物流公司',
+                                      max_length=30, required=False, label=u'物流公司',
 
                                       error_messages={'required': u'请填写物流公司'})
 
@@ -361,7 +361,7 @@ class Send_Message(forms.Form):
         widget=forms.TextInput(attrs={'class': "input__field input__field--hoshi", 'id': "receiver"}), label='收件人')
     title = forms.CharField(
         widget=forms.TextInput(attrs={'class': "input__field input__field--hoshi", 'id': "title"}), label='主题')
-    context = forms.CharField(widget=forms.Textarea(attrs={'id': 'editor'}), label='正文')
+    context = forms.CharField(widget=forms.Textarea(attrs={'id': 'editor', 'style': 'font-size:36px;'}), label='正文')
 
     def __init__(self, *args, **kwargs):  # 初始化的方法
         super(Send_Message, self).__init__(*args, **kwargs)
@@ -374,7 +374,8 @@ class Read_Message(forms.Form):
     title = forms.CharField(
         widget=forms.TextInput(
             attrs={'class': "input__field input__field--hoshi", 'id': "title", 'readonly': 'readonly'}), label='主题')
-    context = forms.CharField(widget=forms.Textarea(attrs={'id': 'editor', 'readonly': 'readonly'}), label='正文')
+    context = forms.CharField(
+        widget=forms.Textarea(attrs={'id': 'editor', 'readonly': 'readonly', 'style': 'font-size:36px;'}), label='正文')
 
     def __init__(self, *args, **kwargs):  # 初始化的方法
         super(Read_Message, self).__init__(*args, **kwargs)

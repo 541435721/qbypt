@@ -157,9 +157,9 @@
   box-sizing: border-box;
   font-family: monaco;
   font-size: 16px;
-  line-height: 1.6;
+  line-height: 0.5;
   border: none;
-  padding: 22px 15px 40px;
+  padding: 10px 15px 40px;
   min-height: 300px;
   outline: none;
   background: transparent;
@@ -587,9 +587,9 @@
 }
 
 .simditor .simditor-body, .editor-style {
-  font-size: 16px;
+  font-size: 25px;
   font-family: arial, sans-serif;
-  line-height: 1.6;
+  line-height: 0.5;
   color: #333;
   outline: none;
   word-wrap: break-word;
