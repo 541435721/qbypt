@@ -283,9 +283,8 @@
 <script>
     function close_layer() {
         var index = parent.layer.getFrameIndex(window.name);
-
+        parent.window.document.getElementById('agree').checked = true;
         parent.layer.close(index);
-
     }
 
 </script>

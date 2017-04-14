@@ -43,7 +43,7 @@ $(document).ready(function () {
     });
     $('#file_upload1').uploadify({
         'swf': '/static/js/uploadify.swf',//
-        'uploader': '/uploadify_script/?project_id='+$("#project_ID").val()+'&classify='+$("#id_classify").val()+'&part='+$("#id_part").val(),
+        'uploader': '/uploadify_script/?project_id='+$("#project_ID").val()+'&classify='+$("#id_classify").val(),
         'folder': '/uploadfile',
         'auto': false,//false,//
         'multi': true,//设置可以上传多个文件
