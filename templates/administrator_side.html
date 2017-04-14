@@ -94,7 +94,7 @@
                     src="../../../static/images/avatar.jpg"> </span> {{ request.user }}<b class="caret"></b> </a>
                 <ul class="dropdown-menu animated fadeInRight">
                     <span class="arrow top"></span>
-                    <li><a href="/user_center/">个人中心</a></li>
+{#                    <li><a href="/user_center/">个人中心</a></li>#}
                     <li><a href="/administrator_project_list/">项目管理</a></li>
                     <li><a href="#"> {% if request.session.not_read %}
                         <span class="badge bg-danger pull-right">{{ request.session.not_read }}</span>

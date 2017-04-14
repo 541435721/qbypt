@@ -1,4 +1,5 @@
 {% extends 'customer_side.html' %}
+{% load static %}
 {% block title %}订单管理{% endblock %}
 {% block content %}
     <section id="content">
@@ -21,9 +22,16 @@
                                                           value="{{ order.order }}"><br>
                                 <label>项目号：</label><input class="form-control input-lg" readonly="readonly"
                                                           value="{{ order.project.project }}"><br>
+                                <label>项目名称：</label><input class="form-control input-lg" readonly="readonly"
+                                                           value="{{ project.project_name }}"><br>
+                                <label>项目类型：</label><input class="form-control input-lg" readonly="readonly"
+                                                           value="{{ project.classify.classify_name }}"><br>
+                                <label>项目备注：</label><input class="form-control input-lg" readonly="readonly"
+                                                           value="{{ project.remark }}"><br>
                                 <label>金额：</label><input class="form-control input-lg" readonly="readonly"
                                                          value="{{ order.order_price }}"><br>
                             </div>
+
                             <div class="form-group-left">
                                 <a href="{{ url }}" class="btn btn-large btn-primary">确认支付</a>
                             </div>
@@ -42,7 +50,17 @@
         </section>
     </section>
     <a href="#" class="hide nav-off-screen-block" data-toggle="class:nav-off-screen" data-target="#nav"></a>
+    {% if project.status == '0' %}
+        <script>
+            if (confirm('此项目还没有上传文件，请前往项目列表上传')) {
+                location.href="/customer_project_list/";
+            }
+            else {
+                window.opener = null;
+                window.open('', '_self');
+                window.close();
+            }
 
+        </script>
+    {% endif %}
 {% endblock %}
-
-<a href="{{ url }}">确认支付</a>

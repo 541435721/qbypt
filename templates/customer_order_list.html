@@ -48,8 +48,10 @@
                                     <td>{{ foo.username }}</td>
                                     <td>{{ foo.out_trade_no }}</td>
                                     <td>{{ foo.classify_name }}</td>
-                                    <td>{% if foo.is_complete == '1' %}
+                                    <td>{% if foo.is_complete == '1'%}
                                         已完成
+                                    {% elif foo.is_complete == '2' %}
+                                        已申请发票
                                     {% else %}
                                         未完成
                                     {% endif %}</td>
@@ -62,7 +64,7 @@
 
                                     <td>
                                         <a href="/customer_order_info/?order_id={{ foo.out_trade_no }}"
-                                           target="_blank">查看详情</a>
+                                           target="">查看详情</a>
                                         {% if foo.is_pay %}
                                             {% if foo.is_complete == '1' %}
                                                 <a href="javascript:demand_invoice('{{ foo.out_trade_no }}')">申请发票</a>
@@ -71,7 +73,7 @@
                                             {% endif %}
                                         {% else %}
                                             <a href="/customer_check_pay?out_trade_no={{ foo.out_trade_no }}&total_fee={{ foo.order_price }}"
-                                               target="_blank">支付</a>
+                                               target="">支付</a>
                                             <a href="/alipy_notify?is_success=T&trade_status=TRADE_SUCCESS&out_trade_no={{ foo.out_trade_no }}">完成支付</a>
 
                                         {% endif %}
