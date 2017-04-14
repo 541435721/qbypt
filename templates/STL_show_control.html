@@ -3,7 +3,7 @@
 {% load static %}
 <head>
     <meta charset="utf-8"/>
-    <title>Notebook | Web Application</title>
+    <title>强本宇康 | 医学影像云服务平台</title>
     <meta name="description"
           content="app, web app, responsive, admin dashboard, admin, flat, flat ui, ui kit, off screen nav"/>
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
@@ -156,11 +156,14 @@
                                         <span>显示所有</span> </a>
                                         {% for foo in project.part_name %}
                                             <ul class="nav lt">
-                                                <input id="changer_{{ foo.0.1 }}" type="color"
-                                                       onchange="javascript:change_color('{{ foo.0.1 }}',this.value)">
-                                                <input id="r_{{ foo.0.1 }}" type="range" min="0" max="100" step="1"
-                                                       value="100"
-                                                       onchange="javascript:change_transparency('{{ foo.0.1 }}',this.value)"><br>
+                                                <div style="text-align: left">
+                                                    <b style="font-size: large">{{ foo.0.0 }}</b>
+                                                    <input id="changer_{{ foo.0.1 }}" type="color"
+                                                           onchange="javascript:change_color('{{ foo.0.1 }}',this.value)">
+                                                    <input id="r_{{ foo.0.1 }}" type="range" min="0" max="100" step="1"
+                                                           value="100"
+                                                           onchange="javascript:change_transparency('{{ foo.0.1 }}',this.value)"><br>
+                                                </div>
                                             </ul>
                                         {% endfor %}
                                     </li>
