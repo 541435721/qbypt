@@ -1625,3 +1625,7 @@ def alipy_notify(request):
 
 def contact_us(request):
     return render(request, 'contactus.html')
+
+
+def dicom_show(request):
+    return render(request, 'dicom_show.html')
