@@ -36,13 +36,13 @@ function disable()
     }
 } catch (err) {
 }
-function administrator_file_upload(project_ID) {
+function administrator_file_upload(project_ID,part) {
             var index = layer.open({
                 type: 2,
                 area: ['700px', '530px'],
                 fix: false, //不固定
                 maxmin: true,
-                content: '/administrator_file_upload/?project_ID='+project_ID
+                content: '/administrator_file_upload/?project_ID='+project_ID + '&part=' +part
             });
         }
     </script>
@@ -105,30 +105,21 @@ function administrator_file_upload(project_ID) {
                             <label>CT数据下载：</label>
                             <a href="/download/{{ project.user.username }}/{{ project.classify }}/{{ project.project }}/DICOM/{{ project.upload_name }}">下载</a>
                             <br>
+                            {% for everypart in parts %}
+                                <label>{{ everypart.part.part_name }} &nbsp;&nbsp;&nbsp;&nbsp;</label>
+                                <label>
+                                {% if not everypart.directory%}
+                                    未上传&nbsp;&nbsp;
+                                    {% else %}
+                                    {{ everypart.directory }}&nbsp;&nbsp;&nbsp;
+                                {% endif %}
+                                </label>
 
-{#                            {% for everypart in parts %}#}
-{#                                <label>{{ everypart.part.part_name }} &nbsp;&nbsp;&nbsp;&nbsp;</label>#}
-{#                                <label>#}
-{#                                {% if not everypart.directory%}#}
-{#                                    未上传&nbsp;&nbsp;#}
-{#                                    {% else %}#}
-{#                                    {{ everypart.directory }}&nbsp;&nbsp;&nbsp;#}
-{#                                {% endif %}#}
-{#                                </label>#}
-{#                                <a href="javascript:administrator_file_upload('{{ everypart.project.project }}',{{ everypart.part.part }})">上传</a>#}
-{#                                <br>#}
-{#                            {% endfor %}#}
-                        <br>
-                        已上传：
-                        {% if project_part %}
-                        {% for part in project_part.part_name %}
-                            <br>
-                            <label>{{ part.0.0 }}.stl</label>
-                        {% endfor%}
-                            {% else %}
-                            <label>未上传任何文件</label>
-                        {% endif %}
-                        <a href="javascript:administrator_file_upload('{{ project.project }}')">上传</a>
+                                <a href="javascript:administrator_file_upload('{{ everypart.project.project }}',{{ everypart.part.part }})">上传</a>
+                                <br>
+                            {% endfor %}
+
+
                             <div class="form-group-left">
                                 <button type="submit" class="btn btn-large btn-primary">确定</button>
                             </div>
