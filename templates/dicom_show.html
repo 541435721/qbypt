@@ -1,0 +1,242 @@
+<!DOCTYPE html>
+<!-- <html manifest="cache.manifest"> -->
+<html>
+
+<head>
+    <title>强本宇康 | 医学影像云服务平台</title>
+    <meta charset="UTF-8">
+    <meta name="description" content="DICOM Web Viewer (DWV) static version">
+    <meta name="keywords" content="DICOM,HTML5,JavaScript,medical,imaging,DWV">
+    <link type="text/css" rel="stylesheet" href="../static/dwv/css/style.css">
+    <link type="text/css" rel="stylesheet"
+          href="../static/dwv/ext/jquery-ui/themes/ui-darkness/jquery-ui-1.12.0.min.css">
+    <style type="text/css">
+        .ui-widget-content {
+            background-color: #222;
+            background-image: url();
+        }
+    </style>
+    <!-- Third party (dwv) -->
+    <script type="text/javascript" src="../static/dwv/ext/i18next/i18next.min.js"></script>
+    <script type="text/javascript" src="../static/dwv/ext/i18next/i18nextXHRBackend.min.js"></script>
+    <script type="text/javascript" src="../static/dwv/ext/i18next/i18nextBrowserLanguageDetector.min.js"></script>
+    <script type="text/javascript" src="../static/dwv/ext/konva/konva-1.5.0.min.js"></script>
+    <script type="text/javascript" src="../static/dwv/ext/magic-wand/magic-wand.js"></script>
+    <!-- Third party (viewer) -->
+    <script type="text/javascript" src="../static/dwv/ext/jquery/jquery-2.1.4.min.js"></script>
+    <script type="text/javascript" src="../static/dwv/ext/jquery-ui/jquery-ui-1.12.0.min.js"></script>
+    <script type="text/javascript" src="../static/dwv/ext/flot/jquery.flot.min.js"></script>
+    <!-- decoders -->
+    <script type="text/javascript" src="../static/dwv/ext/pdfjs/jpx.js"></script>
+    <script type="text/javascript" src="../static/dwv/ext/pdfjs/util.js"></script>
+    <script type="text/javascript" src="../static/dwv/ext/pdfjs/arithmetic_decoder.js"></script>
+    <script type="text/javascript" src="../static/dwv/ext/pdfjs/jpg.js"></script>
+    <script type="text/javascript" src="../static/dwv/ext/rii-mango/lossless-min.js"></script>
+    <!-- Local -->
+    <script type="text/javascript" src="../static/dwv/src/app/application.js"></script>
+    <script type="text/javascript" src="../static/dwv/src/app/drawController.js"></script>
+    <script type="text/javascript" src="../static/dwv/src/app/infoController.js"></script>
+    <script type="text/javascript" src="../static/dwv/src/app/toolboxController.js"></script>
+    <script type="text/javascript" src="../static/dwv/src/app/viewController.js"></script>
+    <script type="text/javascript" src="../static/dwv/src/app/state.js"></script>
+    <script type="text/javascript" src="../static/dwv/src/dicom/dicomParser.js"></script>
+    <script type="text/javascript" src="../static/dwv/src/dicom/dictionary.js"></script>
+    <script type="text/javascript" src="../static/dwv/src/gui/filter.js"></script>
+    <script type="text/javascript" src="../static/dwv/src/gui/generic.js"></script>
+    <script type="text/javascript" src="../static/dwv/src/gui/help.js"></script>
+    <script type="text/javascript" src="../static/dwv/src/gui/html.js"></script>
+    <script type="text/javascript" src="../static/dwv/src/gui/info.js"></script>
+    <script type="text/javascript" src="../static/dwv/src/gui/layer.js"></script>
+    <script type="text/javascript" src="../static/dwv/src/gui/loader.js"></script>
+    <script type="text/javascript" src="../static/dwv/src/gui/style.js"></script>
+    <script type="text/javascript" src="../static/dwv/src/gui/tools.js"></script>
+    <script type="text/javascript" src="../static/dwv/src/gui/undo.js"></script>
+    <script type="text/javascript" src="../static/dwv/src/image/decoder.js"></script>
+    <script type="text/javascript" src="../static/dwv/src/image/filter.js"></script>
+    <script type="text/javascript" src="../static/dwv/src/image/geometry.js"></script>
+    <script type="text/javascript" src="../static/dwv/src/image/image.js"></script>
+    <script type="text/javascript" src="../static/dwv/src/image/luts.js"></script>
+    <script type="text/javascript" src="../static/dwv/src/image/reader.js"></script>
+    <script type="text/javascript" src="../static/dwv/src/image/view.js"></script>
+    <script type="text/javascript" src="../static/dwv/src/io/file.js"></script>
+    <script type="text/javascript" src="../static/dwv/src/io/url.js"></script>
+    <script type="text/javascript" src="../static/dwv/src/math/matrix.js"></script>
+    <script type="text/javascript" src="../static/dwv/src/math/bucketQueue.js"></script>
+    <script type="text/javascript" src="../static/dwv/src/math/point.js"></script>
+    <script type="text/javascript" src="../static/dwv/src/math/scissors.js"></script>
+    <script type="text/javascript" src="../static/dwv/src/math/shapes.js"></script>
+    <script type="text/javascript" src="../static/dwv/src/math/stats.js"></script>
+    <script type="text/javascript" src="../static/dwv/src/math/vector.js"></script>
+    <script type="text/javascript" src="../static/dwv/src/tools/arrow.js"></script>
+    <script type="text/javascript" src="../static/dwv/src/tools/draw.js"></script>
+    <script type="text/javascript" src="../static/dwv/src/tools/drawCommands.js"></script>
+    <script type="text/javascript" src="../static/dwv/src/tools/editor.js"></script>
+    <script type="text/javascript" src="../static/dwv/src/tools/ellipse.js"></script>
+    <script type="text/javascript" src="../static/dwv/src/tools/filter.js"></script>
+    <script type="text/javascript" src="../static/dwv/src/tools/floodfill.js"></script>
+    <script type="text/javascript" src="../static/dwv/src/tools/freeHand.js"></script>
+    <script type="text/javascript" src="../static/dwv/src/tools/livewire.js"></script>
+    <script type="text/javascript" src="../static/dwv/src/tools/protractor.js"></script>
+    <script type="text/javascript" src="../static/dwv/src/tools/rectangle.js"></script>
+    <script type="text/javascript" src="../static/dwv/src/tools/roi.js"></script>
+    <script type="text/javascript" src="../static/dwv/src/tools/ruler.js"></script>
+    <script type="text/javascript" src="../static/dwv/src/tools/scroll.js"></script>
+    <script type="text/javascript" src="../static/dwv/src/tools/toolbox.js"></script>
+    <script type="text/javascript" src="../static/dwv/src/tools/undo.js"></script>
+    <script type="text/javascript" src="../static/dwv/src/tools/windowLevel.js"></script>
+    <script type="text/javascript" src="../static/dwv/src/tools/zoomPan.js"></script>
+    <script type="text/javascript" src="../static/dwv/src/utils/browser.js"></script>
+    <script type="text/javascript" src="../static/dwv/src/utils/i18n.js"></script>
+    <script type="text/javascript" src="../static/dwv/src/utils/string.js"></script>
+    <script type="text/javascript" src="../static/dwv/src/utils/uri.js"></script>
+    <script type="text/javascript" src="../static/dwv/src/utils/thread.js"></script>
+
+    <!-- Launch the app -->
+    <script type="text/javascript" src="../static/dwv/viewers/static/appgui.js"></script>
+    <script type="text/javascript" src="../static/dwv/viewers/static/applauncher.js"></script>
+</head>
+
+<body>
+
+<!-- DWV -->
+<div id="dwv">
+
+    <div id="pageHeader">
+
+        <!-- Title -->
+        <h1>强本宇康阅片系统</h1>
+
+        <!-- Toolbar -->
+        <div class="toolbar"></div>
+
+    </div><!-- /pageHeader -->
+
+    <div id="pageMain">
+
+        <!-- Open file -->
+        <div class="openData" title="文件">
+            <div id="dicom_read">
+                <div class="loaderlist"></div>
+            </div>
+            <div id="progressbar"></div>
+        </div>
+
+        <!-- Toolbox -->
+        <div class="toolList" title="工具箱"></div>
+
+        <!-- History -->
+        <div class="history" title="历史记录"></div>
+
+        <!-- Tags -->
+        <div class="tags" title="标签"></div>
+
+        <!-- DrawList -->
+        <div class="drawList" title="图层"></div>
+
+        <!-- Help -->
+        <div class="help" title="帮助"></div>
+
+        <!-- Layer Container -->
+        <div class="layerDialog" title="CT图">
+            <div class="dropBox"></div>
+            <div class="layerContainer">
+                <canvas class="imageLayer">Only for HTML5 compatible browsers...</canvas>
+                <div class="drawDiv"></div>
+                <div class="infoLayer">
+                    <div class="infotl"></div>
+                    <div class="infotr"></div>
+                    <div class="infobl"></div>
+                    <div class="infobr">
+                        <div class="plot"></div>
+                    </div>
+                </div><!-- /infoLayer -->
+            </div><!-- /layerContainer -->
+        </div><!-- /layerDialog -->
+
+    </div><!-- /pageMain -->
+
+</div><!-- /dwv -->
+
+</body>
+<style type="text/css">
+    body {
+        background-color: #222;
+        color: white;
+        font-size: 80%;
+    }
+
+    #pageHeader h1 {
+        display: inline-block;
+        margin: 0;
+        color: #fff;
+    }
+
+    #pageHeader a {
+        color: #ddf;
+    }
+
+    #pageHeader .toolbar {
+        display: inline-block;
+        float: right;
+    }
+
+    .toolList ul {
+        padding: 0;
+    }
+
+    .toolList li {
+        list-style-type: none;
+    }
+
+    #pageMain {
+        position: absolute;
+        height: 92%;
+        width: 99%;
+        bottom: 5px;
+        left: 5px;
+        background-color: #333;
+    }
+
+    .infotl {
+        color: #333;
+        text-shadow: 0 1px 0 #fff;
+    }
+
+    .infotr {
+        color: #333;
+        text-shadow: 0 1px 0 #fff;
+    }
+
+    .dropBox {
+        margin: 20px;
+    }
+
+    .ui-icon {
+        zoom: 125%;
+    }
+
+    .tagsTable tr:nth-child(even) {
+        background-color: #333;
+    }
+
+    .drawList tr:nth-child(even) {
+        background-color: #333;
+    }
+
+    button, input, li, table {
+        margin-top: 0.2em;
+    }
+
+    li button, li input {
+        margin: 0;
+    }
+
+    .history_list {
+        width: 100%;
+    }
+</style>
+<script>
+    var dicom_read = document.getElementById('dicom_read').firstElementChild;
+    alert(dicom_read.childElementCount);
+</script>
+</html>

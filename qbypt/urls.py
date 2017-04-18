@@ -167,4 +167,6 @@ urlpatterns = [
     url(r'^project_show/$', views.project_show, name='project_show'),
 
     url(r'^dicom_show/$', views.dicom_show, name='dicom_show'),
+
+    url(r'^data_analyze/$', views.data_analyze, name='data_analyze'),
 ]

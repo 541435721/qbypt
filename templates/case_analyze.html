@@ -1,0 +1,224 @@
+{% extends 'administrator_side.html' %}
+{% load static %}
+{% block title %}案例统计{% endblock %}
+{% block content %}
+    <section id="content">
+        <section class="vbox">
+            <section class="scrollable padder">
+                <ul class="breadcrumb no-border no-radius b-b b-light pull-in">
+                    <li><a href="/"><i class="fa fa-home"></i> 主页</a></li>
+                    <li class="active">案例统计</li>
+                </ul>
+                <script src="{% static 'js/echarts.min.js' %}"></script>
+                <section class="panel panel-default">
+                    <div style="border:0px solid; width:auto; height: auto; overflow:auto;">
+                        <table data-toggle="table"
+                                {#               data-url="/gh/get/response.json/wenzhixin/bootstrap-table/tree/master/docs/data/data1/"#}
+                               data-search="true"
+                               data-sort-name="stargazers_count"
+                               data-sort-order="desc"
+                               data-show-refresh="true"
+                               data-show-toggle="true"
+                               data-show-columns="true">
+                            <thead>
+                            <tr>
+                                <th data-field="project_name" data-sortable="true">
+                                    <div style="font-weight: 900;font-size: medium">项目名</div>
+                                </th>
+                                <th data-field="project_type" data-sortable="true">
+                                    <div style="font-weight: 900;font-size: medium">项目类型</div>
+                                </th>
+                                <th data-field="project_price" data-sortable="true">
+                                    <div style="font-weight: 900;font-size: medium">项目金额</div>
+                                </th>
+                            </tr>
+                            </thead>
+                            {% for foo in data %}
+                                <tr>
+                                    <td>{{ foo.project__project_name }}</td>
+                                    <td>{{ foo.project__classify__classify_name }}</td>
+                                    <td>{{ foo.total_price }}</td>
+                                </tr>
+                            {% endfor %}
+                        </table>
+                        <br>
+                        <table>
+                            <tr>
+                                <td>
+                                    <div id="SVG1" style="width: 600px;height:400px;text-align: center"></div>
+                                </td>
+                                <td>
+                                    <div id="SVG2" style="width: 600px;height:400px;text-align: center"></div>
+                                </td>
+                            </tr>
+                        </table>
+                    </div>
+                </section>
+            </section>
+        </section>
+        <script>
+            var myChart1 = echarts.init(document.getElementById('SVG1'));
+            var myChart2 = echarts.init(document.getElementById('SVG2'));
+            var datas = {{ paras|safe }};
+
+            var classify_count = new Array();
+            var profit_count = new Array();
+            for (var x in datas) {
+                if (!classify_count.hasOwnProperty(datas[x][1])) {
+                    classify_count[datas[x][1]] = 0;
+                }
+                if (!profit_count.hasOwnProperty(datas[x][1])) {
+                    profit_count[datas[x][1]] = 0.0;
+                }
+                classify_count[datas[x][1]] += 1;
+                profit_count[datas[x][1]] += parseFloat(datas[x][2]);
+            }
+            data1 = new Array();
+            data2 = new Array();
+            for (var x in classify_count) {
+                data1.push({value: classify_count[x], name: x});
+            }
+            for (var x in profit_count) {
+                data2.push({value: profit_count[x], name: x});
+            }
+            option1 = {
+                backgroundColor: '#cdcdcd',
+                title: {
+                    text: '病例类型分析',
+                    left: 'center',
+                    top: 20,
+                    textStyle: {
+                        color: '#272822'
+                    }
+                },
+
+                tooltip: {
+                    trigger: 'item',
+                    formatter: "{a} <br/>{b} : {c} ({d}%)"
+                },
+
+                visualMap: {
+                    show: false,
+                    min: 0,
+                    max: 100,
+                    inRange: {
+                        colorLightness: [0, 1]
+                    }
+                },
+                series: [
+                    {
+                        name: '',
+                        type: 'pie',
+                        radius: '55%',
+                        center: ['50%', '50%'],
+                        data: data1.sort(function (a, b) {
+                            return a.value - b.value
+                        }),
+                        roseType: 'angle',
+                        label: {
+                            normal: {
+                                textStyle: {
+                                    color: 'rgba(0, 0, 0, 0.8)'
+                                }
+                            }
+                        },
+                        labelLine: {
+                            normal: {
+                                lineStyle: {
+                                    color: 'rgba(0, 0, 0, 0.3)'
+                                },
+                                smooth: 0.2,
+                                length: 10,
+                                length2: 20
+                            }
+                        },
+                        itemStyle: {
+                            normal: {
+                                color: '#c2c149',
+                                shadowBlur: 200,
+                                shadowColor: 'rgba(0, 0, 0, 0.5)'
+                            }
+                        },
+
+                        animationType: 'scale',
+                        animationEasing: 'elasticOut',
+                        animationDelay: function (idx) {
+                            return Math.random() * 200;
+                        }
+                    }
+                ]
+            };
+            option2 = {
+                backgroundColor: '#cdcdcd',
+
+                title: {
+                    text: '病例利润分析',
+                    left: 'center',
+                    top: 20,
+                    textStyle: {
+                        color: '#272822'
+                    }
+                },
+
+                tooltip: {
+                    trigger: 'item',
+                    formatter: "{a} <br/>{b} : {c} ({d}%)"
+                },
+
+                visualMap: {
+                    show: false,
+                    min: 500,
+                    max: 50000,
+                    inRange: {
+                        colorLightness: [0, 1]
+                    }
+                },
+                series: [
+                    {
+                        name: '访问来源',
+                        type: 'pie',
+                        radius: '55%',
+                        center: ['50%', '50%'],
+                        data: data2.sort(function (a, b) {
+                            return a.value - b.value
+                        }),
+                        roseType: 'angle',
+                        label: {
+                            normal: {
+                                textStyle: {
+                                    color: 'rgba(0, 0, 0, 0.8)'
+                                }
+                            }
+                        },
+                        labelLine: {
+                            normal: {
+                                lineStyle: {
+                                    color: 'rgba(0, 0, 0, 0.3)'
+                                },
+                                smooth: 0.2,
+                                length: 10,
+                                length2: 20
+                            }
+                        },
+                        itemStyle: {
+                            normal: {
+                                color: '#b2c2b3',
+                                shadowBlur: 200,
+                                shadowColor: 'rgba(0, 0, 0, 0.5)'
+                            }
+                        },
+
+                        animationType: 'scale',
+                        animationEasing: 'elasticOut',
+                        animationDelay: function (idx) {
+                            return Math.random() * 200;
+                        }
+                    }
+                ]
+            };
+            myChart1.setOption(option1);
+            myChart2.setOption(option2);
+        </script>
+    </section>
+    <a href="#" class="hide nav-off-screen-block" data-toggle="class:nav-off-screen" data-target="#nav"></a>
+{% endblock %}

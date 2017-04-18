@@ -6,7 +6,10 @@ from django.conf import settings
 import django.contrib.auth as auth
 from django.contrib import messages
 from django.contrib.auth.models import User
+from django.db.models import Sum, Count
+from django.forms.models import model_to_dict
 import json
+from itertools import chain
 import uuid
 from django.utils import timezone
 import os, random
@@ -75,6 +78,8 @@ def login(request):  # 登陆
 
             elif request.user.is_superuser == 0:
                 return redirect('/customer_account_info')
+            else:
+                return redirect('/administrator_project_list')
         else:
             return render(request, 'login.html', {'form': form})
     else:
@@ -1153,7 +1158,7 @@ def administrator_work_order_assess_handle(request):  # 工单审核
 def administrator_order_list(request):  # 管理员订单列表查看
     if not request.user.is_authenticated():
         return redirect('/login')
-    if not request.user.is_superuser == 4:
+    if not request.user.is_superuser >= 1:
         return redirect('/login')
     orders = xmqb_model.Order.objects.all()
     return render(request, 'administrator_order_list.html', {'orders': orders})
@@ -1162,7 +1167,7 @@ def administrator_order_list(request):  # 管理员订单列表查看
 def administrator_order_info(request):  # 管理员订单信息查看
     if not request.user.is_authenticated():
         return redirect('/login')
-    if not request.user.is_superuser == 1:
+    if not request.user.is_superuser >= 1:
         return redirect('/login')
     if request.method == "GET":
         order_id = request.GET['order_id']
@@ -1404,8 +1409,6 @@ def administrator_part_price_alter(request):  # 管理员服务价格修改
             return redirect('/administrator_price_list/')
         else:
             print 'invalid'
-    else:
-        print 'invalid'
     return redirect('/administrator_price_list/')
 
 
@@ -1415,21 +1418,22 @@ def administrator_price_alter(request):  # 管理员订单价格修改
     if not request.user.is_superuser >= 1:
         return redirect('/login')
     if request.method == 'GET':
-        if request.GET['state']:
+        try:
             order_id = request.GET['order_ID']
             state = request.GET['state']
             record = xmqb_model.Order.objects.get(order=order_id)
             record.is_pay = state
             record.save()
             return redirect('/administrator_order_list')
+        except Exception, e:
+            order_id = request.GET['order_ID']
+            old_price = request.GET['order_price']
+            change_price_form = xmqb_form.ChangePriceForm(initial={
+                'old_price': old_price,
+                'order_id': order_id,
+            })
+            return render(request, 'administrator_price_alter.html', {'form': change_price_form})
 
-        order_id = request.GET['order_ID']
-        old_price = request.GET['order_price']
-        change_price_form = xmqb_form.ChangePriceForm(initial={
-            'old_price': old_price,
-            'order_id': order_id,
-        })
-        return render(request, 'administrator_price_alter.html', {'form': change_price_form})
     if request.method == 'POST':
         change_price_form = xmqb_form.ChangePriceForm(request.POST)
         if change_price_form.is_valid():
@@ -1549,3 +1553,34 @@ def contact_us(request):
 
 def dicom_show(request):
     return render(request, 'dicom_show.html')
+
+
+def data_analyze(request):
+    if not request.user.is_authenticated():
+        return redirect('/login')
+    if request.user.is_superuser >= 1:
+        if request.method == "GET":
+            try:
+                types = request.GET['type']
+                data = {'case': [],
+                        'patient': [],
+                        'identity': []}
+                if types == 'case':  # 案例统计
+                    case_record = xmqb_model.Project.objects.all().values('project')
+                    record = xmqb_model.Order.objects.filter(project__in=case_record).values('project__project_name',
+                                                                                             'project__classify__classify_name').annotate(
+                        total_price=Sum('order_price'))
+                    paras = map(
+                        lambda x: [x['project__project_name'], x['project__classify__classify_name'], x['total_price']],
+                        record)
+                    data['case'] = record
+                elif types == 'patient':  # 患者统计
+                    pass
+                elif types == 'identity':  # 机构统计
+                    pass
+                else:
+                    return redirect('/data_analyze?type=case')
+                return render(request, str(types) + '_analyze.html', {'data': data[types], 'paras': json.dumps(paras)})
+            except Exception, e:
+                return HttpResponse(e)
+    return HttpResponse('404')
