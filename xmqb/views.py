@@ -1078,8 +1078,41 @@ def administrator_work_order_handle(request):  # 工单处理
             'patient_address': project.patient_address,
             'remark': project.remark
         })
-        return render(request, 'administrator_work_order_handle.html',
-                      {'form': form, 'project': project, 'parts': parts})
+        try:
+            project_id = workorder.project_id
+            if project_id:
+                project = xmqb_model.Project.objects.get(project=project_id)
+                url = u'' + DOWNLOAD_DIR + '/' + str(project.user.username) + '/' + str(project.classify_id) + '/' + str(
+                    project.project) + '/STL/'
+                url = url.replace('\\', '/')
+                sub_url = u'' + '/download' + '/' + str(project.user.username) + '/' + str(
+                    project.classify_id) + '/' + str(project.project) + '/STL/'
+                sub_url = sub_url.replace('\\', '/')
+                part_url = os.listdir(url)
+                part_name = copy.copy(part_url)
+                index = []
+                for x in xrange(len(part_name)):
+                    part_name[x] = part_name[x][0:-4]
+                    index.append(x + 1)
+                for i in xrange(len(part_url)):
+                    part_url[i] = sub_url + part_url[i]
+                part_name = zip(zip(part_name, index), part_url)
+                project_part = {'name': project.project_name,
+                           'part_name': part_name,
+                           'stl_url': part_url,
+                           'num': len(part_name)
+                                }
+                return render(request, 'administrator_work_order_handle.html',
+                              {'form': form, 'project': project, 'parts': parts, 'project_part': project_part})
+        except Exception, e:
+            print e
+            pass
+            project_id = workorder.project_id
+            if project_id:
+                project = xmqb_model.Project.objects.get(project=project_id)
+                project_part = []
+                return render(request, 'administrator_work_order_handle.html',
+                              {'form': form, 'project': project, 'parts': parts, 'project_part': project_part})
     else:
         workorder.status = 2
         workorder.save()
@@ -1088,20 +1121,26 @@ def administrator_work_order_handle(request):  # 工单处理
 
 def administrator_file_upload(request):
     if request.method == 'GET':
-        project_ID = request.GET['project_ID']
-        project = xmqb_model.Project.objects.get(project=project_ID)
-        part_id = request.GET['part']
-        part = xmqb_model.ProjectPart.objects.get(project=project, part=part_id)
-        return render(request, 'administrator_upload.html', {'project': project, 'part': part})
+        try:
+            project_ID = request.GET['project_ID']
+            project = xmqb_model.Project.objects.get(project=project_ID)
+            # part_id = request.GET['part']
+            # part = xmqb_model.ProjectPart.objects.get(project=project, part=part_id)
+            # return render(request, 'administrator_upload.html', {'project': project, 'part': part})
+            return render(request, 'administrator_upload.html', {'project': project})
+        except Exception,e:
+            print e
+            pass
+            return HttpResponse('上传出错')
     else:
-        project_ID = request.POST['project_ID']
-        part_id = request.POST['id_part']
-        project = xmqb_model.Project.objects.get(project=project_ID)
-        part = xmqb_model.ProjectPart.objects.get(project=project, part=part_id)
+        # project_ID = request.POST['project_ID']
+        # part_id = request.POST['id_part']
+        # project = xmqb_model.Project.objects.get(project=project_ID)
+        # part = xmqb_model.ProjectPart.objects.get(project=project, part=part_id)
         upload_name = request.POST['id_upload_name']
         if len(upload_name) > 0:
-            part.directory = upload_name
-            part.save()
+            # part.directory = upload_name
+            # part.save()
             return render(request, 'administrator_work_order_handle.html', {'method': '1'})
         else:
             return render(request, 'administrator_work_order_handle.html', {'method': '0'})
@@ -1133,6 +1172,43 @@ def administrator_work_order_assess_handle(request):  # 工单审核
             'patient_address': project.patient_address,
             'remark': project.remark
         })
+        try:
+            project_id = workorder.project_id
+            if project_id:
+                project = xmqb_model.Project.objects.get(project=project_id)
+                url = u'' + DOWNLOAD_DIR + '/' + str(project.user.username) + '/' + str(
+                    project.classify_id) + '/' + str(
+                    project.project) + '/STL/'
+                url = url.replace('\\', '/')
+                sub_url = u'' + '/download' + '/' + str(project.user.username) + '/' + str(
+                    project.classify_id) + '/' + str(project.project) + '/STL/'
+                sub_url = sub_url.replace('\\', '/')
+                part_url = os.listdir(url)
+                part_name = copy.copy(part_url)
+                index = []
+                for x in xrange(len(part_name)):
+                    part_name[x] = part_name[x][0:-4]
+                    index.append(x + 1)
+                for i in xrange(len(part_url)):
+                    part_url[i] = sub_url + part_url[i]
+                part_name = zip(zip(part_name, index), part_url)
+                project_part = {'name': project.project_name,
+                                'part_name': part_name,
+                                'stl_url': part_url,
+                                'num': len(part_name)
+                                }
+                print project_part
+                return render(request, 'administrator_work_order_assess_handle.html',
+                              {'form': form, 'project': project, 'parts': parts, 'project_part': project_part})
+        except Exception, e:
+            print e
+            pass
+            project_id = workorder.project_id
+            if project_id:
+                project = xmqb_model.Project.objects.get(project=project_id)
+                project_part = []
+                return render(request, 'administrator_work_order_assess_handle.html',
+                              {'form': form, 'project': project, 'parts': parts, 'project_part': project_part})
         return render(request, 'administrator_work_order_assess_handle.html',
                       {'form': form, 'project': project, 'parts': parts})
     else:
@@ -1529,19 +1605,23 @@ def alipy_notify(request):
             thisorder = xmqb_model.Order.objects.get(order=request.GET['out_trade_no'])
             thisorder.is_pay = True  # 将当前已支付的订单设置为已支付
             thisproject = thisorder.project  # 将当前订单对应的项目设置为已支付状态
-            thisproject.status = '2'
-            # 支付完成生成工单,默认1号为审核员
-            processor = auth.models.User.objects.get(username=1)
-            worker = xmqb_model.Worker.objects.get(worker=processor)
-            workorder = xmqb_model.WorkOrder.objects.create(project=thisproject, order=thisorder,
-                                                            assessor=worker, processor=processor, status=0,
-                                                            plan_complete_time=time.strftime('%Y-%m-%d %H:%M',
-                                                                                             time.localtime(
-                                                                                                 time.time() + 60 * 60 * 24 * 60))
-                                                            )
-            workorder.save()
-            thisorder.save()
-            thisproject.save()
+            if thisproject.status == '1':
+                thisproject.status = '2'
+                # 支付完成生成工单,默认1号为审核员
+                processor = auth.models.User.objects.get(username=1)
+                worker = xmqb_model.Worker.objects.get(worker=processor)
+                workorder = xmqb_model.WorkOrder.objects.create(project=thisproject, order=thisorder,
+                                                                assessor=worker, processor=processor, status=0,
+                                                                plan_complete_time=time.strftime('%Y-%m-%d %H:%M',
+                                                                                                 time.localtime(
+                                                                                                     time.time() + 60 * 60 * 24 * 60))
+                                                                )
+                workorder.save()
+                thisorder.save()
+                thisproject.save()
+
+            else:
+                return redirect('/customer_order_list')
             return redirect('/customer_order_list')
         else:
             return render(request, 'index.html', {'dic': 'failed'})
