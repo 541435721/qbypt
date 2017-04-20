@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+{% load static %}
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>选择上传文件</title>
+    <link rel="stylesheet" href="{% static 'css/app.v2.css' %}" type="text/css"/>
+    <link rel="stylesheet" href="{% static 'css/combo.select.css' %}" type="text/css"/>
+    <link rel="stylesheet" href="{% static 'js/calendar/bootstrap_calendar.css' %}" type="text/css" cache="false"/>
+    <link rel="stylesheet" href="{% static 'css/buttons.css' %}" type="text/css" cache="false"/>
+    <link href="{% static 'css/uploadify.css' %}" type="text/css" rel="stylesheet">
+    <script src="{% static 'js/jquery.js' %}"></script>
+    <script src="{% static 'js/jquery.uploadify.min.js' %}"></script>
+    <script src="{% static 'js/swfobject.js' %}"></script>
+    <script src="{% static 'js/upload_deal.js' %}"></script>
+    <script src="{% static 'js/layer.js' %}"></script>
+
+</head>
+<body>
+<section class="vbox">
+    <section class="scrollable padder" style="padding-left: 20%">
+
+        <div class="col-sm-8">
+    <div class="demo-box">
+        <input id="file_upload2" type="file" name="Filedata">
+        <button class="button button-action button-rounded" onclick="javascript:$('#file_upload2').uploadify('upload','*')">
+            上传文件
+        </button>
+        <div id="file_uploadQueue" class="uploadifyQueue"></div>
+        <p><span id="id_span_msg"></span></p>
+    </div>
+
+
+        </div>
+
+    </section>
+    <div class="text-center">
+<form  method="post">
+        {% csrf_token %}
+        <input type="text" id="id_upload_name" name="id_upload_name" style="display: none" value=""/>
+        <button type="submit" class="btn btn-large btn-primary">提交</button>
+    </form>
+</div>
+</section>
+
+</body>
+</html>
