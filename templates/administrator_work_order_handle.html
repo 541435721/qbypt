@@ -3,6 +3,10 @@
 {% block title %}项目管理{% endblock %}
 {% block content %}
     <script>
+    function download() {
+        alert(111)
+         location.href=encodeURI("/upload/我曹.txt");
+    }
 function chooseParts(parts) {
     document.getElementById('id_part_' + String(parseInt(parts) - 1)).checked = true
     document.getElementById('id_part_' + String(parseInt(parts) - 1)).disabled = 'disabled'
@@ -39,7 +43,7 @@ function disable()
 function administrator_file_upload(project_ID) {
             var index = layer.open({
                 type: 2,
-                area: ['700px', '530px'],
+                area: ['300px', '330px'],
                 fix: false, //不固定
                 maxmin: true,
                 content: '/administrator_file_upload/?project_ID='+project_ID
@@ -103,7 +107,8 @@ function administrator_file_upload(project_ID) {
                             <label>元</label>
                             <br>
                             <label>CT数据下载：</label>
-                            <a href="/download/{{ project.user.username }}/{{ project.classify }}/{{ project.project }}/DICOM/{{ project.upload_name }}">下载</a>
+                            <a href="javascript:download()">测试</a>
+                            <a href="/static/upload/{{ project.user.username }}/{{ project.classify }}/{{ project.project }}/DICOM/{{ project.upload_name }}">下载</a>
                             <br>
 
 {#                            {% for everypart in parts %}#}

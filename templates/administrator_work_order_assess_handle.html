@@ -103,7 +103,7 @@ function administrator_file_upload(project_ID,part) {
                             <label>元</label>
                             <br>
                             <label>CT数据下载：</label>
-                            <a href="/download/{{ project.user.username }}/{{ project.classify }}/{{ project.project }}/DICOM/{{ project.upload_name }}">下载</a>
+                            <a href="/upload/{{ project.user.username }}/{{ project.classify }}/{{ project.project }}/DICOM/{{ project.upload_name }}">下载</a>
                             <br>
 {#                            {% for everypart in parts %}#}
 {#                                <label>{{ everypart.part.part_name }} &nbsp;&nbsp;&nbsp;&nbsp;</label>#}

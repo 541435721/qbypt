@@ -20,11 +20,11 @@ import StringIO
 from xmqb.Helper import Checkcode
 # 支付用api
 from alipay_API import Alipay
-from qbypt.settings import DOWNLOAD_DIR
+from qbypt.settings import UPLOAD_DIR
 import json
 import top.api
 import unicodedata
-
+import urllib
 # Create your views here.
 
 # 创建支付对象，用以生成支付链接
@@ -56,7 +56,9 @@ def login(request):  # 登陆
             user = auth.authenticate(username=username, password=password)
             auth.login(request, user)
             not_read = len(xmqb_model.Message.objects.filter(user_id=request.user.id, is_read=0))
+            pic_dir = xmqb_model.UserInfo.objects.get(user=request.user).pic_dir
             request.session['not_read'] = not_read
+            request.session['pic_dir'] = pic_dir
             print not_read
             if request.user.is_superuser == 1:  # 管理员登录
                 return redirect('/administrator_project_list')
@@ -348,6 +350,20 @@ def customer_file_upload(request):
             return render(request, 'customer_upload.html')
 
 
+def image_upload(request):
+    if request.method == 'POST':
+        upload_name = request.POST['id_upload_name']
+        if len(upload_name) > 0:
+            userInfo = xmqb_model.UserInfo.objects.get(user=request.user)
+            userInfo.pic_dir = upload_name
+            request.session['pic_dir'] = userInfo.pic_dir
+            userInfo.save()
+            return redirect('/customer_account_info/')
+        else:
+            return redirect('/customer_account_info/')
+    else:
+        return render(request, 'image_upload.html')
+
 def customer_project_info(request):  # 用户查看项目
     if not request.user.is_authenticated():
         return redirect('/login')
@@ -467,13 +483,13 @@ def customer_stl_show(request):  # 用户查看3D模型
             project_id = request.GET['project_id']
             if project_id:
                 record = xmqb_model.Project.objects.get(project=project_id)
-                url = u'' + DOWNLOAD_DIR + '/' + str(record.user.username) + '/' + str(record.classify_id) + '/' + str(
+                url = u'' + '/static' + '/upload' + '/' + str(record.user.username) + '/' + str(record.classify_id) + '/' + str(
                     record.project) + '/STL/'
                 url = url.replace('\\', '/')
-                sub_url = u'' + '/download' + '/' + str(record.user.username) + '/' + str(
+                sub_url = u'' + '/static' + '/upload' + '/' + str(record.user.username) + '/' + str(
                     record.classify_id) + '/' + str(record.project) + '/STL/'
                 sub_url = sub_url.replace('\\', '/')
-                part_url = os.listdir(url)
+                part_url = os.listdir(url[1:])
                 part_name = copy.copy(part_url)
                 index = []
                 for x in xrange(len(part_name)):
@@ -501,13 +517,14 @@ def project_show(request):  # 项目展示
             project_id = request.GET['project_id']
             if project_id:
                 record = xmqb_model.Project.objects.get(project=project_id)
-                url = u'' + DOWNLOAD_DIR + '/' + str(record.user.username) + '/' + str(record.classify_id) + '/' + str(
+                url = u'' + '/static' + '/upload' + '/' + str(record.user.username) + '/' + str(
+                    record.classify_id) + '/' + str(
                     record.project) + '/STL/'
                 url = url.replace('\\', '/')
-                sub_url = u'' + '/download' + '/' + str(record.user.username) + '/' + str(
+                sub_url = u'' + '/static' + '/upload' + '/' + str(record.user.username) + '/' + str(
                     record.classify_id) + '/' + str(record.project) + '/STL/'
                 sub_url = sub_url.replace('\\', '/')
-                part_url = os.listdir(url)
+                part_url = os.listdir(url[1:])
                 part_name = copy.copy(part_url)
                 index = []
                 for x in xrange(len(part_name)):
@@ -778,34 +795,54 @@ def uploadify_script(request):  # 前端 uploadify在后台的处理函数，用
 
 @csrf_exempt
 def profile_upload(file, request):  # 处理文件函数，函数之间共享网页传来的参数，传递request就好了想
-    project_ID = request.GET['project_id']
-    classify = request.GET['classify']
-    request.session['classify'] = classify
-    project = xmqb_model.Project.objects.get(project=project_ID)
-    user = project.user
-    sub_dir = 'DICOM'
-    if not request.user.is_superuser:
+    try:
+        project_ID = request.GET['project_id']
+        classify = request.GET['classify']
+        request.session['classify'] = classify
+        project = xmqb_model.Project.objects.get(project=project_ID)
+        user = project.user
         sub_dir = 'DICOM'
+        if not request.user.is_superuser:
+            sub_dir = 'DICOM'
+            user = request.user
+        else:
+            sub_dir = 'STL'
+        if file:  # 如果文件有效
+            path = os.path.join(settings.BASE_DIR, 'static')+ '\\'+ 'upload' + '\\' + str(
+                user.username) + '\\' + classify + '\\' + project_ID + '\\' + sub_dir  # 生成路径
+            if not os.path.exists(path):  # 如果路径不存在 就生成
+                os.makedirs(path)
+            # file_name=str(uuid.uuid1())+".jpg"
+            file_name = file.name
+
+            # fname = os.path.join(settings.MEDIA_ROOT,filename)
+            path_file = os.path.join(path, file_name)  # 将路径和文件名结合
+            fp = open(path_file, 'wb')  # 以二进制方法写文件，生成对象fb
+            for content in file.chunks():  # 将文件分段读取
+                fp.write(content)  # 写入fb
+            fp.close()  # 关闭流
+            return (True, file_name)  # change
+        return (False, 'failed')  # change
+    except Exception, e:
+        print e
         user = request.user
-    else:
-        sub_dir = 'STL'
-    if file:  # 如果文件有效
-        path = os.path.join(settings.BASE_DIR, 'upload') + '\\' + str(
-            user.username) + '\\' + classify + '\\' + project_ID + '\\' + sub_dir  # 生成路径
-        if not os.path.exists(path):  # 如果路径不存在 就生成
-            os.makedirs(path)
-        # file_name=str(uuid.uuid1())+".jpg"
-        file_name = file.name
-
-        # fname = os.path.join(settings.MEDIA_ROOT,filename)
-        path_file = os.path.join(path, file_name)  # 将路径和文件名结合
-        fp = open(path_file, 'wb')  # 以二进制方法写文件，生成对象fb
-        for content in file.chunks():  # 将文件分段读取
-            fp.write(content)  # 写入fb
-        fp.close()  # 关闭流
-        return (True, file_name)  # change
-    return (False, 'failed')  # change
-
+        sub_dir = 'images'
+        if file:  # 如果文件有效
+            path = os.path.join(settings.BASE_DIR, 'static') + '\\' + sub_dir + '\\' + str(
+                user.username)   # 生成路径
+            if not os.path.exists(path):  # 如果路径不存在 就生成
+                os.makedirs(path)
+            # file_name=str(uuid.uuid1())+".jpg"
+            # file_name = 'image'+(file.name)[len(file.name)-4:len(file.name)]
+            file_name = file.name
+            # fname = os.path.join(settings.MEDIA_ROOT,filename)
+            path_file = os.path.join(path, file_name)  # 将路径和文件名结合
+            fp = open(path_file, 'wb')  # 以二进制方法写文件，生成对象fb
+            for content in file.chunks():  # 将文件分段读取
+                fp.write(content)  # 写入fb
+            fp.close()  # 关闭流
+            return (True, file_name)  # change
+        return (False, 'failed')  # change
 
 @csrf_exempt
 def profile_delte(request):  # 删除文件处理
@@ -1077,13 +1114,13 @@ def administrator_work_order_handle(request):  # 工单处理
             project_id = workorder.project_id
             if project_id:
                 project = xmqb_model.Project.objects.get(project=project_id)
-                url = u'' + DOWNLOAD_DIR + '/' + str(project.user.username) + '/' + str(project.classify_id) + '/' + str(
+                url = u'' + '/static' + '/upload' + '/' + str(project.user.username) + '/' + str(project.classify_id) + '/' + str(
                     project.project) + '/STL/'
                 url = url.replace('\\', '/')
-                sub_url = u'' + '/download' + '/' + str(project.user.username) + '/' + str(
+                sub_url = u'' + '/static' + 'upload' + '/' + str(project.user.username) + '/' + str(
                     project.classify_id) + '/' + str(project.project) + '/STL/'
                 sub_url = sub_url.replace('\\', '/')
-                part_url = os.listdir(url)
+                part_url = os.listdir(url[1:])
                 part_name = copy.copy(part_url)
                 index = []
                 for x in xrange(len(part_name)):
@@ -1171,14 +1208,14 @@ def administrator_work_order_assess_handle(request):  # 工单审核
             project_id = workorder.project_id
             if project_id:
                 project = xmqb_model.Project.objects.get(project=project_id)
-                url = u'' + DOWNLOAD_DIR + '/' + str(project.user.username) + '/' + str(
+                url = u'' + '/static' + '/upload' + '/' + str(project.user.username) + '/' + str(
                     project.classify_id) + '/' + str(
                     project.project) + '/STL/'
                 url = url.replace('\\', '/')
-                sub_url = u'' + '/download' + '/' + str(project.user.username) + '/' + str(
+                sub_url = u'' + '/static' + '/upload' + '/' + str(project.user.username) + '/' + str(
                     project.classify_id) + '/' + str(project.project) + '/STL/'
                 sub_url = sub_url.replace('\\', '/')
-                part_url = os.listdir(url)
+                part_url = os.listdir(url[1:])
                 part_name = copy.copy(part_url)
                 index = []
                 for x in xrange(len(part_name)):
@@ -1229,7 +1266,7 @@ def administrator_work_order_assess_handle(request):  # 工单审核
 def administrator_order_list(request):  # 管理员订单列表查看
     if not request.user.is_authenticated():
         return redirect('/login')
-    if not request.user.is_superuser == 4:
+    if not request.user.is_superuser >= 1:
         return redirect('/login')
     orders = xmqb_model.Order.objects.all()
     return render(request, 'administrator_order_list.html', {'orders': orders})
@@ -1238,7 +1275,7 @@ def administrator_order_list(request):  # 管理员订单列表查看
 def administrator_order_info(request):  # 管理员订单信息查看
     if not request.user.is_authenticated():
         return redirect('/login')
-    if not request.user.is_superuser == 1:
+    if not request.user.is_superuser >= 1:
         return redirect('/login')
     if request.method == "GET":
         order_id = request.GET['order_id']
@@ -1491,7 +1528,7 @@ def administrator_price_alter(request):  # 管理员订单价格修改
     if not request.user.is_superuser >= 1:
         return redirect('/login')
     if request.method == 'GET':
-        if request.GET['state']:
+        try:
             order_id = request.GET['order_ID']
             state = request.GET['state']
             record = xmqb_model.Order.objects.get(order=order_id)
@@ -1499,13 +1536,14 @@ def administrator_price_alter(request):  # 管理员订单价格修改
             record.save()
             return redirect('/administrator_order_list')
 
-        order_id = request.GET['order_ID']
-        old_price = request.GET['order_price']
-        change_price_form = xmqb_form.ChangePriceForm(initial={
-            'old_price': old_price,
-            'order_id': order_id,
-        })
-        return render(request, 'administrator_price_alter.html', {'form': change_price_form})
+        except:
+            order_id = request.GET['order_ID']
+            old_price = request.GET['order_price']
+            change_price_form = xmqb_form.ChangePriceForm(initial={
+                'old_price': old_price,
+                'order_id': order_id,
+            })
+            return render(request, 'administrator_price_alter.html', {'form': change_price_form})
     if request.method == 'POST':
         change_price_form = xmqb_form.ChangePriceForm(request.POST)
         if change_price_form.is_valid():

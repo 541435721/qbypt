@@ -7,29 +7,44 @@
     <link rel="stylesheet" href="{% static 'css/app.v2.css' %}" type="text/css"/>
     <link rel="stylesheet" href="{% static 'css/combo.select.css' %}" type="text/css"/>
     <link rel="stylesheet" href="{% static 'js/calendar/bootstrap_calendar.css' %}" type="text/css" cache="false"/>
+    <link rel="stylesheet" href="{% static 'css/buttons.css' %}" type="text/css" cache="false"/>
     <link href="{% static 'css/uploadify.css' %}" type="text/css" rel="stylesheet">
     <script src="{% static 'js/jquery.js' %}"></script>
     <script src="{% static 'js/jquery.uploadify.min.js' %}"></script>
     <script src="{% static 'js/swfobject.js' %}"></script>
     <script src="{% static 'js/upload_deal.js' %}"></script>
     <script src="{% static 'js/layer.js' %}"></script>
-    <script src="{% static 'js/jquery.combo.select.js' %}"></script>
+
 </head>
 <body>
-<div class="demo-box">
-    <input id="file_upload1" type="file" name="Filedata">
-    <div id="file_uploadQueue" class="uploadifyQueue"></div>
-    <a href="javascript:$('#file_upload1').uploadify('upload','*')">上传</a>
-    <p><span id="id_span_msg"></span></p>
+<section class="vbox">
+    <section class="scrollable padder" style="padding-left: 20%">
+
+        <div class="col-sm-8">
+    <div class="demo-box">
+        <input id="file_upload1" type="file" name="Filedata">
+        <button class="button button-action button-rounded" onclick="javascript:$('#file_upload1').uploadify('upload','*')">
+            上传文件
+        </button>
+        <div id="file_uploadQueue" class="uploadifyQueue"></div>
+        <p><span id="id_span_msg"></span></p>
+    </div>
+
+
+        </div>
+
+    </section>
+    <div class="text-center">
+<form action="{% url 'administrator_file_upload' %}" method="post">
+        {% csrf_token %}
+        <input type="text" id="project_ID" name="project_ID" style="display: none" value="{{ project.project }}"/>
+        <input type="text" id="id_classify" name="id_classify" style="display: none" value="{{ project.classify }}"/>
+        <input type="text" id="id_upload_name" name="id_upload_name" style="display: none" value=""/>
+        <button type="submit" class="btn btn-large btn-primary">提交</button>
+
+    </form>
 </div>
-<form  method="post">
-    {% csrf_token %}
-    <input type="text" id="project_ID" name="project_ID" style="display: none" value="{{ project.project }}"/>
-    <input type="text" id="id_classify" name="id_classify" style="display: none" value="{{ project.classify }}"/>
-    <input type="text" id="id_part" name="id_part" style="display: none" value="{{ part.part_id }}"/>
-    <input type="text" id="id_upload_name" name="id_upload_name" style="display: none" value=""/>
-    <button type="submit" class="btn btn-large btn-primary">提交</button>
-</form>
+</section>
 
 </body>
 </html>

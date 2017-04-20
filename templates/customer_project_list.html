@@ -4,7 +4,6 @@
 <script src="{% static 'js/jquery.js' %}"></script>
 {% block title %}查看项目{% endblock %}
 {% block content %}
-
     <section id="content">
         <section class="vbox">
             <section class="scrollable padder">
@@ -158,7 +157,6 @@
         }
         function customer_project_info(project_id) {
             location.href = "/customer_project_info/?project_id=" + project_id;
-
         }
         function upload_file(project_ID) {
             var index = layer.open({
