@@ -556,6 +556,8 @@ def project_show(request):  # 项目展示
 
 
 def customer_order_list(request):  # 用户订单列表
+    if not request.user.is_authenticated:
+        return redirect("/login/")
     orders = xmqb_model.Order.objects.filter(user=request.user)
     pays = []
     for foo in orders:
@@ -569,6 +571,7 @@ def customer_order_list(request):  # 用户订单列表
                         'start_date': foo.start_date,
                         'order_price': foo.order_price,
                         'out_trade_no': foo.order,
+                        'status':foo.project.status
                         }
         if not foo.is_pay and foo.order_price == 0:
             temp_url = {'is_complete': foo.is_complete,
@@ -580,6 +583,7 @@ def customer_order_list(request):  # 用户订单列表
                         'start_date': foo.start_date,
                         'order_price': foo.order_price,
                         'out_trade_no': foo.order,
+                        'status':foo.project.status
                         }
         else:
             temp_url = {'is_complete': foo.is_complete,
@@ -591,6 +595,7 @@ def customer_order_list(request):  # 用户订单列表
                         'start_date': foo.start_date,
                         'order_price': foo.order_price,
                         'out_trade_no': foo.order,
+                        'status':foo.project.status,
                         'url': "/"
                         }
         pays.append(temp_url)
@@ -1639,6 +1644,7 @@ def alipy_notify(request):
             thisorder = xmqb_model.Order.objects.get(order=request.GET['out_trade_no'])
             thisorder.is_pay = True  # 将当前已支付的订单设置为已支付
             thisproject = thisorder.project  # 将当前订单对应的项目设置为已支付状态
+<<<<<<< HEAD
             if thisproject.status == '1':
                 thisproject.status = '2'
                 # 支付完成生成工单,默认1号为审核员
@@ -1656,6 +1662,22 @@ def alipy_notify(request):
 
             else:
                 return redirect('/customer_order_list')
+=======
+            thisorder.pay_date=time.strftime('%Y-%m-%d %H:%M',time.localtime(time.time()))
+            thisproject.status = '2'
+            # 支付完成生成工单,默认1号为审核员
+            processor = auth.models.User.objects.get(username=1)
+            worker = xmqb_model.Worker.objects.get(worker=processor)
+            workorder = xmqb_model.WorkOrder.objects.create(project=thisproject, order=thisorder,
+                                                            assessor=worker, processor=processor, status=0,
+                                                            plan_complete_time=time.strftime('%Y-%m-%d %H:%M',
+                                                                                             time.localtime(
+                                                                                                 time.time() + 60 * 60 * 24 * 60))
+                                                            )
+            workorder.save()
+            thisorder.save()
+            thisproject.save()
+>>>>>>> 225f0dcafbe7dcde329e5521c7bfb29798124d2e
             return redirect('/customer_order_list')
         else:
             return render(request, 'index.html', {'dic': 'failed'})
