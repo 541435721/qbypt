@@ -72,15 +72,10 @@
                                                 已申请发票
                                             {% endif %}
                                         {% else %}
-<<<<<<< HEAD
                                             <a href="/customer_check_pay?out_trade_no={{ foo.out_trade_no }}&total_fee={{ foo.order_price }}"
                                                target="">支付</a>
                                             <a href="/alipy_notify?is_success=T&trade_status=TRADE_SUCCESS&out_trade_no={{ foo.out_trade_no }}">完成支付</a>
 
-=======
-                                            <a href="javascript:check_pay('{{ foo.out_trade_no }}',{{ foo.order_price }},{{ foo.status }})">支付</a>
-{#                                            <a href="/alipy_notify?is_success=T&trade_status=TRADE_SUCCESS&out_trade_no={{ foo.out_trade_no }}">完成支付</a>#}
->>>>>>> 225f0dcafbe7dcde329e5521c7bfb29798124d2e
                                         {% endif %}
                                     </td>
                                 </tr>

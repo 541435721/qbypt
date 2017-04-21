@@ -1462,7 +1462,7 @@ def administrator_coupon_alter(request):  # 管理员优惠券修改
             return redirect('/administrator_coupon_list/')
         else:
             return render(request, 'administrator_coupon_alter.html', {"form": form, "coupon": coupon})
-        return redirect('/administrator_coupon_list/')
+        # return redirect('/administrator_coupon_list/')
 
 
 def administrator_price_list(request):  # 管理员服务价格列表
@@ -1644,25 +1644,6 @@ def alipy_notify(request):
             thisorder = xmqb_model.Order.objects.get(order=request.GET['out_trade_no'])
             thisorder.is_pay = True  # 将当前已支付的订单设置为已支付
             thisproject = thisorder.project  # 将当前订单对应的项目设置为已支付状态
-<<<<<<< HEAD
-            if thisproject.status == '1':
-                thisproject.status = '2'
-                # 支付完成生成工单,默认1号为审核员
-                processor = auth.models.User.objects.get(username=1)
-                worker = xmqb_model.Worker.objects.get(worker=processor)
-                workorder = xmqb_model.WorkOrder.objects.create(project=thisproject, order=thisorder,
-                                                                assessor=worker, processor=processor, status=0,
-                                                                plan_complete_time=time.strftime('%Y-%m-%d %H:%M',
-                                                                                                 time.localtime(
-                                                                                                     time.time() + 60 * 60 * 24 * 60))
-                                                                )
-                workorder.save()
-                thisorder.save()
-                thisproject.save()
-
-            else:
-                return redirect('/customer_order_list')
-=======
             thisorder.pay_date=time.strftime('%Y-%m-%d %H:%M',time.localtime(time.time()))
             thisproject.status = '2'
             # 支付完成生成工单,默认1号为审核员
@@ -1677,7 +1658,6 @@ def alipy_notify(request):
             workorder.save()
             thisorder.save()
             thisproject.save()
->>>>>>> 225f0dcafbe7dcde329e5521c7bfb29798124d2e
             return redirect('/customer_order_list')
         else:
             return render(request, 'index.html', {'dic': 'failed'})
