@@ -23,6 +23,8 @@ import settings
 urlpatterns = [
     url(r'^$', views.index, name='index'),
 
+    # url(r'^static/(?P<path>.*)$', serve, {'document_root': settings.STATIC_DIR, 'show_indexes': False}),
+
     url(r'^login/$', views.login, name='login'),
 
     url(r'^logout/$', logout, {'next_page': '/'}, name='logout'),
@@ -81,7 +83,7 @@ urlpatterns = [
 
     url(r'^profile_upload/$', views.profile_upload, name='profile_upload'),
 
-    url(r'^download/(?P<path>.*)$', serve, {'document_root': settings.DOWNLOAD_DIR, 'show_indexes': False}),
+    # url(r'^upload/(?P<path>.*)$', serve, {'document_root': settings.UPLOAD_DIR, 'show_indexes': False}),
 
     url(r'^administrator_user_info_list/$', views.administrator_user_info_list, name='administrator_user_info_list'),
 
@@ -99,22 +101,17 @@ urlpatterns = [
 
     url(r'^administrator_project_delete/$', views.administrator_project_delete, name='administrator_project_delete'),
 
-    url(r'^administrator_work_order_distribute/$', views.administrator_work_order_distribute,
-        name='administrator_work_order_distribute'),
+    url(r'^administrator_work_order_distribute/$', views.administrator_work_order_distribute,name='administrator_work_order_distribute'),
 
-    url(r'^administrator_work_order_handle_list/$', views.administrator_work_order_handle_list,
-        name='administrator_work_order_handle_list'),
+    url(r'^administrator_work_order_handle_list/$', views.administrator_work_order_handle_list,name='administrator_work_order_handle_list'),
 
-    url(r'^administrator_work_order_handle/$', views.administrator_work_order_handle,
-        name='administrator_work_order_handle'),
+    url(r'^administrator_work_order_handle/$', views.administrator_work_order_handle,name='administrator_work_order_handle'),
 
-    url(r'^administrator_file_upload/$', views.administrator_file_upload, name='administrator_upload.html'),
+    url(r'^administrator_file_upload/$', views.administrator_file_upload, name='administrator_file_upload'),
 
-    url(r'^administrator_work_order_assess_list/$', views.administrator_work_order_assess_list,
-        name='administrator_work_order_assess_list'),
+    url(r'^administrator_work_order_assess_list/$', views.administrator_work_order_assess_list,name='administrator_work_order_assess_list'),
 
-    url(r'^administrator_work_order_assess_handle/$', views.administrator_work_order_assess_handle,
-        name='administrator_work_order_assess_handle'),
+    url(r'^administrator_work_order_assess_handle/$', views.administrator_work_order_assess_handle,name='administrator_work_order_assess_handle'),
 
     url(r'^administrator_order_list/$', views.administrator_order_list, name='administrator_order_list'),
 
@@ -128,8 +125,7 @@ urlpatterns = [
 
     url(r'^administrator_invoice_create/$', views.administrator_invoice_create, name='administrator_invoice_create'),
 
-    url(r'^administrator_coupon_distribute/$', views.administrator_coupon_distribute,
-        name='administrator_coupon_distribute'),
+    url(r'^administrator_coupon_distribute/$', views.administrator_coupon_distribute,name='administrator_coupon_distribute'),
 
     url(r'^administrator_coupon_list/$', views.administrator_coupon_list, name='administrator_coupon_list'),
 
@@ -141,8 +137,7 @@ urlpatterns = [
 
     url(r'^administrator_price_new/$', views.administrator_price_new, name='administrator_price_new'),
 
-    url(r'^administrator_part_price_alter/$', views.administrator_part_price_alter,
-        name='administrator_part_price_alter'),
+    url(r'^administrator_part_price_alter/$', views.administrator_part_price_alter,name='administrator_part_price_alter'),
 
     url(r'^administrator_price_alter/$', views.administrator_price_alter, name='administrator_price_alter'),
 
@@ -168,5 +163,5 @@ urlpatterns = [
 
     url(r'^dicom_show/$', views.dicom_show, name='dicom_show'),
 
-    url(r'^data_analyze/$', views.data_analyze, name='data_analyze'),
+    url(r'^image_upload/$', views.image_upload, name='image_upload'),
 ]

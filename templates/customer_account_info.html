@@ -2,14 +2,6 @@
 {% load static %}
 {% block title %}个人中心{% endblock %}
 {% block content %}
-    {% if method == '1' %}
-        <script>
-            parent.location.reload();
-            var index = parent.layer.getFrameIndex(window.name); //先得到当前iframe层的索引
-            parent.layer.close(index);
-        </script>
-    {% endif %}
-
     <section id="content">
         <section class="vbox">
             <section class="scrollable padder">
@@ -26,8 +18,23 @@
                         <header class="panel-heading font-bold">账号信息</header>
                         <div class="col-sm-5 col-md-2 padder-v b-light">
                                     <span
-                                            class="thumb-lg avatar pull-left "> <img
-                                            src="../../../static/images/avatar.jpg"> </span>
+                                            class="thumb-lg avatar pull-left ">
+                                        {% if user_info.pic_dir %}
+                                        <img
+                                            src="../../static/images/{{ request.user }}/{{ user_info.pic_dir }}" style="height: 125px;" >
+                                            {% else %}
+                                            <img
+                                            src="../../static/images/avatar_default.jpg" style="height: 125px;" >
+                                        {% endif %}
+                                    <br>
+                                        <div class="text-center">
+                                            <a  href="javascript:upload_file()">上传头像</a>
+                                        </div>
+
+                                    </span>
+
+
+
 
                         </div>
                         <div class="col-sm-8 col-md-4 padder-v b-light">
@@ -89,6 +96,25 @@
         <a href="#" class="hide nav-off-screen-block" data-toggle="class:nav-off-screen" data-target="#nav"></a>
     </section>
     <script>
+     try {
+            var index = parent.layer.getFrameIndex(window.name);
+            if (index) {
+                parent.location.reload();
+                parent.layer.close(index);
+            }
+        } catch (err) {
+
+        }
+     function upload_file() {
+            var index = layer.open({
+                type: 2,
+                area: ['300px', '330px'],
+                fix: false, //不固定
+                maxmin: true,
+                content: '/image_upload/'
+            });
+        }
+
         function Change_password() {
             var index = layer.open({
                 type: 2,
