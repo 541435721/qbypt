@@ -20,61 +20,58 @@
                             <header class="panel-heading"><span class="h4" style="font-family: 微软雅黑">新建项目</span>
                             </header>
 
-                            <div class="panel-body">
-                                {% csrf_token %}
-                                <fieldset>
-                                    <div class="panel-body">
-                                        <div class="form-group pull-in clearfix">
-                                            {% for field in form.visible_fields %}
-                                                <div class="form-group{% if field.errors %} has-error{% endif %}">
-                                                    <label for="{{ field.label }}">{{ field.label }}</label>
-                                                    {% if field.name == 'upload_name' %}
-                                                        <div style="display: none;">{{ field }}</div>
-                                                    {% else %}
-                                                        {{ field }}
-                                                    {% endif %}
-                                                    {% if field.help_text %}
-                                                        <span class="help-block">{{ field.help_text|safe }}</span>
-                                                    {% endif %}
-                                                    {% for error in field.errors %}
-                                                        <label class="control-label">{{ error }}</label>
-                                                    {% endfor %}
-                                                </div>
-                                            {% endfor %}
-                                            {% for field in form.visible_fields %}
-                                                {% for error in field.errors %}
-                                                {% endfor %}
-                                            {% endfor %}
-                                            {% for everypart in part %}
-                                                <script>choose_checkbox({{ everypart.part }}, {{ everypart.classify }})</script>
-                                                <script>part_price({{ everypart.part }}, {{ everypart.part_price }})</script>
-                                            {% endfor %}
+                    <div class="panel-body">
+                        {% csrf_token %}
+                        <fieldset>
+                        <div class="panel-body">
+                        <div class="form-group pull-in clearfix">
+                            {% for field in form.visible_fields %}
+                                <div class="form-group{% if field.errors %} has-error{% endif %}">
+                                    <label for="{{ field.label }}">{{ field.label }}</label>
+                                    {% if field.name == 'upload_name' %}
+                                        <div style="display: none;">{{ field }}</div>
+                                    {% else %}
+                                        {{ field }}
+                                    {% endif %}
+                                    {% if field.help_text %}
+                                        <span class="help-block">{{ field.help_text|safe }}</span>
+                                    {% endif %}
+                                    {% for error in field.errors %}
+                                        <label class="control-label">{{ error }}</label>
+                                    {% endfor %}
+                                </div>
+                            {% endfor %}
+                            {% for field in form.visible_fields %}
+                                {% for error in field.errors %}
+                                {% endfor %}
+                            {% endfor %}
+                            {% for everypart in part %}
+                                <script>choose_checkbox({{ everypart.part }}, {{ everypart.classify }})</script>
+                                <script>part_price({{ everypart.part }}, {{ everypart.part_price }})</script>
+                            {% endfor %}
 
-                                            {% for relation in part_relation %}
-                                                <script> checkbox_relation({{ relation.part_son }}, {{ relation.part_father_id }})</script>
-                                            {% endfor %}
+                            {% for relation in part_relation %}
+                                <script> checkbox_relation({{ relation.part_son }}, {{ relation.part_father_id }})</script>
+                            {% endfor %}
 
-                                            <select name="coupon" id="coupons" onchange="javascript:change_coupon()">
-                                                <option value="0" rest_amount="0">不使用优惠券</option>
-                                                {% for coupon in coupons %}
-                                                    <option mytype="{{ coupon.type.classify }}"
-                                                            rest_amount="{{ coupon.rest_amount }}"
-                                                            value="{{ coupon.coupon }}">
-                                                        余额：{{ coupon.rest_amount }}</option>
-                                                {% endfor %}
-                                                <script>
-                                                    choose_coupon({{ coupon.type }})
-                                                </script>
-                                            </select>
+                            <select name="coupon" id="coupons" onchange="javascript:change_coupon()">
+                              <option value ="0" rest_amount="0">不使用优惠券</option>
+                                {% for coupon in coupons %}
+                              <option mytype="{{ coupon.type.classify }}"  rest_amount = "{{ coupon.rest_amount }}" value ="{{ coupon.coupon }}">余额：{{ coupon.rest_amount }}</option>
+                                {% endfor %}
+                            <script>
+                                        choose_coupon({{ coupon.type }})
+                                    </script>
+                            </select>
 
-                                            <label>所需费用为：</label>
-                                            <span id="price" label="0">0</span>
-                                            <label>元</label>
+                            <label>所需费用为：</label>
+                            <span id="price" label="0">0</span>
+                            <label>元</label>
 
-                                        </div>
-                                    </div>
-                                </fieldset>
-                                <footer class="panel-footer text-right bg-light lter">
+                        </div>
+                        </div>
+                        </fieldset>
+                    <footer class="panel-footer text-right bg-light lter">
 
                                     <button type="submit" class="btn btn-success btn-s-xs">提交资料</button>
                                 </footer>
