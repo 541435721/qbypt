@@ -1115,6 +1115,9 @@ def administrator_work_order_handle(request):  # 工单处理
             'patient_address': project.patient_address,
             'remark': project.remark
         })
+
+
+
         try:
             project_id = workorder.project_id
             if project_id:
@@ -1150,6 +1153,8 @@ def administrator_work_order_handle(request):  # 工单处理
                 project_part = []
                 return render(request, 'administrator_work_order_handle.html',
                               {'form': form, 'project': project, 'parts': parts, 'project_part': project_part})
+
+
     else:
         workorder.status = 2
         workorder.save()
@@ -1209,6 +1214,9 @@ def administrator_work_order_assess_handle(request):  # 工单审核
             'patient_address': project.patient_address,
             'remark': project.remark
         })
+
+ 
+
         try:
             project_id = workorder.project_id
             if project_id:
@@ -1246,6 +1254,9 @@ def administrator_work_order_assess_handle(request):  # 工单审核
                 project_part = []
                 return render(request, 'administrator_work_order_assess_handle.html',
                               {'form': form, 'project': project, 'parts': parts, 'project_part': project_part})
+
+
+
         return render(request, 'administrator_work_order_assess_handle.html',
                       {'form': form, 'project': project, 'parts': parts})
     else:
@@ -1549,6 +1560,18 @@ def administrator_price_alter(request):  # 管理员订单价格修改
                 'order_id': order_id,
             })
             return render(request, 'administrator_price_alter.html', {'form': change_price_form})
+
+
+
+        except:
+            order_id = request.GET['order_ID']
+            old_price = request.GET['order_price']
+            change_price_form = xmqb_form.ChangePriceForm(initial={
+                'old_price': old_price,
+                'order_id': order_id,
+            })
+            return render(request, 'administrator_price_alter.html', {'form': change_price_form})
+
     if request.method == 'POST':
         change_price_form = xmqb_form.ChangePriceForm(request.POST)
         if change_price_form.is_valid():

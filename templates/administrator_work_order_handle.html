@@ -1,12 +1,6 @@
 <script src="../static/js/jquery.js"></script>
-{% extends 'administrator_side.html' %}
-{% block title %}项目管理{% endblock %}
-{% block content %}
-    <script>
-    function download() {
-        alert(111)
-         location.href=encodeURI("/upload/我曹.txt");
-    }
+<script>
+
 function chooseParts(parts) {
     document.getElementById('id_part_' + String(parseInt(parts) - 1)).checked = true
     document.getElementById('id_part_' + String(parseInt(parts) - 1)).disabled = 'disabled'
@@ -50,6 +44,9 @@ function administrator_file_upload(project_ID) {
             });
         }
     </script>
+{% extends 'administrator_side.html' %}
+{% block title %}项目管理{% endblock %}
+{% block content %}
     <section id="content">
         <section class="vbox">
             <section class="scrollable padder">
@@ -108,7 +105,8 @@ function administrator_file_upload(project_ID) {
                             <br>
                             <label>CT数据下载：</label>
                             <a href="javascript:download()">测试</a>
-                            <a href="/static/upload/{{ project.user.username }}/{{ project.classify }}/{{ project.project }}/DICOM/{{ project.upload_name }}">下载</a>
+                            <a href="/static/upload/{{ project.user.username }}/{{ project.classify }}/{{ project.project }}/DICOM/{{project.upload_name}}">下载</a>
+
                             <br>
 
 {#                            {% for everypart in parts %}#}

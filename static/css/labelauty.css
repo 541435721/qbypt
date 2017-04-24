@@ -1,0 +1,42 @@
+﻿.rdolist, .chklist {
+    display: none;
+}
+
+.rdobox, .chkbox {
+    display: inline-block;
+    padding: 5px;
+
+    height: 30px;
+    width: 75px;
+    background: #eee;
+    border-radius: 10px;
+    color: #666;
+    font-family: "微软雅黑 Light";
+}
+
+.check-image {
+    display: inline-block;
+    width: 16px;
+    height: 16px;
+    margin-top: -4px;
+    background: url(images/input-unchecked.png) no-repeat;
+    vertical-align: middle;
+}
+
+.unchecked {
+    background: #ECF0F1;
+    color: #666;
+    transition-property: background;
+    transition-delay: 0s;
+    transition-duration: .1s;
+    transition-timing-function: linear;
+}
+
+    .unchecked:hover {
+        background: #dedfe0;
+    }
+
+.checked {
+    background: #3498DB;
+    color: #fff;
+}

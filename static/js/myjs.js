@@ -37,7 +37,16 @@ var color = new Array(
     '#A52A2A',
     '#008000',
     '#FF8C00',
-    '#0000FF');
+    '#0000FF',
+    '#00ffff',
+    '#00008b',
+    '#e9967a',
+    '#1e90ff',
+    '#ff00ff',
+    '#ffa500',
+    '#4682b4',
+    '#9acd32'
+);
 
 // new added
 var labels = new Array();
@@ -142,43 +151,58 @@ function onWindowResize() {
     controls.handleResize();
 }
 
-function show_single_stl(path, id) {
-    var loader = new THREE.STLLoader();
-    var mesh;
+function show_single_stl(path, id, opa) {
+    var loader = new THREE.STLLoader();         // new 一个load加载对象
+    var mesh;                                   // 申明一个mesh变量
     //var index = layer.load(1, {
     //    shade: [0.1, '#fff'] //0.1透明度的白色背景
     //});
 
 
     loader.load(path, function (geo) {
-        geo.center();
-        var num = path.lastIndexOf(".stl");
+        if(scene.children.length-7 == 0){
+            offset = geo.center();
+        }// loader的初始化
+        else {
+            try {
+                geo.translate(offset.x, offset.y, offset.z);
+            } catch (e) {
+                alert(e);
+            }
+
+            //alert(id + " " + offset.x + " " + offset.y + " " + offset.z);
+        }
+                                   // 将其放入最中间位置
+        var num = path.lastIndexOf(".stl");     // 读取是第几个stl
         //var p = document.getElementById('dis' + path.substring(path.lastIndexOf("/") + 1, num));
         //p.innerHTML = "X:" + calculateSize(geo)[0] + " Y:" + calculateSize(geo)[1] + " Z:" + calculateSize(geo)[2];
 
-        var material = new THREE.MeshPhongMaterial({
+        var material = new THREE.MeshPhongMaterial({        //加载材料
             // color: color[c],
             specular: 0x001111,
-            shininess: 100,
-            wireframe: false
+            shininess: 80,
+            wireframe: false,
+            //side: THREE.doubleSided,
+            transparent: true,
+            opacity: opa,
         });
-        if (labels[id - 1] == 1) {
-            material.color = new THREE.Color(COLORS[id - 1]);
-        } else {
-            // material.color = new THREE.Color(color[c]);
-        }
-        material.color = new THREE.Color(color[id % color.length]);
-        mesh = new THREE.Mesh(geo, material);
+        // if (labels[id - 1] == 1) {
+        //     material.color = new THREE.Color(COLORS[id - 1]);
+        // } else {
+        //     // material.color = new THREE.Color(color[c]);
+        // }
+        material.color = new THREE.Color(color[id % color.length]);     //加载不通的颜色
+        mesh = new THREE.Mesh(geo, material);               //合并成一个mesh
 
 
         mesh.position.set(0, 0, 0);
-        mesh.rotation.set(mesh_r_x, mesh_r_y, mesh_r_z);
-        mesh.scale.set(0.2, 0.2, 0.2);
+        mesh.rotation.set(mesh_r_x, mesh_r_y, mesh_r_z);  //加载位置设置
+        mesh.scale.set(0.2, 0.2, 0.2);                  // 加载的大小设置
 
-        mesh.castShadow = true;
+        mesh.castShadow = true;             //阴影
         mesh.receiveShadow = true;
-        mesh.name = 'actor' + id;
-        scene.add(mesh);
+        mesh.name = 'actor' + id;           //定义名字
+        scene.add(mesh);                       //场景加入mesh
         //layer.close(index);
     });
 
@@ -228,6 +252,7 @@ function show_all_stl(path, id, opa) {
         mesh.castShadow = true;
         mesh.receiveShadow = true;
         mesh.name = 'actor' + (parseInt(id) + 1);
+
         scene.add(mesh);
         // for (var i = 1; i <= 8; i++) {
         //     document.getElementById('a' + i).removeAttribute('disabled');

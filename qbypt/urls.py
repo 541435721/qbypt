@@ -109,9 +109,10 @@ urlpatterns = [
 
     url(r'^administrator_file_upload/$', views.administrator_file_upload, name='administrator_file_upload'),
 
-    url(r'^administrator_work_order_assess_list/$', views.administrator_work_order_assess_list,name='administrator_work_order_assess_list'),
+    url(r'^administrator_work_order_assess_list/$', views.administrator_work_order_assess_list, name='administrator_work_order_assess_list'),
 
-    url(r'^administrator_work_order_assess_handle/$', views.administrator_work_order_assess_handle,name='administrator_work_order_assess_handle'),
+    url(r'^administrator_work_order_assess_handle/$', views.administrator_work_order_assess_handle, name='administrator_work_order_assess_handle'),
+
 
     url(r'^administrator_order_list/$', views.administrator_order_list, name='administrator_order_list'),
 
@@ -163,5 +164,9 @@ urlpatterns = [
 
     url(r'^dicom_show/$', views.dicom_show, name='dicom_show'),
 
+ 
     url(r'^image_upload/$', views.image_upload, name='image_upload'),
+
+    url(r'^data_analyze/$', views.data_analyze, name='data_analyze'),
+
 ]
