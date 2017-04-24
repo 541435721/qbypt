@@ -170,5 +170,9 @@ urlpatterns = [
 
     url(r'^dicom_show/$', views.dicom_show, name='dicom_show'),
 
+ 
     url(r'^image_upload/$', views.image_upload, name='image_upload'),
+
+    url(r'^data_analyze/$', views.data_analyze, name='data_analyze'),
+ 
 ]

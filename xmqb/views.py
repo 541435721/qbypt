@@ -6,7 +6,10 @@ from django.conf import settings
 import django.contrib.auth as auth
 from django.contrib import messages
 from django.contrib.auth.models import User
+from django.db.models import Sum, Count
+from django.forms.models import model_to_dict
 import json
+from itertools import chain
 import uuid
 from django.utils import timezone
 import os, random
@@ -77,6 +80,8 @@ def login(request):  # 登陆
 
             elif request.user.is_superuser == 0:
                 return redirect('/customer_account_info')
+            else:
+                return redirect('/administrator_project_list')
         else:
             return render(request, 'login.html', {'form': form})
     else:
@@ -1110,6 +1115,7 @@ def administrator_work_order_handle(request):  # 工单处理
             'patient_address': project.patient_address,
             'remark': project.remark
         })
+
         try:
             project_id = workorder.project_id
             if project_id:
@@ -1145,6 +1151,7 @@ def administrator_work_order_handle(request):  # 工单处理
                 project_part = []
                 return render(request, 'administrator_work_order_handle.html',
                               {'form': form, 'project': project, 'parts': parts, 'project_part': project_part})
+
     else:
         workorder.status = 2
         workorder.save()
@@ -1153,26 +1160,20 @@ def administrator_work_order_handle(request):  # 工单处理
 
 def administrator_file_upload(request):
     if request.method == 'GET':
-        try:
-            project_ID = request.GET['project_ID']
-            project = xmqb_model.Project.objects.get(project=project_ID)
-            # part_id = request.GET['part']
-            # part = xmqb_model.ProjectPart.objects.get(project=project, part=part_id)
-            # return render(request, 'administrator_upload.html', {'project': project, 'part': part})
-            return render(request, 'administrator_upload.html', {'project': project})
-        except Exception,e:
-            print e
-            pass
-            return HttpResponse('上传出错')
+        project_ID = request.GET['project_ID']
+        project = xmqb_model.Project.objects.get(project=project_ID)
+        part_id = request.GET['part']
+        part = xmqb_model.ProjectPart.objects.get(project=project, part=part_id)
+        return render(request, 'administrator_upload.html', {'project': project, 'part': part})
     else:
-        # project_ID = request.POST['project_ID']
-        # part_id = request.POST['id_part']
-        # project = xmqb_model.Project.objects.get(project=project_ID)
-        # part = xmqb_model.ProjectPart.objects.get(project=project, part=part_id)
+        project_ID = request.POST['project_ID']
+        part_id = request.POST['id_part']
+        project = xmqb_model.Project.objects.get(project=project_ID)
+        part = xmqb_model.ProjectPart.objects.get(project=project, part=part_id)
         upload_name = request.POST['id_upload_name']
         if len(upload_name) > 0:
-            # part.directory = upload_name
-            # part.save()
+            part.directory = upload_name
+            part.save()
             return render(request, 'administrator_work_order_handle.html', {'method': '1'})
         else:
             return render(request, 'administrator_work_order_handle.html', {'method': '0'})
@@ -1204,6 +1205,7 @@ def administrator_work_order_assess_handle(request):  # 工单审核
             'patient_address': project.patient_address,
             'remark': project.remark
         })
+ 
         try:
             project_id = workorder.project_id
             if project_id:
@@ -1241,6 +1243,7 @@ def administrator_work_order_assess_handle(request):  # 工单审核
                 project_part = []
                 return render(request, 'administrator_work_order_assess_handle.html',
                               {'form': form, 'project': project, 'parts': parts, 'project_part': project_part})
+
         return render(request, 'administrator_work_order_assess_handle.html',
                       {'form': form, 'project': project, 'parts': parts})
     else:
@@ -1517,8 +1520,6 @@ def administrator_part_price_alter(request):  # 管理员服务价格修改
             return redirect('/administrator_price_list/')
         else:
             print 'invalid'
-    else:
-        print 'invalid'
     return redirect('/administrator_price_list/')
 
 
@@ -1535,6 +1536,15 @@ def administrator_price_alter(request):  # 管理员订单价格修改
             record.is_pay = state
             record.save()
             return redirect('/administrator_order_list')
+        except Exception, e:
+            order_id = request.GET['order_ID']
+            old_price = request.GET['order_price']
+            change_price_form = xmqb_form.ChangePriceForm(initial={
+                'old_price': old_price,
+                'order_id': order_id,
+            })
+            return render(request, 'administrator_price_alter.html', {'form': change_price_form})
+
 
         except:
             order_id = request.GET['order_ID']
@@ -1544,6 +1554,7 @@ def administrator_price_alter(request):  # 管理员订单价格修改
                 'order_id': order_id,
             })
             return render(request, 'administrator_price_alter.html', {'form': change_price_form})
+
     if request.method == 'POST':
         change_price_form = xmqb_form.ChangePriceForm(request.POST)
         if change_price_form.is_valid():
@@ -1639,23 +1650,19 @@ def alipy_notify(request):
             thisorder = xmqb_model.Order.objects.get(order=request.GET['out_trade_no'])
             thisorder.is_pay = True  # 将当前已支付的订单设置为已支付
             thisproject = thisorder.project  # 将当前订单对应的项目设置为已支付状态
-            if thisproject.status == '1':
-                thisproject.status = '2'
-                # 支付完成生成工单,默认1号为审核员
-                processor = auth.models.User.objects.get(username=1)
-                worker = xmqb_model.Worker.objects.get(worker=processor)
-                workorder = xmqb_model.WorkOrder.objects.create(project=thisproject, order=thisorder,
-                                                                assessor=worker, processor=processor, status=0,
-                                                                plan_complete_time=time.strftime('%Y-%m-%d %H:%M',
-                                                                                                 time.localtime(
-                                                                                                     time.time() + 60 * 60 * 24 * 60))
-                                                                )
-                workorder.save()
-                thisorder.save()
-                thisproject.save()
-
-            else:
-                return redirect('/customer_order_list')
+            thisproject.status = '2'
+            # 支付完成生成工单,默认1号为审核员
+            processor = auth.models.User.objects.get(username=1)
+            worker = xmqb_model.Worker.objects.get(worker=processor)
+            workorder = xmqb_model.WorkOrder.objects.create(project=thisproject, order=thisorder,
+                                                            assessor=worker, processor=processor, status=0,
+                                                            plan_complete_time=time.strftime('%Y-%m-%d %H:%M',
+                                                                                             time.localtime(
+                                                                                                 time.time() + 60 * 60 * 24 * 60))
+                                                            )
+            workorder.save()
+            thisorder.save()
+            thisproject.save()
             return redirect('/customer_order_list')
         else:
             return render(request, 'index.html', {'dic': 'failed'})
@@ -1667,3 +1674,34 @@ def contact_us(request):
 
 def dicom_show(request):
     return render(request, 'dicom_show.html')
+
+
+def data_analyze(request):
+    if not request.user.is_authenticated():
+        return redirect('/login')
+    if request.user.is_superuser >= 1:
+        if request.method == "GET":
+            try:
+                types = request.GET['type']
+                data = {'case': [],
+                        'patient': [],
+                        'identity': []}
+                if types == 'case':  # 案例统计
+                    case_record = xmqb_model.Project.objects.all().values('project')
+                    record = xmqb_model.Order.objects.filter(project__in=case_record).values('project__project_name',
+                                                                                             'project__classify__classify_name').annotate(
+                        total_price=Sum('order_price'))
+                    paras = map(
+                        lambda x: [x['project__project_name'], x['project__classify__classify_name'], x['total_price']],
+                        record)
+                    data['case'] = record
+                elif types == 'patient':  # 患者统计
+                    pass
+                elif types == 'identity':  # 机构统计
+                    pass
+                else:
+                    return redirect('/data_analyze?type=case')
+                return render(request, str(types) + '_analyze.html', {'data': data[types], 'paras': json.dumps(paras)})
+            except Exception, e:
+                return HttpResponse(e)
+    return HttpResponse('404')

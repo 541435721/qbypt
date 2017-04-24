@@ -105,26 +105,18 @@ function administrator_file_upload(project_ID,part) {
                             <label>CT数据下载：</label>
                             <a href="/upload/{{ project.user.username }}/{{ project.classify }}/{{ project.project }}/DICOM/{{ project.upload_name }}">下载</a>
                             <br>
-{#                            {% for everypart in parts %}#}
-{#                                <label>{{ everypart.part.part_name }} &nbsp;&nbsp;&nbsp;&nbsp;</label>#}
-{#                                <label>#}
-{#                                {% if not everypart.directory%}#}
-{#                                    未上传&nbsp;&nbsp;#}
-{#                                    {% else %}#}
-{#                                    {{ everypart.directory }}&nbsp;&nbsp;&nbsp;#}
-{#                                {% endif %}#}
-{#                                </label>#}
-{#                                <a href="/download/{{ project.user.username }}/{{ project.classify }}/{{ project.project }}/STL/{{ everypart.directory}}">下载</a>#}
-{#                                <br>#}
-{#                            {% endfor %}#}
-                        {% if project_part %}
-                        {% for part in project_part.part_name %}
-                            <br>
-                            <label>{{ part.0.0 }}</label> <a href="{{ part.1 }}">下载</a>
-                        {% endfor%}
-                            {% else %}
-                            <label>未上传任何文件</label>
-                        {% endif %}
+                            {% for everypart in parts %}
+                                <label>{{ everypart.part.part_name }} &nbsp;&nbsp;&nbsp;&nbsp;</label>
+                                <label>
+                                {% if not everypart.directory%}
+                                    未上传&nbsp;&nbsp;
+                                    {% else %}
+                                    {{ everypart.directory }}&nbsp;&nbsp;&nbsp;
+                                {% endif %}
+                                </label>
+                                <a href="/download/{{ project.user.username }}/{{ project.classify }}/{{ project.project }}/STL/{{ everypart.directory}}">下载</a>
+                                <br>
+                            {% endfor %}
                         <br>
                                 <a href="/customer_stl_show/?project_id={{ project.project }}" target="_blank">查看三维模型</a>
                         <br>
