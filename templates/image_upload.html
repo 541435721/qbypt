@@ -22,8 +22,8 @@
 
         <div class="col-sm-8">
     <div class="demo-box">
-        <input id="file_upload1" type="file" name="Filedata">
-        <button class="button button-action button-rounded" onclick="javascript:$('#file_upload1').uploadify('upload','*')">
+        <input id="file_upload2" type="file" name="Filedata">
+        <button class="button button-action button-rounded" onclick="javascript:$('#file_upload2').uploadify('upload','*')">
             上传文件
         </button>
         <div id="file_uploadQueue" class="uploadifyQueue"></div>
@@ -35,13 +35,10 @@
 
     </section>
     <div class="text-center">
-<form action="{% url 'administrator_file_upload' %}" method="post">
+<form  method="post">
         {% csrf_token %}
-        <input type="text" id="project_ID" name="project_ID" style="display: none" value="{{ project.project }}"/>
-        <input type="text" id="id_classify" name="id_classify" style="display: none" value="{{ project.classify }}"/>
         <input type="text" id="id_upload_name" name="id_upload_name" style="display: none" value=""/>
         <button type="submit" class="btn btn-large btn-primary">提交</button>
-
     </form>
 </div>
 </section>

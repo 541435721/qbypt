@@ -23,6 +23,8 @@ import settings
 urlpatterns = [
     url(r'^$', views.index, name='index'),
 
+    # url(r'^static/(?P<path>.*)$', serve, {'document_root': settings.STATIC_DIR, 'show_indexes': False}),
+
     url(r'^login/$', views.login, name='login'),
 
     url(r'^logout/$', logout, {'next_page': '/'}, name='logout'),
@@ -81,7 +83,7 @@ urlpatterns = [
 
     url(r'^profile_upload/$', views.profile_upload, name='profile_upload'),
 
-    url(r'^download/(?P<path>.*)$', serve, {'document_root': settings.DOWNLOAD_DIR, 'show_indexes': False}),
+    # url(r'^upload/(?P<path>.*)$', serve, {'document_root': settings.UPLOAD_DIR, 'show_indexes': False}),
 
     url(r'^administrator_user_info_list/$', views.administrator_user_info_list, name='administrator_user_info_list'),
 
@@ -168,5 +170,9 @@ urlpatterns = [
 
     url(r'^dicom_show/$', views.dicom_show, name='dicom_show'),
 
+ 
+    url(r'^image_upload/$', views.image_upload, name='image_upload'),
+
     url(r'^data_analyze/$', views.data_analyze, name='data_analyze'),
+ 
 ]

@@ -24,7 +24,9 @@ SECRET_KEY = 'nao11td_3vvno#3vd80w@mcz8&d(j)t022i4pl4^%xwdkm36ya'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = [
+    '127.0.0.1',
+]
 
 # Application definition
 
@@ -123,4 +125,6 @@ STATIC_URL = '/static/'
 STATICFILES_DIRS = (
     os.path.join(os.path.dirname(__file__), '../static/').replace('\\', '/'),)
 
-DOWNLOAD_DIR = os.path.join(BASE_DIR, 'upload')
+STATIC_DIR = os.path.join(BASE_DIR, 'static')
+
+UPLOAD_DIR = os.path.join(BASE_DIR, 'upload')
