@@ -2,26 +2,6 @@
 {% load static %}
 {% block title %}个人中心{% endblock %}
 {% block content %}
-    <script>
-     try {
-            var index = parent.layer.getFrameIndex(window.name);
-            if (index) {
-                parent.location.reload();
-                parent.layer.close(index);
-            }
-        } catch (err) {
-
-        }
-     function upload_file() {
-            var index = layer.open({
-                type: 2,
-                area: ['300px', '330px'],
-                fix: false, //不固定
-                maxmin: true,
-                content: '/image_upload/'
-            });
-        }
-    </script>
     <section id="content">
         <section class="vbox">
             <section class="scrollable padder">
@@ -48,7 +28,8 @@
                                         {% endif %}
                                     <br>
                                         <div class="text-center">
-                                            <a  href="javascript:upload_file()">上传头像</a>
+                                            <br>
+                                            <button style="width: 65px;height: 25px" onclick="javascript:upload_file()">上传头像</button>
                                         </div>
 
                                     </span>
@@ -116,6 +97,25 @@
         <a href="#" class="hide nav-off-screen-block" data-toggle="class:nav-off-screen" data-target="#nav"></a>
     </section>
     <script>
+     try {
+            var index = parent.layer.getFrameIndex(window.name);
+            if (index) {
+                parent.location.reload();
+                parent.layer.close(index);
+            }
+        } catch (err) {
+
+        }
+     function upload_file() {
+            var index = layer.open({
+                type: 2,
+                area: ['300px', '330px'],
+                fix: false, //不固定
+                maxmin: true,
+                content: '/image_upload/'
+            });
+        }
+
         function Change_password() {
             var index = layer.open({
                 type: 2,
