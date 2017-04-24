@@ -2,15 +2,6 @@
 {% load static %}
 {% block title %}查看项目{% endblock %}
 {% block content %}
-    <script src="{% static 'js/jquery.js' %}"></script>
-    <script src="{% static 'js/layer.js' %}"></script>
-    <script type="text/javascript" src="{% static 'js/three.js' %}"></script>
-    <script type="text/javascript" src="{% static 'js/OrbitControls.js' %}"></script>
-    <script type="text/javascript" src="{% static 'js/TrackballControls.js' %}"></script>
-    <script type="text/javascript" src="{% static 'js/Detector.js' %}"></script>
-    <script type="text/javascript" src="{% static 'js/stats.min.js' %}"></script>
-    <script type="text/javascript" src="{% static 'js/STLLoader.js' %}"></script>
-
     <section id="content">
         <section class="vbox">
             <section class="scrollable padder">
@@ -26,7 +17,10 @@
                 <div id="canvas_div"></div>
                 <script type="text/javascript" src="{% static 'js/myjs.js' %}"></script>
                 <script>
-                    show_single_stl('{{ project.stl_url.0 }}', 1);
+                    $(document).ready(function () {
+                            //参数{input类名，选择类型(单选or多选)}
+                            document.getElementById('chkbox_1').click();
+                        });
                     animate();
                 </script>
             </section>

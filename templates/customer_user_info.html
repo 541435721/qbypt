@@ -21,8 +21,9 @@
                                 <fieldset>
 
                                     <div class="panel-body">
+
                                         <div class="form-group pull-in clearfix">
-                                            <div class="col-sm-6">
+                                            <div class="form-group  col-sm-6">
                                                 <label>姓名</label>
                                                 {{ form.user_name }}
                                                 {% for error in form.name.errors %}
@@ -30,7 +31,7 @@
                                                            style="color: #cd0a0a">{{ error }}</label>
                                                 {% endfor %}
                                             </div>
-                                            <div class="col-sm-6">
+                                            <div class="form-group col-sm-6">
                                                 <label>联系方式</label>
                                                 {{ form.user_telephone }}
                                                 {% for error in form.telephone.errors %}
@@ -38,43 +39,49 @@
                                                            style="color: #cd0a0a">{{ error }}</label>
                                                 {% endfor %}
                                             </div>
-                                        </div>
-                                        <div class="form-group">
-                                            <label>电子邮箱</label>
-                                            {{ form.email }}
-                                            {% for error in form.hospital.errors %}
-                                                <label class="control-label" style="color: #cd0a0a">{{ error }}</label>
-                                            {% endfor %}
-                                        </div>
 
-                                        <div class="form-group">
-                                            <label>身份</label>
-                                            {{ form.user_identify }}
-                                            {% for error in form.user_identify.errors %}
-                                                <label class="control-label" style="color: #cd0a0a">{{ error }}</label>
-                                            {% endfor %}
-                                        </div>
-                                        <div class="form-group">
+
+
+
+{#                                        <div class="form-group col-sm-6">#}
+{#                                            <label>电子邮箱</label>#}
+{#                                            {{ form.email }}#}
+{#                                            {% for error in form.hospital.errors %}#}
+{#                                                <label class="control-label" style="color: #cd0a0a">{{ error }}</label>#}
+{#                                            {% endfor %}#}
+{#                                        </div>#}
+
+
+                                        <div class="form-group col-sm-6">
                                             <label>医院</label>
                                             {{ form.hospital }}
                                             {% for error in form.hospital.errors %}
                                                 <label class="control-label" style="color: #cd0a0a">{{ error }}</label>
                                             {% endfor %}
                                         </div>
-                                        <div class="form-group">
+                                         <div class="form-group col-sm-6">
+                                            <label>身份</label>
+                                            {{ form.user_identify }}
+                                            {% for error in form.user_identify.errors %}
+                                                <label class="control-label" style="color: #cd0a0a">{{ error }}</label>
+                                            {% endfor %}
+                                        </div>
+
+                                        <div class="form-group col-sm-6">
                                             <label>部门</label>
                                             {{ form.department }}
                                             {% for error in form.department.errors %}
                                                 <label class="control-label" style="color: #cd0a0a">{{ error }}</label>
                                             {% endfor %}
                                         </div>
-                                        <div class="form-group">
+                                     <div class="form-group col-sm-6">
                                             <label>职位</label>
                                             {{ form.position }}
                                             {% for error in form.position.errors %}
                                                 <label class="control-label" style="color: #cd0a0a">{{ error }}</label>
                                             {% endfor %}
                                         </div>
+
                                         <div class="form-group">
                                             <label>地址</label>
                                             {{ form.address }}
@@ -82,13 +89,7 @@
                                                 <label class="control-label" style="color: #cd0a0a">{{ error }}</label>
                                             {% endfor %}
                                         </div>
-                                        <div class="form-group" style="display: none">
-                                            <label>图片地址</label>
-                                            {{ form.pic_dir }}
-                                            {% for error in form.pic_dir.errors %}
-                                                <label class="control-label" style="color: #cd0a0a">{{ error }}</label>
-                                            {% endfor %}
-                                        </div>
+
                                         <div class="form-group">
                                             <label>备注</label>
                                             {{ form.abstract }}
@@ -96,6 +97,7 @@
                                                 <label class="control-label" style="color: #cd0a0a">{{ error }}</label>
                                             {% endfor %}
                                         </div>
+                                    </div>
                                     </div>
                                 </fieldset>
                                 <footer class="panel-footer text-right bg-light lter">
