@@ -113,6 +113,7 @@ urlpatterns = [
 
     url(r'^administrator_work_order_assess_handle/$', views.administrator_work_order_assess_handle, name='administrator_work_order_assess_handle'),
 
+
     url(r'^administrator_order_list/$', views.administrator_order_list, name='administrator_order_list'),
 
     url(r'^administrator_order_info/$', views.administrator_order_info, name='administrator_order_info'),
@@ -167,5 +168,5 @@ urlpatterns = [
     url(r'^image_upload/$', views.image_upload, name='image_upload'),
 
     url(r'^data_analyze/$', views.data_analyze, name='data_analyze'),
- 
+
 ]

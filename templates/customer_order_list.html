@@ -94,5 +94,20 @@
         function demand_invoice(order_id) {
             location.href = "/customer_invoice_demand/?order_id=" + order_id + "";
         }
+        function check_pay(out_trade_no, order_price, is_uploaded) {
+            if (is_uploaded=='0') {
+                location.href = "/customer_check_pay?out_trade_no=" + out_trade_no + "&total_fee=" + order_price + "";
+            }
+            else {
+                if (confirm('此项目还没有上传文件，请前往项目列表上传')) {
+                    location.href = "/customer_project_list/";
+                }
+                else {
+                    window.opener = null;
+                    window.open('', '_self');
+                    window.close();
+                }
+            }
+        }
     </script>
 {% endblock %}
