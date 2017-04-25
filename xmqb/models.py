@@ -71,6 +71,8 @@ class Project(models.Model):
 
     patient_address = models.CharField(max_length=20, null=True, blank=True)  # 病人所属地区
 
+    patient_hospital = models.CharField(max_length=20,null=True,blank=True)   # 病人所在医院
+
     def __unicode__(self):
         return self.project
 
@@ -247,3 +249,6 @@ class PartRelation(models.Model):
     part_father = models.ForeignKey(Price)
 
     part_son = models.CharField(max_length=2, null=False, blank=False)
+
+class AdvertiseTarget(models.Model):
+    email=models.CharField(max_length=100,null=False,blank=False)

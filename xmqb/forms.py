@@ -5,6 +5,7 @@ from django.contrib.auth.models import User
 from django import forms
 from django.contrib import auth
 import models
+import re
 from django.utils.safestring import mark_safe
 
 
@@ -120,6 +121,10 @@ class ProjectForm(forms.Form):
     for obj in models.Price.objects.all().order_by('part'):
         part_choice.append((obj.part, obj.part_name))
 
+    age_choice=[]
+    for i in range(120):
+        age_choice.append((i,i))
+
     sex_choice = ((u'男', u'男'), (u'女', u'女'))
 
     project_name = forms.CharField(widget=forms.TextInput(attrs={'class': 'form-control'}),  # 表单项目名
@@ -136,15 +141,19 @@ class ProjectForm(forms.Form):
         attrs={'onchange': 'javascript:get_relation_checkbox(this.value)'}), choices=part_choice,
                                      error_messages={'required': u'请选择部位'})  # 表单项目建模部位 多选框
 
-    patient_name = forms.CharField(label=u'病人姓名', widget=forms.TextInput(attrs={'class': 'form-control'}),
+    patient_name = forms.CharField(max_length=10,label=u'病人姓名', widget=forms.TextInput(attrs={'class': 'form-control'}),
                                    error_messages={'required': u'病人姓名不能为空'})  # 表单病人名字
 
-    patient_sex = forms.ChoiceField(widget=forms.Select(attrs={'class': 'form-control m-b parsley-validated'}),
+    patient_sex = forms.ChoiceField(widget=forms.Select(attrs={'class': 'form-control'}),
                                     label=u'病人性别', required=True, choices=sex_choice)  # 表单病人性别
 
-    patient_age = forms.CharField(widget=forms.TextInput(attrs={'class': 'form-control'}),
-                                  max_length=3, required=True, label=u'病人年龄',
-                                  error_messages={'required': u'年龄不能为空'})  # 表单病人年龄
+    patient_age = forms.ChoiceField(widget=forms.Select(attrs={'class': 'form-control'}),
+                                     required=True, label=u'病人年龄',choices=age_choice,
+                                  error_messages={'required': u'年龄不能为空','invalid':u'请输入数字'})  # 表单病人年龄
+
+    patient_hospital = forms.CharField(widget=forms.TextInput(attrs={'class': 'form-control'}),
+                                     required=True, label=u'病人所在医院',max_length=20,
+                                  error_messages={'required': u'请填写病人所在医院','invalid':u'请输入数字'})
 
     patient_address = forms.CharField(widget=forms.TextInput(attrs={'class': 'form-control'}),  # 表单病人地址
                                       max_length=20, required=False, label=u'病人地区')
@@ -152,6 +161,10 @@ class ProjectForm(forms.Form):
     remark = forms.CharField(widget=forms.Textarea(
         attrs={'class': "form-control", 'rows': "6", 'data-minwords': "6", 'data-required': "false"}),
         required=False, label=u'备注')  # 表单备注
+    def clean(self):  # 自带的数据清理处理方法
+        super(ProjectForm, self).clean()
+            # self._errors['password'] = self.error_class([u'两次密码不匹配'])
+        return self.cleaned_data
 
 
 class ChangePasswordForm(forms.ModelForm):  # 修改密码表单
@@ -428,3 +441,17 @@ class Suggestion(forms.Form):
     def __init__(self, *args, **kwargs):
         """Constructor for Order_Detial"""
         super(Suggestion, self).__init__(*args, **kwargs)
+
+
+class ChangePhoneForm(forms.Form):
+    identifying_code = forms.CharField(widget=forms.TextInput(attrs={'class': 'form-control input-lg'}),  # 表单手机验证码
+                                       required=True,
+                                       label=u'验证码', error_messages={'required': u'请输入手机验证码'},
+                                       max_length=6)
+
+    new_phone = forms.CharField(widget=forms.PasswordInput(attrs={'class': 'form-control input-lg'}),  # 表单密码
+                               label=u'新号码', error_messages={'required': u'请输入新号码'},
+                               required=True)
+
+    def clean(self):  # 自带的数据清理处理方法
+        super(ChangePhoneForm, self).clean()

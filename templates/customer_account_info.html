@@ -75,7 +75,7 @@
                         <div class="col-sm-10 col-md-10 padder-v">
                             <label class="pull-left" style="font-size: medium">手机号码</label>
                             <span class="" style="font-size: small ">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;您已绑定了手机180****8541。[您的手机号可以直接用于登录、找回密码等]</span>
-                            <a class="pull-right" href="/#/" style="color: #00a6ce">修改</a>
+                            <a class="pull-right" href="javascript:Change_phone_number()" style="color: #00a6ce">修改</a>
                         </div>
                     </div>
                 </div>
@@ -123,6 +123,16 @@
                 fix: false, //不固定
                 maxmin: true,
                 content: '/customer_password_change/'
+            });
+        }
+
+        function Change_phone_number() {
+            var index = layer.open({
+                type: 2,
+                area: ['700px', '530px'],
+                fix: false, //不固定
+                maxmin: true,
+                content: '/customer_change_phone/'
             });
         }
     </script>

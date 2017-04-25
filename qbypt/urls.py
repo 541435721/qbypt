@@ -167,5 +167,9 @@ urlpatterns = [
     url(r'^image_upload/$', views.image_upload, name='image_upload'),
 
     url(r'^data_analyze/$', views.data_analyze, name='data_analyze'),
- 
+
+    url(r'^customer_change_phone/$',views.customer_change_phone,name='customer_change_phone'),
+
+    url(r'^check_code_phone/$',views.check_code_phone,name='customer_change_phone'),
+
 ]

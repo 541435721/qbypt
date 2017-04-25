@@ -279,22 +279,27 @@ def customer_project_new(request):  # 用户新建项目
             project = xmqb_model.Project.objects.create(user=request.user, classify=classify,
                                                         project=time.strftime('%y%m%d%H%M%S') + str(
                                                             (request.user.id) % 100000).zfill(4))
-
             project.project_name = form.cleaned_data['project_name']
             project.classify = classify
             project.status = 0
             project.patient_name = form.cleaned_data['patient_name']
             project.patient_sex = form.cleaned_data['patient_sex']
             project.patient_age = form.cleaned_data['patient_age']
-            project.patient_address = form.cleaned_data['patient_address']
+            pro_cit = request.POST['pc']  # 获取表单中的省份和城市信息
+            project.patient_address = pro_cit + form.cleaned_data['patient_address']
             project.remark = form.cleaned_data['remark']
+            project.patient_hospital=form.cleaned_data['patient_hospital']
             # upload_name = form.cleaned_data['upload_name']
             # project.upload_name = upload_name
             # if len(upload_name) > 0:
             #     project.status = '1'
             # else:
             #     project.status = '0'
-            project.save()
+            try:
+                project.save()
+            except Exception,e:
+                print e
+                project.delete()      #若数据更新出错，删除此数据
             partlist = form.cleaned_data['part']
             coupon_id = request.POST.get('coupon')
 
@@ -730,7 +735,10 @@ def customer_invoice_demand(request):  # 用户发票索取
                                                         address=address, telephone=telephone, deliver_id=deliver_id,
                                                         deliver_company=deliver_company, remark=remark, amount=amount
                                                         )
-            invoice.save()
+            try:
+                invoice.save()
+            except:
+                invoice.delete()
             order.is_complete = '2'  # 申请发票成功后，修改订单状态
             order.save()
             return redirect('/customer_invoice_list/')
@@ -1753,3 +1761,53 @@ def data_analyze(request):
             except Exception, e:
                 return HttpResponse(e)
     return HttpResponse('404')
+
+def customer_change_phone(request):
+    if request.method=='GET':
+        form=xmqb_form.ChangePhoneForm()
+        return render(request,'customer_change_phone.html',{'form':form})
+    if request.method=='POST':
+        form=xmqb_form.ChangePhoneForm(request.POST)
+        if form.is_valid():
+            changed_number=form.cleaned_data['new_phone']
+            thisuser=xmqb_model.UserInfo.objects.get(user=request.user)
+            thisuser.user_telephone=changed_number
+            try:
+                thisuser.save()
+            except Exception,e:
+                print e
+            return render(request,'customer_account_info.html',{'form':form})
+        else:
+            form=form=xmqb_form.ChangePhoneForm(request.POST)
+            return render(request, 'customer_account_info.html', {'form': form})
+
+def check_code_phone(request):
+    phone_number = request.GET['phone_number']
+    users = xmqb_model.UserInfo.objects.filter(user_telephone=phone_number)
+    if len(users) > 0:
+        return HttpResponse("此号码已存在")
+    # req = top.api.AlibabaAliqinFcSmsNumSendRequest()
+    # req.set_app_info(top.appinfo("23744157", "5e0763455c8f5b66c295f13c6184928e"))
+    # phone_number = unicodedata.normalize('NFKD', phone_number).encode('ascii', 'ignore')  # 将手机号码转换成ascii编码
+    # req.extend = ""
+    # req.sms_type = "normal"
+    # req.sms_free_sign_name = "王弘轩"
+    # 生成随机验证码
+    codes = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
+    random.shuffle(codes)
+    code = ''
+    for i in range(4):
+        temp_index = int(random.uniform(0, 9))
+        code = code + str(codes[temp_index])
+    # req.sms_param = "{code:'" + code + "'}"
+    # req.rec_num = phone_number
+    # req.sms_template_code = "SMS_57820069"
+    try:
+        # resp = req.getResponse()
+        # print (resp)
+        ajax_list = {'status': "验证码已发送", 'code': code}
+        return JsonResponse(ajax_list)
+    except Exception, e:
+        print (e)
+        ajax_list = {'status': "error"}
+        return HttpResponse(ajax_list)
