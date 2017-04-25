@@ -72,7 +72,7 @@ class Project(models.Model):
     patient_address = models.CharField(max_length=20, null=True, blank=True)  # 病人所属地区
 
     def __unicode__(self):
-        return self.project_id
+        return self.project
 
 
 # 部位价格表
