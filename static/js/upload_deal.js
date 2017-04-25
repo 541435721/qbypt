@@ -22,7 +22,7 @@ $(document).ready(function () {
         'buttonText': '选择文件',
         'removeCompleted': false,//
         'fileSizeLimit': '1024MB',//设置上传文件大小单位kb
-        'fileTypeExts': '*.doc;*.docx;*.odt;*.jpg;*.png;*.txt;*exe;*.mp4;*.stl;',//设置上传文件类型为常用文档格式
+        'fileTypeExts': '*.rar;*.zip;*.dcm;',//设置上传文件类型为常用文档格式
 
         'onSelect': function (e, queueId, fileObj) {
             $('#id_span_msg').html("");
@@ -53,7 +53,7 @@ $(document).ready(function () {
         'buttonText': '选择文件',
         'removeCompleted': false,//
         'fileSizeLimit': '1024MB',//设置上传文件大小单位kb
-        'fileTypeExts': '*.doc;*.docx;*.odt;*.jpg;*.png;*.txt;*exe;*.mp4;*.stl;',//设置上传文件类型为常用文档格式
+        'fileTypeExts': '*.stl;',//设置上传文件类型为常用文档格式
 
         'onSelect': function (e, queueId, fileObj) {
             $('#id_span_msg').html("");
@@ -83,7 +83,7 @@ $(document).ready(function () {
         'buttonText': '选择文件',
         'removeCompleted': false,//
         'fileSizeLimit': '1024MB',//设置上传文件大小单位kb
-        'fileTypeExts': '*.doc;*.docx;*.odt;*.jpg;*.png;*.txt;*exe;*.mp4;*.stl;',//设置上传文件类型为常用文档格式
+        'fileTypeExts': '*.jpg;*.png;*.bmp;*jpeg;',//设置上传文件类型为常用文档格式
 
         'onSelect': function (e, queueId, fileObj) {
             $('#id_span_msg').html("");
