@@ -10,6 +10,7 @@
     <link rel="stylesheet" href="{% static 'css/app.v2.css' %}" type="text/css"/>
     <link rel="stylesheet" href="{% static 'css/font.css' %}" type="text/css" cache="false"/>
     <link rel="stylesheet" href="{% static 'css/landing.css' %}" type="text/css" cache="false"/>
+    <link rel="stylesheet" href="{% static 'css/share.min.css' %}">
     <!--[if lt IE 9]> <script src="../static/js/ie/html5shiv.js" cache="false"></script> <script src="js/ie/respond.min.js" cache="false"></script> <script src="js/ie/excanvas.js" cache="false"></script>
     <![endif]-->
 </head>
@@ -40,12 +41,12 @@
                             <li class="dropdown"><a href="#" class="dropdown-toggle" data-toggle="dropdown"> <span
                                     class="thumb-sm avatar pull-left">
                                 {% if request.session.pic_dir %}
-                                        <img
-                    src="../../../static/images/{{ request.user }}/{{ request.session.pic_dir}}">
-                                            {% else %}
-                                            <img
+                                    <img
+                                            src="../../../static/images/{{ request.user }}/{{ request.session.pic_dir }}">
+                                {% else %}
+                                    <img
                                             src="../../static/images/avatar_default.jpg">
-                                        {% endif %}
+                                {% endif %}
                             </span> {{ request.user }}<b
                                     class="caret"></b> </a>
                                 <ul class="dropdown-menu">
@@ -163,21 +164,23 @@
             </div>
             <div class="row m-t-xl m-b-xl text-center">
                 <div class="col-sm-4" data-ride="animated" data-animation="fadeInLeft" data-delay="300">
-                    <p class="h3 m-b-lg"><i class="fa fa-cloud-upload fa-3x text-info"></i></p>
+                    <p class="h3 m-b-lg"><a href="/customer_project_new/"><i
+                            class="fa fa-cloud-upload fa-3x text-info"></i></a></p>
                     <div class="">
                         <h4 class="m-t-none" style="font-family: 微软雅黑">上传CT文件</h4>
                         <p class="text-muted m-t-lg" style="font-family: 微软雅黑">将您的CT文件压缩后上传到云端</p>
                     </div>
                 </div>
                 <div class="col-sm-4" data-ride="animated" data-animation="fadeInLeft" data-delay="600">
-                    <p class="h3 m-b-lg"><i class="fa fa-inbox fa-3x text-info"></i></p>
+                    <p class="h3 m-b-lg"><a href="/project_show/?project_id=1704121210290008" target="_blank"><i
+                            class="fa fa-inbox fa-3x text-info"></i></a></p>
                     <div class="">
                         <h4 class="m-t-none" style="font-family: 微软雅黑">3D建模</h4>
                         <p class="text-muted m-t-lg" style="font-family: 微软雅黑">后台生成3D模型</p>
                     </div>
                 </div>
                 <div class="col-sm-4" data-ride="animated" data-animation="fadeInLeft" data-delay="900">
-                    <p class="h3 m-b-lg"><i class="fa fa-print fa-3x text-info"></i></p>
+                    <p class="h3 m-b-lg"><a href="#"><i class="fa fa-print fa-3x text-info"></i></a></p>
                     <div class="">
                         <h4 class="m-t-none" style="font-family: 微软雅黑">3D打印</h4>
                         <p class="text-muted m-t-lg" style="font-family: 微软雅黑">通过3D打印机，将3D模型打印出来</p>
@@ -272,18 +275,17 @@
                 </div>
             </div>
             <div class="m-t-xl m-b-xl">
-                <p><a href="#" class="btn btn-icon btn-rounded btn-facebook bg-empty m-sm"><i
-                        class="fa fa-facebook"></i></a> <a href="#"
-                                                           class="btn btn-icon btn-rounded btn-twitter bg-empty m-sm"><i
-                        class="fa fa-twitter"></i></a> <a href="#"
-                                                          class="btn btn-icon btn-rounded btn-gplus bg-empty m-sm"><i
-                        class="fa fa-google-plus"></i></a></p>
+
+                <div class="social-share" data-sites="weibo,qq,wechat,tencent"></div>
+
                 <p><a href="#content" data-jump="true"
                       class="btn btn-icon btn-rounded btn-dark b-dark bg-empty m-sm text-muted"><i
                         class="fa fa-angle-up"></i></a></p>
             </div>
         </div>
     </div>
+    <script src="{% static 'js/jquery-1.11.2.min.js' %}"></script>
+    <script src="{% static 'js/jquery.share.min.js' %}"></script>
 </footer>
 <!-- / footer -->
 <script src="{% static 'js/app.v2.js' %}"></script> <!-- Bootstrap --> <!-- App -->
@@ -291,4 +293,11 @@
 <script src="{% static 'js/scroll/smoothscroll.js' %}" cache="false"></script>
 <script src="{% static 'js/landing.js' %}" cache="false"></script>
 </body>
+<script>
+    $(document).ready(function () {
+        qr = document.getElementsByClassName('qrcode')[0].childNodes;
+        qr[0].src = '../static/images/weixin.jpg';
+    });
+
+</script>
 </html>

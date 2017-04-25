@@ -161,73 +161,85 @@
                             <nav class="nav-primary hidden-xs">
                                 <ul class="nav text-left">
                                     {% for foo in project.part_name %}
-{#                                        <li><a href="#"#}
-{#                                               onclick="javascript:choose_part('{{ foo.1 }}','{{ foo.0.1 }}')">#}
-{#                                            <i#}
-{#                                                    class="fa fa-dollar icon">#}
-{#                                                <b class="bg-success"></b>#}
-{#                                            </i>#}
-{#                                            <span class="pull-right"> <i#}
-{#                                                    class="fa fa-angle-down text"></i> <i#}
-{#                                                    class="fa fa-angle-up text-active"></i> </span>#}
-{#                                            <span>{{ foo.0.0 }}</span> </a> #}
-{#                                            <ul class="nav lt">#}
-{#                                                <input id="changer{{ foo.0.1 }}" type="color"#}
-{#                                                       onchange="javascript:change_color({{ foo.0.1 }},this.value)">#}
-{#                                                <br>#}
-{#                                            </ul>#}
-{#                                        </li>#}
+                                        {#                                        <li><a href="#"#}
+                                        {#                                               onclick="javascript:choose_part('{{ foo.1 }}','{{ foo.0.1 }}')">#}
+                                        {#                                            <i#}
+                                        {#                                                    class="fa fa-dollar icon">#}
+                                        {#                                                <b class="bg-success"></b>#}
+                                        {#                                            </i>#}
+                                        {#                                            <span class="pull-right"> <i#}
+                                        {#                                                    class="fa fa-angle-down text"></i> <i#}
+                                        {#                                                    class="fa fa-angle-up text-active"></i> </span>#}
+                                        {#                                            <span>{{ foo.0.0 }}</span> </a> #}
+                                        {#                                            <ul class="nav lt">#}
+                                        {#                                                <input id="changer{{ foo.0.1 }}" type="color"#}
+                                        {#                                                       onchange="javascript:change_color({{ foo.0.1 }},this.value)">#}
+                                        {#                                                <br>#}
+                                        {#                                            </ul>#}
+                                        {#                                        </li>#}
                                         <br>
 
-                                        <input type="checkbox" id="chk_{{ foo.0.1 }}"  class="chklist"  />
+                                        <input autocomplete="off" type="checkbox" id="chk_{{ foo.0.1 }}" class="chklist"/>
                                         <!--  -->
-                                        <label class="chkbox" id="chkbox_{{ foo.0.1 }}" style="vertical-align:middle;display:inline-block;" onclick="javascript:choose_part('{{ foo.1 }}','{{ foo.0.1 }}')" >
+                                        <label class="chkbox" id="chkbox_{{ foo.0.1 }}"
+                                               style="vertical-align:middle;display:inline-block;"
+                                               onclick="javascript:choose_part('{{ foo.1 }}','{{ foo.0.1 }}')">
                                             <span class="check-image"></span>
                                             {{ foo.0.0 }}
                                         </label>
 
                                         <div style="float: right;padding: 1px">
-                                        <div style="float: left;padding-right: 3px">
+                                            <div style="float: left;padding-right: 3px">
 
-                                        <input name="{{ foo.0.1 }}" class="full" id="changer{{ foo.0.1 }}"
-                                               onchange="javascript:change_color('{{ foo.1 }}',{{ foo.0.1 }},this.value)">
+                                                <input name="{{ foo.0.1 }}" class="full" id="changer{{ foo.0.1 }}"
+                                                       onchange="javascript:change_color('{{ foo.1 }}',{{ foo.0.1 }},this.value)">
 
                                             </div>
-                                        <div style="float: right;padding-top: 3px">
-                                        <input id="r_{{ foo.0.1 }}" type="range" min="0" max="100" step="1" style="width: 80px"
-                                                           value="100"
-                                                           onchange="javascript:change_transparency('{{ foo.1 }}','{{ foo.0.1 }}',this.value)">
-                                        </div>
+                                            <div style="float: right;padding-top: 3px">
+                                                <input id="r_{{ foo.0.1 }}" type="range" min="0" max="100" step="1"
+                                                       style="width: 80px"
+                                                       value="100"
+                                                       onchange="javascript:change_transparency('{{ foo.1 }}','{{ foo.0.1 }}',this.value)">
+                                            </div>
                                         </div>
 
                                         <br>
                                         <br>
                                     {% endfor %}
-                                        <br>
-                                        <div class="text-center">
-                                        <button style="border-radius:5px" onclick="show_all_part({{ project.num }})">显示全部</button>
-                                        </div>
-{#                                    <li>#}
-{#                                        <a href="#uikit"#}
-{#                                           onclick="javascript:show_all()"> <i#}
-{#                                                class="fa fa-dollar icon"> <b class="bg-success"></b>#}
-{#                                        </i>#}
-{#                                        <span class="pull-right"> <i class="fa fa-angle-down text"></i> <i#}
-{#                                                class="fa fa-angle-up text-active"></i> </span>#}
-{#                                            <span>显示所有</span> </a>#}
-{#                                        {% for foo in project.part_name %}#}
-{#                                            <ul class="nav lt">#}
-{#                                                <div style="text-align: left">#}
-{#                                                    <b style="font-size: large">{{ foo.0.0 }}</b>#}
-{#                                                    <input id="changer_{{ foo.0.1 }}" type="color"#}
-{#                                                           onchange="javascript:change_color('{{ foo.0.1 }}',this.value)">#}
-{#                                                    <input id="r_{{ foo.0.1 }}" type="range" min="0" max="100" step="1"#}
-{#                                                           value="100"#}
-{#                                                           onchange="javascript:change_transparency('{{ foo.0.1 }}',this.value)"><br>#}
-{#                                                </div>#}
-{#                                            </ul>#}
-{#                                        {% endfor %}#}
-{#                                    </li>#}
+                                    <br>
+                                    <div class="text-center">
+                                        <button style="border-radius:5px" onclick="show_all_part({{ project.num }})">
+                                            显示全部
+                                        </button>
+{#                                        <input type="checkbox" id="rotate" class="chklist"/>#}
+{#                                        <label class="chkbox" id="rotate_"#}
+{#                                               style="vertical-align:middle;display:inline-block;"#}
+{#                                               onclick="javascript:rotate({{ project.num }})">#}
+{#                                            <span class="check-image"></span>#}
+{#                                            旋转#}
+{#                                        </label>#}
+                                    </div>
+                                    {#                                    <li>#}
+                                    {#                                        <a href="#uikit"#}
+                                    {#                                           onclick="javascript:show_all()"> <i#}
+                                    {#                                                class="fa fa-dollar icon"> <b class="bg-success"></b>#}
+                                    {#                                        </i>#}
+                                    {#                                        <span class="pull-right"> <i class="fa fa-angle-down text"></i> <i#}
+                                    {#                                                class="fa fa-angle-up text-active"></i> </span>#}
+                                    {#                                            <span>显示所有</span> </a>#}
+                                    {#                                        {% for foo in project.part_name %}#}
+                                    {#                                            <ul class="nav lt">#}
+                                    {#                                                <div style="text-align: left">#}
+                                    {#                                                    <b style="font-size: large">{{ foo.0.0 }}</b>#}
+                                    {#                                                    <input id="changer_{{ foo.0.1 }}" type="color"#}
+                                    {#                                                           onchange="javascript:change_color('{{ foo.0.1 }}',this.value)">#}
+                                    {#                                                    <input id="r_{{ foo.0.1 }}" type="range" min="0" max="100" step="1"#}
+                                    {#                                                           value="100"#}
+                                    {#                                                           onchange="javascript:change_transparency('{{ foo.0.1 }}',this.value)"><br>#}
+                                    {#                                                </div>#}
+                                    {#                                            </ul>#}
+                                    {#                                        {% endfor %}#}
+                                    {#                                    </li>#}
                                 </ul>
                             </nav>
                         </div>
@@ -250,39 +262,37 @@
                         function choose_part(part_name, id) {
 
                             color_id = 'changer' + id;
-                            chk_id = 'chk_'+id
+                            chk_id = 'chk_' + id
                             r_id = 'r_' + id
                             opa = document.getElementById(r_id).value * 1.0 / 100
-{#                            document.getElementById(color_id).value = color[id % color.length];#}
+                            {#                            document.getElementById(color_id).value = color[id % color.length];#}
                             if (document.getElementById(chk_id).checked == false)       //因为改变状态是从点击之后
                             {
 
                                 show_single_stl(part_name, id, opa);
                             }
 
-                            else{
+                            else {
                                 var selectedObject = scene.getObjectByName('actor' + id);
                                 scene.remove(selectedObject);
                             }
-{#                            for (var i = 1; i <= color_board.length; i++) {#}
-{#                                var selectedObject = scene.getObjectByName('actor' + i);#}
-{#                                if (selectedObject) {#}
-{#                                    scene.remove(selectedObject);#}
-{#                                }#}
-{#                            }#}
+                            {#                            for (var i = 1; i <= color_board.length; i++) {#}
+                            {#                                var selectedObject = scene.getObjectByName('actor' + i);#}
+                            {#                                if (selectedObject) {#}
+                            {#                                    scene.remove(selectedObject);#}
+                            {#                                }#}
+                            {#                            }#}
 
 
                             animate();
                         }
                         function show_all_part(num) {
-                            for(var i=1;i<=num;i++){
-                                if (document.getElementById( 'chk_'+i).checked == false)       //如果未选中则选中
-                            {
-                                document.getElementById('chkbox_'+i).click();
+                            for (var i = 1; i <= num; i++) {
+                                if (document.getElementById('chk_' + i).checked == false)       //如果未选中则选中
+                                {
+                                    document.getElementById('chkbox_' + i).click();
+                                }
                             }
-
-                            }
-
                         }
 
                         function show_all() {
@@ -302,18 +312,18 @@
                             }
                         }
 
-                        function change_color(path ,id, value) {
+                        function change_color(path, id, value) {
 
                             var selectedObject = scene.getObjectByName('actor' + id);
                             if (selectedObject) {
                                 color[id % color.length] = selectedObject.material.color = new THREE.Color(value);
                                 // document.getElementById("changer" + id).value = value;
 
-{#                                document.getElementById("changer_" + id).value = value;#}
-{#                                color_board[parseInt(id) - 1] = value;#}
+                                {#                                document.getElementById("changer_" + id).value = value;#}
+                                {#                                color_board[parseInt(id) - 1] = value;#}
                             } else {
                                 color[id % color.length] = value                //取色都是从这个数组里
-                                document.getElementById('chkbox_'+id).click();
+                                document.getElementById('chkbox_' + id).click();
                                 selectedObject = scene.getObjectByName('actor' + id);
 
                             }
@@ -324,11 +334,18 @@
                             if (selectedObject) {
                                 selectedObject.material.opacity = value * 1.0 / 100;
                             } else {
-                                document.getElementById('chkbox_'+id).click();
+                                document.getElementById('chkbox_' + id).click();
                                 selectedObject = scene.getObjectByName('actor' + id);
                                 selectedObject.material.opacity = value * 1.0 / 100;
                             }
                             animate();
+                        }
+                        function rotate(num) {
+                            if (document.getElementById('rotate').checked == false) {
+                                auto_rotate(parseInt(num));
+                            } else {
+                                cancle_rotate(parseInt(num));
+                            }
                         }
 
                     </script>
@@ -385,7 +402,7 @@
 <link href="{% static 'css/bootstrap-table.css' %}" rel="stylesheet">
 <script src="{% static 'js/bootstrap-table.js' %}"></script>
 
-    <script type="text/javascript" src={% static 'js/spectrum.js' %}></script>
-    <script type="text/javascript" src={% static 'js/docs/docs.js' %}></script>
+<script type="text/javascript" src={% static 'js/spectrum.js' %}></script>
+<script type="text/javascript" src={% static 'js/docs/docs.js' %}></script>
 </body>
 </html>

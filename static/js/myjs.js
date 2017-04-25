@@ -10,7 +10,6 @@ function doNothing() {
 }
 color_board = new Array();
 var container, stats;
-var index;
 var camera, cameraTarget, scene, renderer;
 
 var camera_p_x = 100;
@@ -154,13 +153,12 @@ function onWindowResize() {
 function show_single_stl(path, id, opa) {
     var loader = new THREE.STLLoader();         // new 一个load加载对象
     var mesh;                                   // 申明一个mesh变量
-    //var index = layer.load(1, {
-    //    shade: [0.1, '#fff'] //0.1透明度的白色背景
-    //});
-
-
+    var index = layer.load(1, {
+        shade: [0.4, '#fff'] //0.1透明度的白色背景
+    });
+    count++;
     loader.load(path, function (geo) {
-        if(scene.children.length-7 == 0){
+        if (scene.children.length - 7 == 0) {
             offset = geo.center();
         }// loader的初始化
         else {
@@ -172,7 +170,7 @@ function show_single_stl(path, id, opa) {
 
             //alert(id + " " + offset.x + " " + offset.y + " " + offset.z);
         }
-                                   // 将其放入最中间位置
+        // 将其放入最中间位置
         var num = path.lastIndexOf(".stl");     // 读取是第几个stl
         //var p = document.getElementById('dis' + path.substring(path.lastIndexOf("/") + 1, num));
         //p.innerHTML = "X:" + calculateSize(geo)[0] + " Y:" + calculateSize(geo)[1] + " Z:" + calculateSize(geo)[2];
@@ -180,11 +178,12 @@ function show_single_stl(path, id, opa) {
         var material = new THREE.MeshPhongMaterial({        //加载材料
             // color: color[c],
             specular: 0x001111,
-            shininess: 80,
+            shininess: 10,
             wireframe: false,
             //side: THREE.doubleSided,
             transparent: true,
             opacity: opa,
+            side: THREE.DoubleSide,
         });
         // if (labels[id - 1] == 1) {
         //     material.color = new THREE.Color(COLORS[id - 1]);
@@ -203,21 +202,19 @@ function show_single_stl(path, id, opa) {
         mesh.receiveShadow = true;
         mesh.name = 'actor' + id;           //定义名字
         scene.add(mesh);                       //场景加入mesh
-        //layer.close(index);
+        count--;
+        if (count <= 0) {
+            layer.closeAll('loading'); //关闭加载层
+        }
     });
-
 }
 
 
 function show_all_stl(path, id, opa) {
     var loader = new THREE.STLLoader();
     var mesh;
-
     offset = 0;
     loader.load(path, function (geo) {
-        //geo.center();
-        //geo.translate(0, 0, 0);
-
         if (offset == 0) {
             offset = geo.center();
         } else {
@@ -254,15 +251,8 @@ function show_all_stl(path, id, opa) {
         mesh.name = 'actor' + (parseInt(id) + 1);
 
         scene.add(mesh);
-        // for (var i = 1; i <= 8; i++) {
-        //     document.getElementById('a' + i).removeAttribute('disabled');
-        // }
-        // count--;
 
-        //if (count == 0)
-        //    layer.close(index);
     });
-
 }
 
 
@@ -270,12 +260,32 @@ function render() {
 
     var timer = Date.now() * 0.005;
     controls.autoRotate = false;
-    //camera.position.x = Math.cos(timer) * 3;
-    //camera.position.y = Math.sin( timer ) * 3;
+    // camera.position.x = Math.cos(timer) * 0.01;
+    // camera.position.y = Math.sin( timer ) * 1;
     renderer.render(scene, camera);
-
-
 }
+
+function auto_rotate(parts) {
+    for (var part_index = 0; part_index < parts; part_index++) {
+        selectedObject = scene.getObjectByName('actor' + part_index);
+        if (selectedObject) {
+            selectedObject.rotation.z += 0.04;
+        }
+    }
+    requestAnimationFrame(auto_rotate);
+    renderer.render(scene, camera);
+}
+function cancle_rotate(parts) {
+    for (var part_index = 0; part_index < parts; part_index++) {
+        selectedObject = scene.getObjectByName('actor' + part_index);
+        if (selectedObject) {
+            selectedObject.rotation.z -= 0.04;
+        }
+    }
+    requestAnimationFrame(cancle_rotate);
+    renderer.render(scene, camera);
+}
+
 function scaleCanvas(event) {
     var e = window.event || event; // old IE support
     var delta = Math.max(-1, Math.min(1, (e.wheelDelta || -e.detail)));
@@ -300,7 +310,6 @@ function animate() {
     render();
     controls.update();
     stats.update();
-
 }
 
 function calculateVol(geo) {
@@ -346,4 +355,55 @@ function calculateSize(geo) {
     var y_l = geo.boundingBox.max.y - geo.boundingBox.min.y;
     var z_l = geo.boundingBox.max.z - geo.boundingBox.min.z;
     return new Array(x_l.toFixed(2), y_l.toFixed(2), z_l.toFixed(2));
+}
+
+document.getElementById('cvs').onmousedown = function (event) {
+
+}
+document.onkeydown = function (event) {
+    var a = 3;
+    rato1 = 2 * Math.PI / 360 * a;
+    num = scene.children.length - 7;
+    if (event.keyCode == 39) { //右键39
+        for (var part_index = 0; part_index <= num; part_index++) {
+            selectedObject = scene.getObjectByName('actor' + part_index);
+            if (selectedObject) {
+                selectedObject.rotation.z += rato1;
+            }
+        }
+    } else if (event.keyCode == 37) { //左键37
+        for (var part_index = 0; part_index <= num; part_index++) {
+            selectedObject = scene.getObjectByName('actor' + part_index);
+            if (selectedObject) {
+                selectedObject.rotation.z -= rato1;
+            }
+        }
+    } else if (event.keyCode == 38) {// 上键38
+        selectedObject = scene.getObjectByName('actor' + part_index);
+        for (var part_index = 0; part_index <= num; part_index++) {
+            selectedObject = scene.getObjectByName('actor' + part_index);
+            if (selectedObject) {
+                selectedObject.rotation.y -= rato1;
+            }
+        }
+    } else if (event.keyCode == 40) {//下键40
+        selectedObject = scene.getObjectByName('actor' + part_index);
+        for (var part_index = 0; part_index <= num; part_index++) {
+            selectedObject = scene.getObjectByName('actor' + part_index);
+            if (selectedObject) {
+                selectedObject.rotation.y -= rato1;
+            }
+        }
+    }
+}
+document.onkeyup = function (event) {
+    if (event.keyCode == 39) { //右键39
+
+    } else if (event.keyCode == 37) { //左键37
+
+    } else if (event.keyCode == 38) {// 上键38
+
+    } else if (event.keyCode == 40) {//下键40
+
+    }
 }

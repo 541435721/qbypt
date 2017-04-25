@@ -80,8 +80,8 @@ DATABASES = {
         'ENGINE': 'django.db.backends.mysql',
         'NAME': 'qbypt',
         'USER': 'root',
-        'PASSWORD': 'mypwd',
-        'HOST': '127.0.0.1',
+        'PASSWORD': 'root',
+        'HOST': '120.77.9.110',
         'PORT': '3306',
     }
 }

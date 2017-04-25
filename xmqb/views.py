@@ -28,6 +28,7 @@ import json
 import top.api
 import unicodedata
 import urllib
+
 # Create your views here.
 
 # 创建支付对象，用以生成支付链接
@@ -69,6 +70,9 @@ def login(request):  # 登陆
             request.session['not_read'] = not_read
             request.session['pic_dir'] = pic_dir
             request.session['sess_projects'] = sess_projects
+            request.session.set_expiry(0)
+            print not_read
+
             if request.user.is_superuser == 1:  # 管理员登录
                 return redirect('/administrator_project_list')
 
@@ -527,7 +531,8 @@ def customer_stl_show(request):  # 用户查看3D模型
             project_id = request.GET['project_id']
             if project_id:
                 record = xmqb_model.Project.objects.get(project=project_id)
-                url = u'' + '/static' + '/upload' + '/' + str(record.user.username) + '/' + str(record.classify_id) + '/' + str(
+                url = u'' + '/static' + '/upload' + '/' + str(record.user.username) + '/' + str(
+                    record.classify_id) + '/' + str(
                     record.project) + '/STL/'
                 url = url.replace('\\', '/')
                 sub_url = u'' + '/static' + '/upload' + '/' + str(record.user.username) + '/' + str(
@@ -852,7 +857,7 @@ def profile_upload(file, request):  # 处理文件函数，函数之间共享网
         else:
             sub_dir = 'STL'
         if file:  # 如果文件有效
-            path = os.path.join(settings.BASE_DIR, 'static')+ '\\'+ 'upload' + '\\' + str(
+            path = os.path.join(settings.BASE_DIR, 'static') + '\\' + 'upload' + '\\' + str(
                 user.username) + '\\' + classify + '\\' + project_ID + '\\' + sub_dir  # 生成路径
             if not os.path.exists(path):  # 如果路径不存在 就生成
                 os.makedirs(path)
@@ -889,6 +894,8 @@ def profile_upload(file, request):  # 处理文件函数，函数之间共享网
             return (False, 'failed')  # change
         except Exception, e:
             print e
+
+
 
 @csrf_exempt
 def profile_delte(request):  # 删除文件处理
@@ -1161,7 +1168,8 @@ def administrator_work_order_handle(request):  # 工单处理
             project_id = workorder.project_id
             if project_id:
                 project = xmqb_model.Project.objects.get(project=project_id)
-                url = u'' + '/static' + '/upload' + '/' + str(project.user.username) + '/' + str(project.classify_id) + '/' + str(
+                url = u'' + '/static' + '/upload' + '/' + str(project.user.username) + '/' + str(
+                    project.classify_id) + '/' + str(
                     project.project) + '/STL/'
                 url = url.replace('\\', '/')
                 sub_url = u'' + '/static' + '/upload' + '/' + str(project.user.username) + '/' + str(
@@ -1177,9 +1185,9 @@ def administrator_work_order_handle(request):  # 工单处理
                     part_url[i] = sub_url + part_url[i]
                 part_name = zip(zip(part_name, index), part_url)
                 project_part = {'name': project.project_name,
-                           'part_name': part_name,
-                           'stl_url': part_url,
-                           'num': len(part_name)
+                                'part_name': part_name,
+                                'stl_url': part_url,
+                                'num': len(part_name)
                                 }
                 return render(request, 'administrator_work_order_handle.html',
                               {'form': form, 'project': project, 'parts': parts, 'project_part': project_part})
@@ -1252,7 +1260,7 @@ def administrator_work_order_assess_handle(request):  # 工单审核
             'patient_address': project.patient_address,
             'remark': project.remark
         })
- 
+
         try:
             project_id = workorder.project_id
             if project_id:
