@@ -878,7 +878,7 @@ def profile_upload(file, request):  # 处理文件函数，函数之间共享网
             sub_dir = 'images'
             if file:  # 如果文件有效
                 path = os.path.join(settings.BASE_DIR, 'static') + '\\' + sub_dir + '\\' + str(
-                    user.username)   # 生成路径
+                    user.username)  # 生成路径
                 if not os.path.exists(path):  # 如果路径不存在 就生成
                     os.makedirs(path)
                 # file_name=str(uuid.uuid1())+".jpg"
@@ -894,7 +894,6 @@ def profile_upload(file, request):  # 处理文件函数，函数之间共享网
             return (False, 'failed')  # change
         except Exception, e:
             print e
-
 
 
 @csrf_exempt
@@ -1216,7 +1215,7 @@ def administrator_file_upload(request):
             # part = xmqb_model.ProjectPart.objects.get(project=project, part=part_id)
             # return render(request, 'administrator_upload.html', {'project': project, 'part': part})
             return render(request, 'administrator_upload.html', {'project': project})
-        except Exception,e:
+        except Exception, e:
             print e
             pass
             return HttpResponse('上传出错')
@@ -1635,17 +1634,11 @@ def administrator_message_send(request):  # 管理员消息发送
             receiver = forms.cleaned_data['receiver']
             title = forms.cleaned_data['title']
             context = forms.cleaned_data['context']
-
-            Title = title
-            Context = context
-            Is_read = 0
             Send_worker_id = request.user.id
-            User_id = receiver
-
             try:
-                message_record = xmqb_model.Message.objects.create(title=Title, message_content=Context,
-                                                                   is_read=Is_read,
-                                                                   send_worker_id=receiver, user_id=User_id)
+                message_record = xmqb_model.Message.objects.create(title=title, message_content=context,
+                                                                   is_read=0, send_worker_id=Send_worker_id,
+                                                                   user_id=receiver)
                 message_record.save()
                 not_read = len(xmqb_model.Message.objects.filter(user_id=request.user.id, is_read=0))
                 request.session['not_read'] = not_read
