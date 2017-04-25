@@ -84,6 +84,15 @@ function disable()
 {#                            <label>所需费用为：</label>#}
 {#                            <span id="price">{{ project.price }}</span>#}
 {#                            <label>元</label>#}
+                        {% if project_part %}
+                            <label>已上传文件</label>
+                        {% for part in project_part.part_name %}
+                            <br>
+                            <label>{{ part.0.0 }}</label> <a href="{{ part.1 }}">下载</a>
+                        {% endfor%}
+                            {% else %}
+                            <label>未上传任何文件</label>
+                        {% endif %}
                             <div class="form-group-left">
                                 <button type="submit" class="btn btn-large btn-primary">确定</button>
 

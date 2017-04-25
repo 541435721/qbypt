@@ -28,6 +28,7 @@ import json
 import top.api
 import unicodedata
 import urllib
+
 # Create your views here.
 
 # 创建支付对象，用以生成支付链接
@@ -60,9 +61,18 @@ def login(request):  # 登陆
             auth.login(request, user)
             not_read = len(xmqb_model.Message.objects.filter(user_id=request.user.id, is_read=0))
             pic_dir = xmqb_model.UserInfo.objects.get(user=request.user).pic_dir
+            projects = xmqb_model.Project.objects.filter(user=request.user, status='3')
+            sess_projects = []
+            for project in projects:
+                sess_project = {"project": project.project, "project_name": project.project_name}
+                sess_projects.append(sess_project)
+
             request.session['not_read'] = not_read
             request.session['pic_dir'] = pic_dir
+            request.session['sess_projects'] = sess_projects
+            request.session.set_expiry(0)
             print not_read
+
             if request.user.is_superuser == 1:  # 管理员登录
                 return redirect('/administrator_project_list')
 
@@ -374,6 +384,7 @@ def image_upload(request):
     else:
         return render(request, 'image_upload.html')
 
+
 def customer_project_info(request):  # 用户查看项目
     if not request.user.is_authenticated():
         return redirect('/login')
@@ -390,7 +401,39 @@ def customer_project_info(request):  # 用户查看项目
         'patient_address': project.patient_address,
         'remark': project.remark
     })
-    return render(request, 'customer_project_info.html', {'form': form, 'project': project, 'parts': parts})
+    try:
+        project_id = project.project
+        if project_id:
+            project = xmqb_model.Project.objects.get(project=project_id)
+            url = u'' + '/static' + '/upload' + '/' + str(project.user.username) + '/' + str(
+                project.classify_id) + '/' + str(
+                project.project) + '/DICOM/'
+            url = url.replace('\\', '/')
+            sub_url = u'' + '/static' + '/upload' + '/' + str(project.user.username) + '/' + str(
+                project.classify_id) + '/' + str(project.project) + '/DICOM/'
+            sub_url = sub_url.replace('\\', '/')
+            part_url = os.listdir(url[1:])
+            part_name = copy.copy(part_url)
+            index = []
+            for x in xrange(len(part_name)):
+                part_name[x] = part_name[x][0:-4]
+                index.append(x + 1)
+            for i in xrange(len(part_url)):
+                part_url[i] = sub_url + part_url[i]
+            part_name = zip(zip(part_name, index), part_url)
+            project_part = {'name': project.project_name,
+                            'part_name': part_name,
+                            'stl_url': part_url,
+                            'num': len(part_name)
+                            }
+            return render(request, 'customer_project_info.html',
+                          {'form': form, 'project': project, 'parts': parts, 'project_part': project_part})
+        else:
+            return HttpResponse("不存在该项目")
+    except Exception, e:
+        print e
+        pass
+        return HttpResponse(e)
 
 
 def customer_project_alert(request):  # 用户修改项目
@@ -493,7 +536,8 @@ def customer_stl_show(request):  # 用户查看3D模型
             project_id = request.GET['project_id']
             if project_id:
                 record = xmqb_model.Project.objects.get(project=project_id)
-                url = u'' + '/static' + '/upload' + '/' + str(record.user.username) + '/' + str(record.classify_id) + '/' + str(
+                url = u'' + '/static' + '/upload' + '/' + str(record.user.username) + '/' + str(
+                    record.classify_id) + '/' + str(
                     record.project) + '/STL/'
                 url = url.replace('\\', '/')
                 sub_url = u'' + '/static' + '/upload' + '/' + str(record.user.username) + '/' + str(
@@ -821,7 +865,7 @@ def profile_upload(file, request):  # 处理文件函数，函数之间共享网
         else:
             sub_dir = 'STL'
         if file:  # 如果文件有效
-            path = os.path.join(settings.BASE_DIR, 'static')+ '\\'+ 'upload' + '\\' + str(
+            path = os.path.join(settings.BASE_DIR, 'static') + '\\' + 'upload' + '\\' + str(
                 user.username) + '\\' + classify + '\\' + project_ID + '\\' + sub_dir  # 生成路径
             if not os.path.exists(path):  # 如果路径不存在 就生成
                 os.makedirs(path)
@@ -837,25 +881,28 @@ def profile_upload(file, request):  # 处理文件函数，函数之间共享网
             return (True, file_name)  # change
         return (False, 'failed')  # change
     except Exception, e:
-        print e
-        user = request.user
-        sub_dir = 'images'
-        if file:  # 如果文件有效
-            path = os.path.join(settings.BASE_DIR, 'static') + '\\' + sub_dir + '\\' + str(
-                user.username)   # 生成路径
-            if not os.path.exists(path):  # 如果路径不存在 就生成
-                os.makedirs(path)
-            # file_name=str(uuid.uuid1())+".jpg"
-            # file_name = 'image'+(file.name)[len(file.name)-4:len(file.name)]
-            file_name = file.name
-            # fname = os.path.join(settings.MEDIA_ROOT,filename)
-            path_file = os.path.join(path, file_name)  # 将路径和文件名结合
-            fp = open(path_file, 'wb')  # 以二进制方法写文件，生成对象fb
-            for content in file.chunks():  # 将文件分段读取
-                fp.write(content)  # 写入fb
-            fp.close()  # 关闭流
-            return (True, file_name)  # change
-        return (False, 'failed')  # change
+        try:
+            user = request.user
+            sub_dir = 'images'
+            if file:  # 如果文件有效
+                path = os.path.join(settings.BASE_DIR, 'static') + '\\' + sub_dir + '\\' + str(
+                    user.username)  # 生成路径
+                if not os.path.exists(path):  # 如果路径不存在 就生成
+                    os.makedirs(path)
+                # file_name=str(uuid.uuid1())+".jpg"
+                # file_name = 'image'+(file.name)[len(file.name)-4:len(file.name)]
+                file_name = file.name
+                # fname = os.path.join(settings.MEDIA_ROOT,filename)
+                path_file = os.path.join(path, file_name)  # 将路径和文件名结合
+                fp = open(path_file, 'wb')  # 以二进制方法写文件，生成对象fb
+                for content in file.chunks():  # 将文件分段读取
+                    fp.write(content)  # 写入fb
+                fp.close()  # 关闭流
+                return (True, file_name)  # change
+            return (False, 'failed')  # change
+        except Exception, e:
+            print e
+
 
 @csrf_exempt
 def profile_delte(request):  # 删除文件处理
@@ -1128,10 +1175,11 @@ def administrator_work_order_handle(request):  # 工单处理
             project_id = workorder.project_id
             if project_id:
                 project = xmqb_model.Project.objects.get(project=project_id)
-                url = u'' + '/static' + '/upload' + '/' + str(project.user.username) + '/' + str(project.classify_id) + '/' + str(
+                url = u'' + '/static' + '/upload' + '/' + str(project.user.username) + '/' + str(
+                    project.classify_id) + '/' + str(
                     project.project) + '/STL/'
                 url = url.replace('\\', '/')
-                sub_url = u'' + '/static' + 'upload' + '/' + str(project.user.username) + '/' + str(
+                sub_url = u'' + '/static' + '/upload' + '/' + str(project.user.username) + '/' + str(
                     project.classify_id) + '/' + str(project.project) + '/STL/'
                 sub_url = sub_url.replace('\\', '/')
                 part_url = os.listdir(url[1:])
@@ -1144,9 +1192,9 @@ def administrator_work_order_handle(request):  # 工单处理
                     part_url[i] = sub_url + part_url[i]
                 part_name = zip(zip(part_name, index), part_url)
                 project_part = {'name': project.project_name,
-                           'part_name': part_name,
-                           'stl_url': part_url,
-                           'num': len(part_name)
+                                'part_name': part_name,
+                                'stl_url': part_url,
+                                'num': len(part_name)
                                 }
                 return render(request, 'administrator_work_order_handle.html',
                               {'form': form, 'project': project, 'parts': parts, 'project_part': project_part})
@@ -1168,20 +1216,26 @@ def administrator_work_order_handle(request):  # 工单处理
 
 def administrator_file_upload(request):
     if request.method == 'GET':
-        project_ID = request.GET['project_ID']
-        project = xmqb_model.Project.objects.get(project=project_ID)
-        part_id = request.GET['part']
-        part = xmqb_model.ProjectPart.objects.get(project=project, part=part_id)
-        return render(request, 'administrator_upload.html', {'project': project, 'part': part})
+        try:
+            project_ID = request.GET['project_ID']
+            project = xmqb_model.Project.objects.get(project=project_ID)
+            # part_id = request.GET['part']
+            # part = xmqb_model.ProjectPart.objects.get(project=project, part=part_id)
+            # return render(request, 'administrator_upload.html', {'project': project, 'part': part})
+            return render(request, 'administrator_upload.html', {'project': project})
+        except Exception, e:
+            print e
+            pass
+            return HttpResponse('上传出错')
     else:
-        project_ID = request.POST['project_ID']
-        part_id = request.POST['id_part']
-        project = xmqb_model.Project.objects.get(project=project_ID)
-        part = xmqb_model.ProjectPart.objects.get(project=project, part=part_id)
+        # project_ID = request.POST['project_ID']
+        # part_id = request.POST['id_part']
+        # project = xmqb_model.Project.objects.get(project=project_ID)
+        # part = xmqb_model.ProjectPart.objects.get(project=project, part=part_id)
         upload_name = request.POST['id_upload_name']
         if len(upload_name) > 0:
-            part.directory = upload_name
-            part.save()
+            # part.directory = upload_name
+            # part.save()
             return render(request, 'administrator_work_order_handle.html', {'method': '1'})
         else:
             return render(request, 'administrator_work_order_handle.html', {'method': '0'})
@@ -1213,7 +1267,7 @@ def administrator_work_order_assess_handle(request):  # 工单审核
             'patient_address': project.patient_address,
             'remark': project.remark
         })
- 
+
         try:
             project_id = workorder.project_id
             if project_id:
@@ -1588,17 +1642,11 @@ def administrator_message_send(request):  # 管理员消息发送
             receiver = forms.cleaned_data['receiver']
             title = forms.cleaned_data['title']
             context = forms.cleaned_data['context']
-
-            Title = title
-            Context = context
-            Is_read = 0
             Send_worker_id = request.user.id
-            User_id = receiver
-
             try:
-                message_record = xmqb_model.Message.objects.create(title=Title, message_content=Context,
-                                                                   is_read=Is_read,
-                                                                   send_worker_id=receiver, user_id=User_id)
+                message_record = xmqb_model.Message.objects.create(title=title, message_content=context,
+                                                                   is_read=0, send_worker_id=Send_worker_id,
+                                                                   user_id=receiver)
                 message_record.save()
                 not_read = len(xmqb_model.Message.objects.filter(user_id=request.user.id, is_read=0))
                 request.session['not_read'] = not_read

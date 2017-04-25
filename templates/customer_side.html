@@ -15,7 +15,7 @@
     <link rel="stylesheet" href="{% static 'js/calendar/bootstrap_calendar.css' %}" type="text/css" cache="false"/>
     <script src="{% static 'js/jquery.js' %}"></script>
     <script src="{% static 'js/choose_checkbox.js' %}"></script>
-
+    <script src="{% static 'js/project_alter.js' %}"></script>
     <!--[if lt IE 9]>
     <script src="{% static 'js/ie/html5shiv.js'%}" cache="false"></script>
     <script src="{% static 'js/ie/respond.min.js'%}" cache="false"></script>
@@ -23,20 +23,6 @@
     <![endif]-->
 </head>
 <body style="font-family: 微软雅黑">
-
-<div class="izl-rmenu">
-    <a class="consult" target="_blank">
-        <div class="phone" style="display:none;">0592-5760668</div>
-    </a>
-    <a class="cart">
-        <div class="pic"></div>
-    </a>
-</div>
-<!--qq聊天代码部分begin-->
-{#<a target="_blank" href="http://wpa.qq.com/msgrd?v=3&uin=123456&site=qq&menu=yes"#}
-{#   id="udesk-feedback-tab" class="udesk-feedback-tab-left"#}
-{#   style="display: block; background-color: black;"></a>#}
-<!--qq聊天代码部分end-->
 <script>
     $(function () {
         $(".btn_top").hide();
@@ -65,6 +51,7 @@
         <ul class="nav navbar-nav hidden-xs">
             <li>
                 <div class="m-t m-l"><a href="javascript:history.go(-1)" class="dropdown-toggle btn btn-xs btn-primary"
+
                                         title="返回上一页"><i class="fa fa-long-arrow-up"></i></a></div>
             </li>
         </ul>
@@ -153,10 +140,10 @@
                                 <button type="button" class="btn btn-sm btn-primary dropdown-toggle"
                                         data-toggle="dropdown"> 选择项目 <span class="caret"></span></button>
                                 <ul class="dropdown-menu text-left">
-                                    <li><a href="#">项目1</a></li>
-                                    <li><a href="#">项目1</a></li>
-                                    <li><a href="#">项目1</a></li>
-                                    <li><a href="#">项目1</a></li>
+                                    {% for project in request.session.sess_projects %}
+                                    <li><a href="/customer_stl_show/?project_id={{ project.project }}">{{ project.project_name }}</a></li>
+
+                                    {% endfor %}
                                 </ul>
                             </div>
                         </div>
