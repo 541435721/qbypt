@@ -96,13 +96,13 @@ class UserInform(forms.ModelForm):
     position = forms.ChoiceField(widget=forms.Select(attrs={'class': 'form-control m-b parsley-validated'}),
                                  label=u'职位', required=False, choices=position_choice)
     address = forms.CharField(widget=forms.TextInput(attrs={'class': 'form-control'}),
-                              max_length=20, required=True, label=u'地址', error_messages={'required': u'地址为必填项'})
+                              max_length=20, required=False, label=u'地址', error_messages={'required': u'地址为必填项'})
 
     pic_dir = forms.CharField(widget=forms.TextInput(attrs={'class': 'form-control'}),
-                              max_length=20, required=False, label=u'图片地址', error_messages={'required': u'地址为必填项'})
+                              max_length=20, required=False, label=u'图片地址')
 
     abstract = forms.CharField(widget=forms.Textarea(
-        attrs={'class': "form-control", 'rows': "6", 'data-minwords': "6", 'data-required': "true"}), label=u'备注')
+        attrs={'class': "form-control", 'rows': "6", 'data-minwords': "6", 'data-required': "true"}), required=False,label=u'备注')
 
     class Meta:  # 和数据模型关联类ModelForm必要的子类
         model = models.UserInfo

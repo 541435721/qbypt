@@ -141,9 +141,16 @@
                                 <button type="button" class="btn btn-sm btn-primary dropdown-toggle"
                                         data-toggle="dropdown"> 选择项目 <span class="caret"></span></button>
                                 <ul class="dropdown-menu text-left">
+                                {% if show_list %}
+
                                     {% for foo in show_list %}
                                         <li><a href="/project_show/?project_id={{ foo.0 }}">{{ foo.1 }}</a></li>
                                     {% endfor %}
+                                {% else %}
+                                    {% for project in request.session.sess_projects %}
+                                    <li><a href="/customer_stl_show/?project_id={{ project.project }}">{{ project.project_name }}</a></li>
+                                    {% endfor %}
+                                {% endif %}
                                 </ul>
                             </div>
                         </div>
