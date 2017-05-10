@@ -81,7 +81,7 @@ class UserInform(forms.ModelForm):
     user_name = forms.CharField(widget=forms.TextInput(attrs={'class': 'form-control'}),
                                 max_length=20, required=True, label=u'姓名', error_messages={'required': u'姓名为必填项'})
 
-    email = forms.CharField(widget=forms.EmailInput(attrs={'class': 'form-control input-lg'}),
+    email = forms.CharField(widget=forms.EmailInput(attrs={'class': 'form-control'}),
                             required=True,
                             label=u'电子邮件', error_messages={'required': u'邮箱不能为空'},
                             max_length=75)
@@ -449,7 +449,7 @@ class ChangePhoneForm(forms.Form):
                                        label=u'验证码', error_messages={'required': u'请输入手机验证码'},
                                        max_length=6)
 
-    new_phone = forms.CharField(widget=forms.PasswordInput(attrs={'class': 'form-control input-lg'}),  # 表单密码
+    new_phone = forms.CharField(widget=forms.TextInput(attrs={'class': 'form-control input-lg'}),  # 表单密码
                                label=u'新号码', error_messages={'required': u'请输入新号码'},
                                required=True)
 

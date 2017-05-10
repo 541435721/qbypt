@@ -1,6 +1,5 @@
 {% extends 'customer_side.html' %}
 {% load static %}
-
 <script src="{% static 'js/jquery.js' %}"></script>
 {% block title %}查看项目{% endblock %}
 {% block content %}
@@ -134,18 +133,7 @@
                 location.href = "/customer_project_delete/?project_id=" + project_id;
             }
         }
-        function change_peoject(orderid) {
-            location.href = "/change_project/?order_id=" + orderid;
-        }
 
-        function deleteProject(orderId) {
-            if (confirm("您确定要删除么，记录删除后将无法找回")) {
-                location.href = "/delete_project?method=deleteProject&orderId=" + orderId + "";
-            }
-        }
-        function displayProject(orderId) {
-            location.href = "/display_project/?order_id=" + orderId + "";
-        }
         try {
             var index = parent.layer.getFrameIndex(window.name);
             if (index) {
@@ -153,8 +141,8 @@
                 parent.layer.close(index);
             }
         } catch (err) {
-
         }
+
         function customer_project_info(project_id) {
             location.href = "/customer_project_info/?project_id=" + project_id;
         }

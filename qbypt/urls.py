@@ -47,7 +47,7 @@ urlpatterns = [
 
     url(r'^customer_project_info/$', views.customer_project_info, name='customer_project_info'),  # 用户查看项目信息
 
-    url(r'^customer_project_alter/$', views.customer_project_alert, name='customer_project_alter'),  # 用户修改项目
+    url(r'^customer_project_alter/$', views.customer_project_alter, name='customer_project_alter'),  # 用户修改项目
 
     url(r'^customer_file_upload/$', views.customer_file_upload, name='customer_file_upload'),
 
@@ -55,7 +55,9 @@ urlpatterns = [
 
     url(r'^administrator_password_change/$', views.administrator_password_change, name='administrator_password_change'),
 
-    url(r'^customer_project_alert/$', views.customer_project_alert, name='customer_project_alert'),
+    url(r'^customer_project_alter/$', views.customer_project_alter, name='customer_project_alter'),
+
+    url(r'^customer_stl_show_list/$', views.customer_stl_show_list, name='customer_stl_show_list'),
 
     url(r'^customer_stl_show/$', views.customer_stl_show, name='customer_stl_show'),
 

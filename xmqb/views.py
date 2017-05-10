@@ -436,7 +436,7 @@ def customer_project_info(request):  # 用户查看项目
         return HttpResponse(e)
 
 
-def customer_project_alert(request):  # 用户修改项目
+def customer_project_alter(request):  # 用户修改项目
     if not request.user.is_authenticated():
         return redirect('/login')
     project_id = request.GET['project_id']
@@ -451,6 +451,15 @@ def customer_project_alert(request):  # 用户修改项目
         selected_parts = xmqb_model.ProjectPart.objects.filter(project=project)
         parts = xmqb_model.Price.objects.all()
         part_relation = xmqb_model.PartRelation.objects.all()
+        str = project.patient_address
+        strlist = str.split('-')
+        patient_address =[]
+        address = {
+            'province': strlist[0],
+            'city': strlist[1],
+            'area': strlist[2]
+        }
+        patient_address.append(address)
 
         form = xmqb_form.ProjectForm(initial={
             'project_name': project.project_name,
@@ -458,12 +467,14 @@ def customer_project_alert(request):  # 用户修改项目
             'patient_name': project.patient_name,
             'patient_sex': project.patient_sex,
             'patient_age': project.patient_age,
-            'patient_address': project.patient_address,
+            'patient_hospital':project.patient_hospital,
+            'patient_address': strlist[2],
+
             'remark': project.remark
         })
-        return render(request, 'customer_project_alert.html',
+        return render(request, 'customer_project_alter.html',
                       {'form': form, 'project': project, 'selected_parts': selected_parts, 'parts': parts,
-                       'part_relation': part_relation})
+                       'part_relation': part_relation, 'patient_address': patient_address})
 
     else:
         form = xmqb_form.ProjectForm(request.POST)
@@ -473,7 +484,9 @@ def customer_project_alert(request):  # 用户修改项目
             project.patient_name = form.cleaned_data['patient_name']
             project.patient_sex = form.cleaned_data['patient_sex']
             project.patient_age = form.cleaned_data['patient_age']
-            project.patient_address = form.cleaned_data['patient_address']
+            project.patient_hospital = form.cleaned_data['patient_hospital']
+            pro_cit = request.POST['pc']  # 获取表单中的省份和城市信息
+            project.patient_address = pro_cit + form.cleaned_data['patient_address']
             project.remark = form.cleaned_data['remark']
             project.save()
             partlist = form.cleaned_data['part']
@@ -510,7 +523,7 @@ def customer_project_alert(request):  # 用户修改项目
                         return HttpResponse('支付异常')
 
         else:
-            return render(request, 'customer_project_alert.html', {'form': form})
+            return render(request, 'customer_project_alter.html', {'form': form})
     projects = xmqb_model.Project.objects.filter(user=request.user)
     return render(request, 'customer_project_list.html', {'project': projects})
 
@@ -526,6 +539,13 @@ def customer_project_delete(request):  # 用户项目删除
         return HttpResponse("此项目不存在")
     # projects = xmqb_model.Project.objects.all()
     return redirect('/customer_project_list/')
+
+
+def customer_stl_show_list(request):  # 用户查看3D模型
+    if not request.user.is_authenticated():
+        return redirect('/login')
+    record = xmqb_model.Project.objects.filter(user_id=request.user, order__is_complete='1')
+    return render(request, 'customer_stl_show.html', {'project': record})
 
 
 def customer_stl_show(request):  # 用户查看3D模型
@@ -559,10 +579,7 @@ def customer_stl_show(request):  # 用户查看3D模型
                 return render(request, 'stl_show.html', {'project': project, 'urls': json.dumps(part_url)})
         except Exception, e:
             print e
-            pass
-
-    record = xmqb_model.Project.objects.filter(user_id=request.user, order__is_complete='1')
-    return render(request, 'customer_stl_show.html', {'project': record})
+            return HttpResponse("项目异常")
 
 
 def project_show(request):  # 项目展示

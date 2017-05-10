@@ -48,15 +48,15 @@
                                                 <a href="/customer_message_read/?message={{ foo.message }}">{{ foo.title }}</a>
                                             </td>
                                             <td>已读</td>
-                                            <td>{{ foo.send_time }}</td>
-                                            <td>{{ foo.read_time }}</td>
+                                            <td>{{ foo.send_time|date:"Y-m-d H:i:s"  }}</td>
+                                            <td>{{ foo.read_time|date:"Y-m-d H:i:s"  }}</td>
                                         {% else %}
                                             <td><b style="font-weight: 900">{{ foo.send_worker_id }}</b></td>
                                             <td><b style="font-weight: 900"><a
                                                     href="/customer_message_read/?message={{ foo.message }}">{{ foo.title }}</a></b>
                                             </td>
                                             <td><b style="font-weight: 900">未读</b></td>
-                                            <td><b style="font-weight: 900">{{ foo.send_time }}</b></td>
+                                            <td><b style="font-weight: 900">{{ foo.send_time|date:"Y-m-d H:i:s"  }}</b></td>
                                             <td><b style="font-weight: 900"></b></td>
                                         {% endif %}
                                     </tr>

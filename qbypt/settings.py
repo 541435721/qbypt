@@ -81,7 +81,7 @@ DATABASES = {
         'NAME': 'qbypt',
         'USER': 'root',
         'PASSWORD': 'root',
-        'HOST': '120.77.9.110',
+        'HOST': '127.0.0.1',
         'PORT': '3306',
     }
 }
